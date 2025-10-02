@@ -1,6 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Build script for backend
 
-cd backend
 pip install --upgrade pip
-pip install -r requirements.txt
+cd backend && pip install -r requirements.txt
