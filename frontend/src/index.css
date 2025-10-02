@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --blue-primary: #1E88E5;
+    --blue-dark: #1565C0;
+    --blue-light: #42A5F5;
+    --pink-accent: #EC4899;
+    --pink-light: #F472B6;
+    --pink-dark: #DB2777;
+    --bg-white: #FFFFFF;
+    --bg-main: #F8FAFF;
+    --bg-card: #FAFCFF;
+    --text-primary: #1A202C;
+    --text-secondary: #64748B;
+    --border-light: #E2E8F0;
+    --red-muted: #DC2626;
+    --shadow-soft: 0px 4px 10px rgba(30, 136, 229, 0.08);
+    --shadow-hover: 0px 6px 16px rgba(30, 136, 229, 0.12);
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #FAFAFC;
+    min-height: 100vh;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--border-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--blue-primary), var(--pink-accent));
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--blue-dark), var(--pink-dark));
+}
+
+/* Micro-interactions */
+.hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.hover-scale {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+/* Neumorphic shadows */
+.neomorph {
+    box-shadow: var(--shadow-soft);
+}
+
+.neomorph-hover {
+    transition: box-shadow 0.3s ease;
+}
+
+.neomorph-hover:hover {
+    box-shadow: var(--shadow-hover);
+}

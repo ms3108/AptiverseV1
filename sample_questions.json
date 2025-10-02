@@ -1,0 +1,72 @@
+[
+    {
+        "question": "If a train runs at 60 km/h for 2 hours, how far does it travel?",
+        "options": [
+            "100 km",
+            "120 km",
+            "110 km",
+            "130 km"
+        ],
+        "answer": "120 km",
+        "difficulty": "easy",
+        "topic": "quants",
+        "subtopic": "speed_distance_time",
+        "solution": "Distance = Speed × Time = 60 × 2 = 120 km"
+    },
+    {
+        "question": "A shopkeeper bought an item for $800 and sold it for $1000. What is the profit percentage?",
+        "options": [
+            "20%",
+            "25%",
+            "30%",
+            "35%"
+        ],
+        "answer": "25%",
+        "difficulty": "easy",
+        "topic": "quants",
+        "subtopic": "profit_loss",
+        "solution": "Profit = 1000 - 800 = 200. Profit% = (200/800) × 100 = 25%"
+    },
+    {
+        "question": "What is the next number in the sequence: 2, 6, 12, 20, 30, ?",
+        "options": [
+            "40",
+            "42",
+            "44",
+            "46"
+        ],
+        "answer": "42",
+        "difficulty": "medium",
+        "topic": "logical",
+        "subtopic": "number_series",
+        "solution": "Pattern: n(n+1) where n starts from 2. Next is 7(7+1) = 42"
+    },
+    {
+        "question": "Choose the word that is most opposite in meaning to 'EPHEMERAL'",
+        "options": [
+            "Permanent",
+            "Temporary",
+            "Brief",
+            "Fleeting"
+        ],
+        "answer": "Permanent",
+        "difficulty": "medium",
+        "topic": "language",
+        "subtopic": "antonyms",
+        "solution": "Ephemeral means lasting for a very short time. Permanent is the opposite."
+    },
+    {
+        "question": "If 5 machines can produce 5 products in 5 minutes, how many products can 100 machines produce in 100 minutes?",
+        "options": [
+            "100",
+            "500",
+            "1000",
+            "2000"
+        ],
+        "answer": "2000",
+        "difficulty": "hard",
+        "topic": "quants",
+        "subtopic": "work_time",
+        "solution": "Each machine produces 1 product in 5 minutes. In 100 minutes, each produces 20 products. 100 machines × 20 = 2000 products"
+    }
+]

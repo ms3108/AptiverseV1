@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: aptiverse_db
+    environment:
+      POSTGRES_USER: aptiverse
+      POSTGRES_PASSWORD: aptiverse123
+      POSTGRES_DB: aptiverse_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aptiverse" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aptiverse_backend
+    environment:
+      DATABASE_URL: postgresql://aptiverse:aptiverse123@db:5432/aptiverse_db
+      WEAVIATE_URL: http://weaviate:8080
+      SECRET_KEY: your-secret-key-change-in-production-make-it-long-and-random
+      GMAIL_USER: ${GMAIL_USER:-your-gmail@gmail.com}
+      GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD:-your-gmail-app-password}
+      SKIP_EMAIL_VERIFICATION: ${SKIP_EMAIL_VERIFICATION:-false}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      weaviate:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    container_name: aptiverse_weaviate
+    ports:
+      - "8080:8080"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      CLUSTER_HOSTNAME: 'node1'
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aptiverse_frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - WATCHPACK_POLLING=true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  weaviate_data:
