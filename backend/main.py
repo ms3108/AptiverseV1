@@ -254,13 +254,14 @@ def get_dashboard_stats(
             })
     
     # Get activity data for heatmap (last 365 days)
+    # Use func.date to extract date from datetime for proper comparison
     end_date = datetime.utcnow().date()
     start_date = end_date - timedelta(days=365)
     
     activity_logs = db.query(models.ActivityLog).filter(
         models.ActivityLog.user_id == current_user.id,
-        models.ActivityLog.activity_date >= start_date,
-        models.ActivityLog.activity_date <= end_date
+        func.date(models.ActivityLog.activity_date) >= start_date,
+        func.date(models.ActivityLog.activity_date) <= end_date
     ).all()
     
     activity_data = {}
