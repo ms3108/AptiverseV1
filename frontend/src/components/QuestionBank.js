@@ -319,7 +319,13 @@ function QuestionBank() {
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-800">{selectedTopic}</h1>
-                        <p className="text-gray-600">{questions.length} questions</p>
+                        <p className="text-gray-600">
+                            {questionsLoading ? (
+                                <span className="animate-pulse">Loading questions...</span>
+                            ) : (
+                                `${questions.length} question${questions.length !== 1 ? 's' : ''}`
+                            )}
+                        </p>
                     </div>
                 </div>
 
