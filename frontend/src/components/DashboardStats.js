@@ -253,58 +253,58 @@ function DashboardStats() {
 }
 
 // Activity Heatmap Component
-function ActivityHeatmap({ activityData }) {
-    // Generate last 84 days (12 weeks), organized by weeks
+function ActivityHeatmap({ activityData = {} }) {
+    // Generate 12 weeks of data ending with the current week (Monday start)
     const generateHeatmapData = () => {
-        const today = new Date();
-        const startDate = new Date(today);
-        startDate.setDate(today.getDate() - 83); // Go back 12 weeks
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-        // Align to the start of the week (Monday)
-        const startDayOfWeek = startDate.getDay();
-        const daysToMonday = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
-        startDate.setDate(startDate.getDate() - daysToMonday);
+        const startOfWeek = new Date(today);
+        const dayOfWeek = startOfWeek.getDay();
+        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        startOfWeek.setDate(startOfWeek.getDate() + diffToMonday);
 
+        const startDate = new Date(startOfWeek);
+        startDate.setDate(startDate.getDate() - (7 * 11)); // 11 weeks back so we have 12 including current week
+
+        const totalDays = 7 * 12;
         const weeks = [];
-        let currentWeek = [];
-        let currentDate = new Date(startDate);
+        let currentWeek = new Array(7).fill(null);
 
-        for (let i = 0; i < 84; i++) {
+        for (let i = 0; i < totalDays; i++) {
+            const currentDate = new Date(startDate);
+            currentDate.setDate(startDate.getDate() + i);
             const dateStr = currentDate.toISOString().split('T')[0];
-            let dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
 
-            // Convert to Monday = 1, Tuesday = 2, ..., Sunday = 0 at the end
-            dayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
+            const normalizedDay = currentDate.getDay() === 0 ? 7 : currentDate.getDay();
 
-            const activity = activityData[dateStr];
-            currentWeek.push({
-                date: dateStr,
-                dayOfWeek: dayOfWeek,
-                questions: activity ? activity.questions_solved : 0,
-                xp: activity ? activity.xp_earned : 0
-            });
-
-            // Start new week after Sunday (dayOfWeek === 7)
-            if (dayOfWeek === 7 && currentWeek.length === 7) {
+            if (normalizedDay === 1 && currentWeek.some(cell => cell !== null)) {
                 weeks.push(currentWeek);
-                currentWeek = [];
+                currentWeek = new Array(7).fill(null);
             }
 
-            currentDate.setDate(currentDate.getDate() + 1);
+            const activity = activityData[dateStr];
+            currentWeek[normalizedDay - 1] = {
+                date: dateStr,
+                dayOfWeek: normalizedDay,
+                questions: activity ? activity.questions_solved : 0,
+                xp: activity ? activity.xp_earned : 0,
+                isFuture: currentDate > today
+            };
         }
 
-        // Push any remaining days
-        if (currentWeek.length > 0) {
-            weeks.push(currentWeek);
-        }
-
+        weeks.push(currentWeek);
         return weeks;
     };
 
     const weeks = generateHeatmapData();
 
     // Get color intensity based on questions solved - blue to pink gradient
-    const getColorStyle = (questions) => {
+    const getColorStyle = (day) => {
+        if (!day) return { backgroundColor: '#E2E8F0' };
+        if (day.isFuture) return { backgroundColor: '#E2E8F0', opacity: 0.4 };
+
+        const { questions } = day;
         if (questions === 0) return { backgroundColor: '#E2E8F0' };
         if (questions <= 3) return { backgroundColor: 'rgba(30, 136, 229, 0.3)' }; // Light blue
         if (questions <= 6) return { backgroundColor: 'rgba(30, 136, 229, 0.6)' }; // Medium blue
@@ -312,7 +312,15 @@ function ActivityHeatmap({ activityData }) {
         return { backgroundColor: '#EC4899' }; // Full pink
     };
 
-    const dayLabels = ['Mon', 'Wed', 'Fri'];  // Show only Mon, Wed, Fri labels
+    const dayLabels = {
+        1: 'Mon',
+        2: 'Tue',
+        3: 'Wed',
+        4: 'Thu',
+        5: 'Fri',
+        6: 'Sat',
+        7: 'Sun'
+    };
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     return (
@@ -322,8 +330,9 @@ function ActivityHeatmap({ activityData }) {
                 <div className="flex gap-1 mb-2">
                     <div className="w-12"></div>
                     {weeks.map((week, weekIndex) => {
-                        if (!week || !week[0]) return <div key={weekIndex} style={{ width: '14px' }}></div>;
-                        const firstDay = new Date(week[0].date);
+                        const firstDayEntry = week ? week.find(day => day) : null;
+                        if (!firstDayEntry) return <div key={weekIndex} style={{ width: '14px' }}></div>;
+                        const firstDay = new Date(firstDayEntry.date);
                         const showMonth = weekIndex === 0 || firstDay.getDate() <= 7;
                         return (
                             <div key={weekIndex} className="flex flex-col items-center" style={{ width: '14px' }}>
@@ -338,18 +347,18 @@ function ActivityHeatmap({ activityData }) {
                 </div>
 
                 {/* Heatmap grid - rows are days of week, columns are weeks */}
-                {[1, 2, 3, 4, 5].map((dayOfWeek, rowIndex) => (
+                {[1, 2, 3, 4, 5, 6, 7].map((dayOfWeek) => (
                     <div key={dayOfWeek} className="flex gap-1 items-center">
                         <div className="w-12 text-xs font-medium" style={{ color: '#64748B' }}>
-                            {rowIndex === 0 ? 'Mon' : rowIndex === 2 ? 'Wed' : rowIndex === 4 ? 'Fri' : ''}
+                            {dayLabels[dayOfWeek]}
                         </div>
                         {weeks.map((week, weekIndex) => {
-                            const day = week.find(d => d && d.dayOfWeek === dayOfWeek);
+                            const day = week ? week[dayOfWeek - 1] : null;
                             if (!day) return <div key={weekIndex} style={{ width: '14px', height: '14px' }}></div>;
 
                             // Position tooltip below for top rows (0, 1), above for bottom rows (2, 3, 4)
                             // Also handle left/right edges for better visibility
-                            const isTopRow = rowIndex <= 1;
+                            const isTopRow = dayOfWeek <= 3;
                             const isLeftEdge = weekIndex < 2;
                             const isRightEdge = weekIndex >= weeks.length - 2;
 
@@ -369,18 +378,20 @@ function ActivityHeatmap({ activityData }) {
                             return (
                                 <div
                                     key={weekIndex}
-                                    className="cursor-pointer transition-all relative group"
+                                    className={`transition-all relative group ${day.isFuture ? 'cursor-default' : 'cursor-pointer'}`}
                                     style={{
                                         width: '14px',
                                         height: '14px',
                                         borderRadius: '3px',
-                                        ...getColorStyle(day.questions),
+                                        ...getColorStyle(day),
                                         transform: 'scale(1)',
                                         boxShadow: day.questions > 0 ? '0 1px 3px rgba(30, 136, 229, 0.2)' : 'none'
                                     }}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'scale(1.4)';
-                                        e.currentTarget.style.zIndex = '10';
+                                        if (!day.isFuture) {
+                                            e.currentTarget.style.transform = 'scale(1.4)';
+                                            e.currentTarget.style.zIndex = '10';
+                                        }
                                     }}
                                     onMouseLeave={(e) => {
                                         e.currentTarget.style.transform = 'scale(1)';
@@ -388,15 +399,21 @@ function ActivityHeatmap({ activityData }) {
                                     }}
                                 >
                                     {/* Tooltip - position dynamically based on row */}
-                                    <div className={`${tooltipClasses} px-3 py-2 text-xs font-medium text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap`}
+                                    <div className={`${tooltipClasses} px-3 py-2 text-xs font-medium text-white rounded-lg opacity-0 ${day.isFuture ? '' : 'group-hover:opacity-100'} transition-opacity pointer-events-none whitespace-nowrap`}
                                         style={{
                                             backgroundColor: '#1F2937',
                                             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                                             zIndex: '50'
                                         }}>
                                         <div className="font-semibold mb-1">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
-                                        <div style={{ color: '#60A5FA' }}>{day.questions} question{day.questions !== 1 ? 's' : ''}</div>
-                                        <div style={{ color: '#F472B6' }}>{day.xp} XP</div>
+                                        {day.isFuture ? (
+                                            <div style={{ color: '#94A3B8' }}>Upcoming</div>
+                                        ) : (
+                                            <>
+                                                <div style={{ color: '#60A5FA' }}>{day.questions} question{day.questions !== 1 ? 's' : ''}</div>
+                                                <div style={{ color: '#F472B6' }}>{day.xp} XP</div>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             );

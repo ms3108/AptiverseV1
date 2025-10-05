@@ -13,7 +13,9 @@ function QuestionDetail() {
     const [isAnswered, setIsAnswered] = useState(false);
     const [answerResult, setAnswerResult] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [startTime] = useState(Date.now());
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
+    const [startTime, setStartTime] = useState(Date.now());
 
     // Get navigation state if available
     const navigationState = location.state;
@@ -30,6 +32,11 @@ function QuestionDetail() {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setQuestion(response.data);
+            setSelectedAnswer('');
+            setIsAnswered(false);
+            setAnswerResult(null);
+            setSubmitError('');
+            setStartTime(Date.now());
             setLoading(false);
         } catch (err) {
             console.error('Failed to load question', err);
@@ -38,7 +45,7 @@ function QuestionDetail() {
     };
 
     const handleAnswerSelect = (option) => {
-        if (!isAnswered) {
+        if (!isAnswered && !isSubmitting) {
             setSelectedAnswer(option);
         }
     };
@@ -52,6 +59,8 @@ function QuestionDetail() {
         const timeTaken = (Date.now() - startTime) / 1000;
 
         try {
+            setSubmitError('');
+            setIsSubmitting(true);
             const token = localStorage.getItem('token');
             const response = await axios.post(
                 `${API_URL}/submit-answer`,
@@ -65,11 +74,25 @@ function QuestionDetail() {
 
             setAnswerResult(response.data);
             setIsAnswered(true);
-
-            // Refresh question to update solved status
-            fetchQuestionDetail();
+            setQuestion((prev) => {
+                if (!prev) {
+                    return prev;
+                }
+                const attemptCount = (prev.attempt_count || 0) + 1;
+                return {
+                    ...prev,
+                    attempt_count: attemptCount,
+                    solved: prev.solved || response.data.is_correct,
+                    correct_answer: response.data.correct_answer || prev.correct_answer,
+                    explanation: response.data.explanation || prev.explanation
+                };
+            });
         } catch (err) {
-            alert('Error submitting answer: ' + (err.response?.data?.detail || err.message));
+            const message = err.response?.data?.detail || err.message || 'Unknown error';
+            setSubmitError(`Error submitting answer: ${message}`);
+        }
+        finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -235,13 +258,21 @@ function QuestionDetail() {
                     {!isAnswered && !question.solved ? (
                         <button
                             onClick={handleSubmitAnswer}
-                            disabled={!selectedAnswer}
-                            className={`px-6 py-2 rounded-lg font-semibold transition ${selectedAnswer
+                            disabled={!selectedAnswer || isSubmitting}
+                            className={`px-6 py-2 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${selectedAnswer && !isSubmitting
                                 ? 'bg-blue-600 text-white hover:bg-blue-700'
                                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 }`}
+                            aria-busy={isSubmitting}
                         >
-                            Submit Answer
+                            {isSubmitting ? (
+                                <>
+                                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                    <span>Submitting…</span>
+                                </>
+                            ) : (
+                                'Submit Answer'
+                            )}
                         </button>
                     ) : (
                         <button
@@ -261,6 +292,14 @@ function QuestionDetail() {
             />
         </div>
     );
+    {
+        submitError && (
+            <div className="mt-4 p-3 rounded bg-red-50 border border-red-200 text-sm text-red-700">
+                {submitError}
+            </div>
+        )
+    }
+
 }
 
 export default QuestionDetail;
