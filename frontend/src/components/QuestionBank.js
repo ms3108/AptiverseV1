@@ -88,12 +88,15 @@ function QuestionBank() {
 
         const cacheKey = params.toString();
         const cached = questionCacheRef.current.get(cacheKey);
+
+        // If we have cached data, set both questions and loading state synchronously
         if (cached) {
             setQuestions(cached);
             setQuestionsLoading(false);
             return;
         }
 
+        // No cache - start loading
         try {
             setQuestionsLoading(true);
             const token = localStorage.getItem('token');
@@ -131,6 +134,10 @@ function QuestionBank() {
         setSearchParams(params);
 
         if (selectedCategory || selectedTopic) {
+            // Clear previous questions immediately when topic/category changes
+            setQuestions([]);
+            setQuestionsLoading(true);
+
             const controller = new AbortController();
             fetchQuestions(controller.signal);
             return () => controller.abort();
