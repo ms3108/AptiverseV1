@@ -21,6 +21,7 @@ function QuestionBank() {
     });
     const [questionsLoading, setQuestionsLoading] = useState(false);
     const [hasLoadedQuestions, setHasLoadedQuestions] = useState(false);
+    const [error, setError] = useState(null);
     const questionCacheRef = useRef(new Map());
     const navigate = useNavigate();
 
@@ -90,19 +91,17 @@ function QuestionBank() {
         const cacheKey = params.toString();
         const cached = questionCacheRef.current.get(cacheKey);
 
-        // Always set loading to true when starting fetch
-        setQuestionsLoading(true);
-
-        // If we have cached data, return it immediately
+        // If we have cached data, return it immediately WITHOUT showing loading state
         if (cached) {
-            // Use requestAnimationFrame to ensure state updates happen in correct order
-            requestAnimationFrame(() => {
-                setQuestions(cached);
-                setQuestionsLoading(false);
-                setHasLoadedQuestions(true);
-            });
+            setQuestions(cached);
+            setQuestionsLoading(false);
+            setHasLoadedQuestions(true);
             return;
         }
+
+        // No cache - show loading state and fetch from API
+        setQuestionsLoading(true);
+        setError(null);
 
         // No cache - fetch from API
         try {
@@ -125,6 +124,8 @@ function QuestionBank() {
         } catch (err) {
             if (!axios.isCancel(err)) {
                 console.error('Failed to load questions', err);
+                setError('Unable to load questions right now. Please try again.');
+                setHasLoadedQuestions(true);
             }
             setQuestionsLoading(false);
         }
@@ -145,6 +146,7 @@ function QuestionBank() {
             // Reset loaded state when changing topic/category
             setHasLoadedQuestions(false);
             setQuestions([]);
+            setError(null);
 
             const controller = new AbortController();
             fetchQuestions(controller.signal);
@@ -327,7 +329,7 @@ function QuestionBank() {
                     <div>
                         <h1 className="text-3xl font-bold text-gray-800">{selectedTopic}</h1>
                         <p className="text-gray-600">
-                            {questionsLoading ? (
+                            {(questionsLoading || !hasLoadedQuestions) ? (
                                 <span className="animate-pulse">Loading questions...</span>
                             ) : (
                                 `${questions.length} question${questions.length !== 1 ? 's' : ''}`
@@ -411,7 +413,7 @@ function QuestionBank() {
                     </>
                 )}
 
-                {!questionsLoading && (
+                {!questionsLoading && !error && hasLoadedQuestions && (
                     <div className="space-y-4">
                         {questions.map((question) => (
                             <div
@@ -466,13 +468,20 @@ function QuestionBank() {
                     </div>
                 )}
 
-                {!questionsLoading && questions.length === 0 && (
+                {!questionsLoading && hasLoadedQuestions && !error && questions.length === 0 && (
                     <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                         <div className="text-6xl mb-4">🔍</div>
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">No Questions Found</h3>
                         <p className="text-gray-600">
                             No questions match your current filters. Try adjusting the difficulty or sort options.
                         </p>
+                    </div>
+                )}
+
+                {!questionsLoading && error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-6">
+                        <h3 className="text-lg font-semibold mb-2">We ran into an issue</h3>
+                        <p>{error}</p>
                     </div>
                 )}
             </div>
