@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import API_URL from '../config/api';
 import { useSearchParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -21,7 +22,7 @@ function VerifyEmail() {
 
     const verifyEmail = async () => {
         try {
-            const response = await axios.get(`http://localhost:8000/verify-email?token=${token}`);
+            const response = await axios.get(`${API_URL}/verify-email?token=${token}`);
             setStatus('success');
             setMessage(response.data.message);
         } catch (error) {
@@ -134,3 +135,4 @@ function VerifyEmail() {
 }
 
 export default VerifyEmail;
+

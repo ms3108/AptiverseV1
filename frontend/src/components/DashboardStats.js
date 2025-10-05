@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import axios from 'axios';
 
 function DashboardStats() {
@@ -13,7 +14,7 @@ function DashboardStats() {
     const fetchDashboardStats = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8000/dashboard/stats', {
+            const response = await axios.get('${API_URL}/dashboard/stats', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStats(response.data);
@@ -421,3 +422,4 @@ function ActivityHeatmap({ activityData }) {
 }
 
 export default DashboardStats;
+

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import { useAuth } from '../context/AuthContext';
 import Navigation from './Navigation';
 import axios from 'axios';
@@ -18,7 +19,7 @@ function Settings() {
 
     const fetchPreferences = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/user/preferences', {
+            const response = await axios.get('${API_URL}/user/preferences', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDailyPracticeCount(response.data.daily_practice_count);
@@ -41,7 +42,7 @@ function Settings() {
 
         try {
             const response = await axios.put(
-                `http://localhost:8000/user/preferences?daily_practice_count=${dailyPracticeCount}`,
+                `${API_URL}/user/preferences?daily_practice_count=${dailyPracticeCount}`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -185,3 +186,4 @@ function Settings() {
 }
 
 export default Settings;
+

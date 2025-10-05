@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 
 function WarningsModal({ isOpen, onClose }) {
     const [warnings, setWarnings] = useState([]);
@@ -13,7 +14,7 @@ function WarningsModal({ isOpen, onClose }) {
     const fetchWarnings = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8000/warnings', {
+            const response = await fetch('${API_URL}/warnings', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -33,7 +34,7 @@ function WarningsModal({ isOpen, onClose }) {
     const markAsRead = async (warningId) => {
         try {
             const token = localStorage.getItem('token');
-            await fetch(`http://localhost:8000/warnings/${warningId}/mark-read`, {
+            await fetch(`${API_URL}/warnings/${warningId}/mark-read`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -162,3 +163,4 @@ function WarningsModal({ isOpen, onClose }) {
 }
 
 export default WarningsModal;
+

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import DiscussionSection from './DiscussionSection';
@@ -25,7 +26,7 @@ function QuestionDetail() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `http://localhost:8000/question-bank/question/${questionId}`,
+                `${API_URL}/question-bank/question/${questionId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setQuestion(response.data);
@@ -53,7 +54,7 @@ function QuestionDetail() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                'http://localhost:8000/submit-answer',
+                '${API_URL}/submit-answer',
                 {
                     question_id: question.id,
                     user_answer: selectedAnswer,
@@ -263,3 +264,4 @@ function QuestionDetail() {
 }
 
 export default QuestionDetail;
+

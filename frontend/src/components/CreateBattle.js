@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navigation from './Navigation';
@@ -18,7 +19,7 @@ function CreateBattle() {
 
     const fetchTopics = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/battles/topics');
+            const response = await axios.get('${API_URL}/battles/topics');
             setTopics(response.data.topics);
             if (response.data.topics.length > 0) {
                 setSelectedTopic(response.data.topics[0].topic);
@@ -36,7 +37,7 @@ function CreateBattle() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                'http://localhost:8000/battles/create',
+                '${API_URL}/battles/create',
                 {
                     topic: selectedTopic,
                     num_questions: numQuestions,
@@ -47,7 +48,7 @@ function CreateBattle() {
 
             // Join the battle room
             await axios.post(
-                `http://localhost:8000/battles/${response.data.room_code}/join`,
+                `${API_URL}/battles/${response.data.room_code}/join`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -235,3 +236,4 @@ function CreateBattle() {
 }
 
 export default CreateBattle;
+

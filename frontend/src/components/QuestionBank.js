@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navigation from './Navigation';
@@ -40,7 +41,7 @@ function QuestionBank() {
     const fetchCategories = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8000/question-bank/categories', {
+            const response = await axios.get('${API_URL}/question-bank/categories', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCategories(response.data.categories);
@@ -63,7 +64,7 @@ function QuestionBank() {
             params.append('sort_order', filters.sortOrder);
 
             const response = await axios.get(
-                `http://localhost:8000/question-bank/questions?${params.toString()}`,
+                `${API_URL}/question-bank/questions?${params.toString()}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setQuestions(response.data.questions);
@@ -341,3 +342,4 @@ function QuestionBank() {
 }
 
 export default QuestionBank;
+

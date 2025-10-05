@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navigation from './Navigation';
@@ -16,7 +17,7 @@ function BattleHistory() {
     const fetchBattleHistory = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8000/battles/history', {
+            const response = await axios.get('${API_URL}/battles/history', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBattles(response.data.battles);
@@ -272,3 +273,4 @@ function BattleHistory() {
 }
 
 export default BattleHistory;
+

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import axios from 'axios';
 
 function DiscussionSection({ questionId, isSolved }) {
@@ -21,7 +22,7 @@ function DiscussionSection({ questionId, isSolved }) {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `http://localhost:8000/discussions/${questionId}`,
+                `${API_URL}/discussions/${questionId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setDiscussions(response.data.discussions);
@@ -46,7 +47,7 @@ function DiscussionSection({ questionId, isSolved }) {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                'http://localhost:8000/discussions',
+                '${API_URL}/discussions',
                 {
                     question_id: questionId,
                     content: newDiscussion.trim()
@@ -67,7 +68,7 @@ function DiscussionSection({ questionId, isSolved }) {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                `http://localhost:8000/discussions/${discussionId}/vote?vote_type=${voteType}`,
+                `${API_URL}/discussions/${discussionId}/vote?vote_type=${voteType}`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -96,7 +97,7 @@ function DiscussionSection({ questionId, isSolved }) {
         try {
             const token = localStorage.getItem('token');
             await axios.delete(
-                `http://localhost:8000/discussions/${discussionId}`,
+                `${API_URL}/discussions/${discussionId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -116,7 +117,7 @@ function DiscussionSection({ questionId, isSolved }) {
         try {
             const token = localStorage.getItem('token');
             await axios.post(
-                `http://localhost:8000/discussions/${reportModal.discussionId}/report`,
+                `${API_URL}/discussions/${reportModal.discussionId}/report`,
                 { reason: reportReason.trim() },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -436,3 +437,4 @@ function DiscussionSection({ questionId, isSolved }) {
 }
 
 export default DiscussionSection;
+

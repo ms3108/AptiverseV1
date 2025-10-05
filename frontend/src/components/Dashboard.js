@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import DashboardStats from './DashboardStats';
@@ -20,7 +21,7 @@ function Dashboard() {
     const fetchNotificationCount = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8000/warnings', {
+            const response = await fetch('${API_URL}/warnings', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -176,3 +177,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

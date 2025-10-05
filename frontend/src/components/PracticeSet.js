@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navigation from './Navigation';
@@ -24,7 +25,7 @@ function PracticeSet() {
     const fetchPracticeSet = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8000/daily-practice', {
+            const response = await axios.get('${API_URL}/daily-practice', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -63,7 +64,7 @@ function PracticeSet() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                'http://localhost:8000/submit-answer',
+                '${API_URL}/submit-answer',
                 {
                     question_id: currentQuestion.id,
                     user_answer: selectedAnswer,
@@ -380,3 +381,4 @@ function PracticeSet() {
 }
 
 export default PracticeSet;
+

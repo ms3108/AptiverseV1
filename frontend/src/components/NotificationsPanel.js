@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 
 function NotificationsPanel({ isOpen, onClose, anchorEl }) {
     const [notifications, setNotifications] = useState([]);
@@ -16,12 +17,12 @@ function NotificationsPanel({ isOpen, onClose, anchorEl }) {
             const token = localStorage.getItem('token');
 
             // Fetch warnings
-            const warningsResponse = await fetch('http://localhost:8000/warnings', {
+            const warningsResponse = await fetch('${API_URL}/warnings', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
             // Fetch badges (recent earned badges)
-            const statsResponse = await fetch('http://localhost:8000/dashboard/stats', {
+            const statsResponse = await fetch('${API_URL}/dashboard/stats', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -87,7 +88,7 @@ function NotificationsPanel({ isOpen, onClose, anchorEl }) {
     const markWarningAsRead = async (warningId) => {
         try {
             const token = localStorage.getItem('token');
-            await fetch(`http://localhost:8000/warnings/${warningId}/mark-read`, {
+            await fetch(`${API_URL}/warnings/${warningId}/mark-read`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -269,3 +270,4 @@ function NotificationsPanel({ isOpen, onClose, anchorEl }) {
 }
 
 export default NotificationsPanel;
+

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import WarningsModal from './WarningsModal';
+import API_URL from '../config/api';
 
 function Navigation() {
     const navigate = useNavigate();
@@ -19,7 +20,7 @@ function Navigation() {
     const fetchWarningsCount = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8000/warnings', {
+            const response = await fetch(`${API_URL}/warnings`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

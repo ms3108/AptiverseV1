@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Navigation from './Navigation';
@@ -24,7 +25,7 @@ function JoinBattle() {
 
             // First, check if battle exists and get info
             const infoResponse = await axios.get(
-                `http://localhost:8000/battles/${code}/info`,
+                `${API_URL}/battles/${code}/info`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -37,7 +38,7 @@ function JoinBattle() {
 
             // Join the battle
             await axios.post(
-                `http://localhost:8000/battles/${code}/join`,
+                `${API_URL}/battles/${code}/join`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -95,3 +96,4 @@ function JoinBattle() {
 }
 
 export default JoinBattle;
+

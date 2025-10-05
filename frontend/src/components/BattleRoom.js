@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import API_URL from '../config/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -45,7 +46,7 @@ function BattleRoom() {
         try {
             const token = localStorage.getItem('token');
             console.log('🔑 Token exists:', !!token);
-            const response = await axios.get(`http://localhost:8000/battles/${roomCode}/info`, {
+            const response = await axios.get(`${API_URL}/battles/${roomCode}/info`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log('✅ Battle info received:', response.data);
@@ -68,12 +69,12 @@ function BattleRoom() {
                 // Auto-join if not a participant
                 try {
                     await axios.post(
-                        `http://localhost:8000/battles/${roomCode}/join`,
+                        `${API_URL}/battles/${roomCode}/join`,
                         {},
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
                     // Refetch battle info after joining
-                    const updatedResponse = await axios.get(`http://localhost:8000/battles/${roomCode}/info`, {
+                    const updatedResponse = await axios.get(`${API_URL}/battles/${roomCode}/info`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setBattleInfo(updatedResponse.data);
@@ -119,7 +120,10 @@ function BattleRoom() {
 
     const connectWebSocket = () => {
         const token = localStorage.getItem('token');
-        const wsUrl = `ws://localhost:8000/ws/battle/${roomCode}?token=${token}`;
+        // Convert HTTP API URL to WebSocket URL
+        const wsProtocol = API_URL.startsWith('https') ? 'wss' : 'ws';
+        const wsHost = API_URL.replace(/^https?:\/\//, '');
+        const wsUrl = `${wsProtocol}://${wsHost}/ws/battle/${roomCode}?token=${token}`;
         console.log('🔌 Connecting to WebSocket:', wsUrl);
 
         ws.current = new WebSocket(wsUrl);
@@ -662,3 +666,4 @@ function BattleRoom() {
 }
 
 export default BattleRoom;
+

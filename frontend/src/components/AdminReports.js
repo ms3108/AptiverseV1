@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import Navigation from './Navigation';
 
@@ -16,7 +17,7 @@ function AdminReports() {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
-                `http://localhost:8000/admin/reports?status=${filter === 'all' ? '' : filter}`,
+                `${API_URL}/admin/reports?status=${filter === 'all' ? '' : filter}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -41,7 +42,7 @@ function AdminReports() {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
-                `http://localhost:8000/admin/reports/${reportId}/resolve`,
+                `${API_URL}/admin/reports/${reportId}/resolve`,
                 {
                     method: 'POST',
                     headers: {
@@ -266,3 +267,4 @@ function AdminReports() {
 }
 
 export default AdminReports;
+
