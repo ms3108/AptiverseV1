@@ -1,105 +1,106 @@
-"""
-ML Service for predicting weak areas and generating personalized practice sets
-"""
-import numpy as np
-import pandas as pd
-from sklearn.naive_bayes import GaussianNB
+"""Utilities for building daily practice sets without heavyweight dependencies."""
+from collections import defaultdict
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Tuple
+
 from sqlalchemy.orm import Session
-from sqlalchemy import func
-from typing import List, Dict
+from sqlalchemy.sql import func  # type: ignore
+
 import models
 
+# Simple in-process caches to avoid recomputing expensive lookups repeatedly.
+_weak_topic_cache: Dict[int, Tuple[datetime, List[str]]] = {}
+_practice_set_cache: Dict[Tuple[int, int], Tuple[datetime, List[int]]] = {}
 
-def get_user_performance_data(db: Session, user_id: int) -> pd.DataFrame:
+
+def _get_cached_topics(user_id: int, ttl_seconds: int) -> Optional[List[str]]:
+    cached = _weak_topic_cache.get(user_id)
+    if not cached:
+        return None
+    timestamp, topics = cached
+    if datetime.utcnow() - timestamp > timedelta(seconds=ttl_seconds):
+        _weak_topic_cache.pop(user_id, None)
+        return None
+    return topics
+
+
+def _set_cached_topics(user_id: int, topics: List[str]) -> None:
+    _weak_topic_cache[user_id] = (datetime.utcnow(), topics)
+
+
+def _get_cached_practice(user_id: int, num_questions: int, ttl_seconds: int) -> Optional[List[int]]:
+    cached = _practice_set_cache.get((user_id, num_questions))
+    if not cached:
+        return None
+    timestamp, question_ids = cached
+    if datetime.utcnow() - timestamp > timedelta(seconds=ttl_seconds):
+        _practice_set_cache.pop((user_id, num_questions), None)
+        return None
+    return question_ids
+
+
+def _set_cached_practice(user_id: int, num_questions: int, question_ids: List[int]) -> None:
+    _practice_set_cache[(user_id, num_questions)] = (datetime.utcnow(), question_ids)
+
+
+def predict_weak_areas(db: Session, user_id: int, threshold: float = 60.0) -> List[str]:
     """
-    Fetch user's question attempt history and convert to DataFrame
+    Identify weak topics using lightweight aggregates instead of pandas/sklearn.
     """
+    cached_topics = _get_cached_topics(user_id, ttl_seconds=600)
+    if cached_topics is not None:
+        return cached_topics
+
     attempts = db.query(
         models.QuestionAttempt,
-        models.Question.topic,
-        models.Question.difficulty
+        models.Question.topic
     ).join(
         models.Question
     ).filter(
         models.QuestionAttempt.user_id == user_id
     ).all()
-    
+
     if not attempts:
-        return pd.DataFrame()
-    
-    data = []
-    for attempt, topic, difficulty in attempts:
-        data.append({
-            'topic': topic,
-            'difficulty': difficulty,
-            'is_correct': int(attempt.is_correct),
-            'time_taken': attempt.time_taken_seconds,
-            'attempt_count': attempt.attempt_count
-        })
-    
-    return pd.DataFrame(data)
-
-
-def calculate_topic_accuracy(df: pd.DataFrame) -> Dict[str, float]:
-    """
-    Calculate accuracy percentage for each topic
-    """
-    if df.empty:
-        return {}
-    
-    topic_stats = df.groupby('topic').agg({
-        'is_correct': ['sum', 'count']
-    })
-    
-    accuracy = {}
-    for topic in topic_stats.index:
-        correct = topic_stats.loc[topic, ('is_correct', 'sum')]
-        total = topic_stats.loc[topic, ('is_correct', 'count')]
-        accuracy[topic] = (correct / total) * 100 if total > 0 else 0
-    
-    return accuracy
-
-
-def predict_weak_areas(db: Session, user_id: int, threshold: float = 60.0) -> List[str]:
-    """
-    Use Naive Bayes to identify weak topics based on:
-    - Accuracy
-    - Time taken
-    - Attempt count
-    
-    Returns list of weak topics
-    """
-    df = get_user_performance_data(db, user_id)
-    
-    if df.empty:
-        # New user - return all topics for balanced practice
+        # New user - return a balanced sampling of topics
         all_topics = db.query(models.Question.topic).distinct().limit(5).all()
-        return [topic[0] for topic in all_topics]
-    
-    # Calculate topic-level features
-    topic_features = df.groupby('topic').agg({
-        'is_correct': 'mean',  # Accuracy
-        'time_taken': 'mean',   # Avg time
-        'attempt_count': 'mean' # Avg attempts
-    }).reset_index()
-    
-    # Identify weak areas (accuracy below threshold)
-    weak_topics = topic_features[topic_features['is_correct'] < (threshold / 100)]['topic'].tolist()
-    
+        topics = [topic[0] for topic in all_topics]
+        _set_cached_topics(user_id, topics)
+        return topics
+
+    topic_stats: Dict[str, Dict[str, float]] = defaultdict(lambda: {
+        "correct": 0,
+        "total": 0,
+        "time": 0.0,
+        "attempts": 0.0,
+    })
+
+    for attempt, topic in attempts:
+        stats = topic_stats[topic]
+        stats["total"] += 1
+        if attempt.is_correct:
+            stats["correct"] += 1
+        stats["time"] += float(attempt.time_taken_seconds or 0)
+        stats["attempts"] += float(attempt.attempt_count or 0)
+
+    weak_topics: List[str] = []
+    accuracy_threshold = threshold / 100.0
+
+    for topic, stats in topic_stats.items():
+        if stats["total"] == 0:
+            continue
+        accuracy = stats["correct"] / stats["total"]
+        if accuracy < accuracy_threshold:
+            weak_topics.append(topic)
+
     if not weak_topics:
-        # If no weak areas, focus on least practiced topics
-        topic_counts = df['topic'].value_counts()
-        all_topics = db.query(models.Question.topic).distinct().all()
-        all_topic_names = [t[0] for t in all_topics]
-        
-        # Find topics with least practice
-        least_practiced = [t for t in all_topic_names if t not in topic_counts.index]
-        if least_practiced:
-            return least_practiced[:3]
-        
-        # Return topics with lowest count
-        return topic_counts.tail(3).index.tolist()
-    
+        # No weak topics determined by accuracy. Use least practiced topics.
+        sorted_topics = sorted(
+            topic_stats.items(),
+            key=lambda item: (item[1]["total"], -item[1]["correct"]),
+        )
+        weak_topics = [topic for topic, _ in sorted_topics[:3]]
+
+    _set_cached_topics(user_id, weak_topics)
     return weak_topics
 
 
@@ -178,12 +179,20 @@ def generate_daily_practice_set(
     
     Returns list of Question objects
     """
-    from sqlalchemy import func as sql_func
-    
     # Get user's preferred practice count
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if num_questions is None:
         num_questions = user.daily_practice_count if user else 10
+
+    cached_question_ids = _get_cached_practice(user_id, num_questions, ttl_seconds=300)
+    if cached_question_ids:
+        questions = db.query(models.Question).filter(
+            models.Question.id.in_(cached_question_ids)
+        ).all()
+        question_map = {q.id: q for q in questions}
+        ordered_questions = [question_map[qid] for qid in cached_question_ids if qid in question_map]
+        if len(ordered_questions) == len(cached_question_ids):
+            return ordered_questions
     
     # Get weak topics using ML
     weak_topics = predict_weak_areas(db, user_id)
@@ -234,7 +243,7 @@ def generate_daily_practice_set(
             models.Question.topic.in_(weak_topics),
             ~models.Question.id.in_(exclude_ids) if exclude_ids else True
         ).order_by(
-            sql_func.random()
+            func.random()
         ).limit(remaining_count).all()
         
         selected_questions.extend(weak_topic_qs)
@@ -245,12 +254,14 @@ def generate_daily_practice_set(
         random_qs = db.query(models.Question).filter(
             ~models.Question.id.in_(exclude_ids) if exclude_ids else True
         ).order_by(
-            sql_func.random()
+            func.random()
         ).limit(num_questions - len(selected_questions)).all()
         selected_questions.extend(random_qs)
     
     # Return Question objects directly (not dicts)
-    return selected_questions[:num_questions]
+    final_questions = selected_questions[:num_questions]
+    _set_cached_practice(user_id, num_questions, [q.id for q in final_questions])
+    return final_questions
 
 
 def update_user_stats_after_practice(
@@ -263,8 +274,6 @@ def update_user_stats_after_practice(
     Update user stats after completing practice session
     """
     from datetime import datetime, date
-    from sqlalchemy import func as sql_func
-    
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         return
@@ -380,7 +389,3 @@ def check_and_award_badges(db: Session, user_id: int):
         db.commit()
     
     return newly_earned
-
-
-# Import func for random ordering
-from sqlalchemy import func

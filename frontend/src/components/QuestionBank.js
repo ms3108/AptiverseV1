@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import API_URL from '../config/api';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navigation from './Navigation';
+
+const CATEGORY_CACHE_KEY = 'aptiverse.question.categories';
+const CATEGORY_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 function QuestionBank() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -16,10 +19,57 @@ function QuestionBank() {
         sortBy: searchParams.get('sortBy') || 'created_at',
         sortOrder: searchParams.get('sortOrder') || 'desc'
     });
+    const [questionsLoading, setQuestionsLoading] = useState(false);
+    const questionCacheRef = useRef(new Map());
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchCategories();
+        let isActive = true;
+        const controller = new AbortController();
+
+        const loadCategories = async () => {
+            const cached = sessionStorage.getItem(CATEGORY_CACHE_KEY);
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (Date.now() - parsed.timestamp < CATEGORY_CACHE_TTL) {
+                        if (isActive) {
+                            setCategories(parsed.data);
+                            setLoading(false);
+                        }
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Failed to parse cached categories', error);
+                }
+            }
+
+            try {
+                const categoryData = await fetchCategories(controller.signal);
+                if (isActive) {
+                    setCategories(categoryData);
+                    setLoading(false);
+                    sessionStorage.setItem(
+                        CATEGORY_CACHE_KEY,
+                        JSON.stringify({ data: categoryData, timestamp: Date.now() })
+                    );
+                }
+            } catch (error) {
+                if (isActive) {
+                    setLoading(false);
+                }
+                if (!axios.isCancel(error)) {
+                    console.error('Failed to load categories', error);
+                }
+            }
+        };
+
+        loadCategories();
+
+        return () => {
+            isActive = false;
+            controller.abort();
+        };
     }, []);
 
     useEffect(() => {
@@ -34,50 +84,76 @@ function QuestionBank() {
         setSearchParams(params);
 
         if (selectedCategory || selectedTopic) {
-            fetchQuestions();
+            const controller = new AbortController();
+            fetchQuestions(controller.signal);
+            return () => controller.abort();
+        }
+
+        // When backing out to categories we can clear questions and loading state
+        questionCacheRef.current.clear();
+        setQuestions([]);
+        setQuestionsLoading(false);
+        return undefined;
+    }, [selectedCategory, selectedTopic, filters, fetchQuestions, setSearchParams]);
+
+    const fetchCategories = async (signal) => {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_URL}/question-bank/categories`, {
+            headers: { Authorization: `Bearer ${token}` },
+            signal
+        });
+        return response.data.categories || [];
+    };
+
+    const fetchQuestions = useCallback(async (signal) => {
+        if (!selectedCategory && !selectedTopic) {
+            setQuestions([]);
+            setQuestionsLoading(false);
+            return;
+        }
+
+        const params = new URLSearchParams();
+        if (selectedCategory) params.append('category', selectedCategory);
+        if (selectedTopic) params.append('topic', selectedTopic);
+        if (filters.difficulty) params.append('difficulty', filters.difficulty);
+        params.append('sort_by', filters.sortBy);
+        params.append('sort_order', filters.sortOrder);
+
+        const cacheKey = params.toString();
+        const cached = questionCacheRef.current.get(cacheKey);
+        if (cached) {
+            setQuestions(cached);
+            setQuestionsLoading(false);
+            return;
+        }
+
+        try {
+            setQuestionsLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(
+                `${API_URL}/question-bank/questions?${cacheKey}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                    signal
+                }
+            );
+            if (questionCacheRef.current.size > 20) {
+                const oldestKey = questionCacheRef.current.keys().next().value;
+                questionCacheRef.current.delete(oldestKey);
+            }
+            questionCacheRef.current.set(cacheKey, response.data.questions);
+            setQuestions(response.data.questions);
+        } catch (err) {
+            if (!axios.isCancel(err)) {
+                console.error('Failed to load questions', err);
+            }
+        } finally {
+            setQuestionsLoading(false);
         }
     }, [selectedCategory, selectedTopic, filters]);
 
-    const fetchCategories = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            console.log('🔍 Fetching categories from:', `${API_URL}/question-bank/categories`);
-            const response = await axios.get(`${API_URL}/question-bank/categories`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            console.log('✅ Categories response:', response.data);
-            setCategories(response.data.categories || []);
-            setLoading(false);
-        } catch (err) {
-            console.error('❌ Failed to load categories:', err);
-            console.error('Error response:', err.response?.data);
-            console.error('Error status:', err.response?.status);
-            setLoading(false);
-        }
-    };
-
-    const fetchQuestions = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const params = new URLSearchParams();
-
-            if (selectedCategory) params.append('category', selectedCategory);
-            if (selectedTopic) params.append('topic', selectedTopic);
-            if (filters.difficulty) params.append('difficulty', filters.difficulty);
-            params.append('sort_by', filters.sortBy);
-            params.append('sort_order', filters.sortOrder);
-
-            const response = await axios.get(
-                `${API_URL}/question-bank/questions?${params.toString()}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setQuestions(response.data.questions);
-        } catch (err) {
-            console.error('Failed to load questions', err);
-        }
-    };
-
     const handleCategoryClick = (categoryName) => {
+        questionCacheRef.current.clear();
         setSelectedCategory(categoryName);
         setSelectedTopic(null);
     };
@@ -99,24 +175,25 @@ function QuestionBank() {
     };
 
     const handleBackToCategories = () => {
+        questionCacheRef.current.clear();
         setSelectedCategory(null);
         setSelectedTopic(null);
         setQuestions([]);
     };
 
     const handleBackToTopics = () => {
+        questionCacheRef.current.clear();
         setSelectedTopic(null);
         setQuestions([]);
     };
 
-    const getDifficultyColor = (difficulty) => {
-        switch (difficulty) {
-            case 'Easy': return 'text-green-600 bg-green-100';
-            case 'Medium': return 'text-yellow-600 bg-yellow-100';
-            case 'Hard': return 'text-red-600 bg-red-100';
-            default: return 'text-gray-600 bg-gray-100';
-        }
-    };
+    const difficultyColorMap = useMemo(() => ({
+        Easy: 'text-green-600 bg-green-100',
+        Medium: 'text-yellow-600 bg-yellow-100',
+        Hard: 'text-red-600 bg-red-100'
+    }), []);
+
+    const getDifficultyColorClass = (difficulty) => difficultyColorMap[difficulty] || 'text-gray-600 bg-gray-100';
 
     if (loading) {
         return (
@@ -282,6 +359,21 @@ function QuestionBank() {
                 </div>
 
                 {/* Questions List */}
+                {questionsLoading && (
+                    <div className="space-y-4 mb-6" aria-live="polite" aria-busy="true">
+                        {[...Array(3)].map((_, idx) => (
+                            <div
+                                key={`question-skeleton-${idx}`}
+                                className="bg-white rounded-lg shadow p-6 animate-pulse"
+                            >
+                                <div className="h-5 bg-gray-200 rounded w-1/3 mb-3"></div>
+                                <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 <div className="space-y-4">
                     {questions.map((question) => (
                         <div
@@ -311,7 +403,7 @@ function QuestionBank() {
                                     </div>
                                     <p className="text-gray-600 mb-3">{question.description}</p>
                                     <div className="flex items-center gap-3">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(question.difficulty)}`}>
+                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColorClass(question.difficulty)}`}>
                                             {question.difficulty}
                                         </span>
                                         <span className="text-sm text-gray-500">
@@ -335,7 +427,7 @@ function QuestionBank() {
                     ))}
                 </div>
 
-                {questions.length === 0 && (
+                {!questionsLoading && questions.length === 0 && (
                     <div className="bg-gray-50 rounded-lg p-8 text-center">
                         <p className="text-gray-600">No questions found with the current filters.</p>
                     </div>
