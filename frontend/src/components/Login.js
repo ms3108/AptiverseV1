@@ -56,7 +56,8 @@ function Login() {
         setLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:8000/login', {
+            const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+            const response = await axios.post(`${API_URL}/login`, {
                 email: formData.email,
                 password: formData.password
             });
@@ -64,7 +65,7 @@ function Login() {
             login(response.data.access_token);
 
             // Get user info to check if admin
-            const userResponse = await axios.get('http://localhost:8000/me', {
+            const userResponse = await axios.get(`${API_URL}/me`, {
                 headers: { Authorization: `Bearer ${response.data.access_token}` }
             });
 
