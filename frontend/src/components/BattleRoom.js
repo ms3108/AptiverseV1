@@ -107,7 +107,8 @@ function BattleRoom() {
             }
 
             setIsCreator(response.data.creator_id === currentUserId);
-            setShareableLink(`http://localhost:3000/battle/${roomCode}`);
+            const frontendUrl = window.location.origin;
+            setShareableLink(`${frontendUrl}/battle/${roomCode}`);
         } catch (error) {
             console.error('Failed to fetch battle info', error);
             console.error('Error details:', error.response?.data);
