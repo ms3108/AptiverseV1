@@ -360,18 +360,33 @@ function QuestionBank() {
 
                 {/* Questions List */}
                 {questionsLoading && (
-                    <div className="space-y-4 mb-6" aria-live="polite" aria-busy="true">
-                        {[...Array(3)].map((_, idx) => (
-                            <div
-                                key={`question-skeleton-${idx}`}
-                                className="bg-white rounded-lg shadow p-6 animate-pulse"
-                            >
-                                <div className="h-5 bg-gray-200 rounded w-1/3 mb-3"></div>
-                                <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <>
+                        <div className="flex items-center justify-center mb-6">
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-3" style={{ borderColor: '#1E88E5' }}></div>
+                                <p className="text-gray-600 font-medium">Loading questions...</p>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                        <div className="space-y-4 mb-6" aria-live="polite" aria-busy="true">
+                            {[...Array(3)].map((_, idx) => (
+                                <div
+                                    key={`question-skeleton-${idx}`}
+                                    className="bg-white rounded-lg shadow p-6 animate-pulse"
+                                >
+                                    <div className="flex items-start gap-3 mb-3">
+                                        <div className="w-6 h-6 bg-gray-200 rounded-full"></div>
+                                        <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+                                    </div>
+                                    <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                                    <div className="flex gap-2">
+                                        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                                        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
 
                 <div className="space-y-4">
@@ -428,8 +443,12 @@ function QuestionBank() {
                 </div>
 
                 {!questionsLoading && questions.length === 0 && (
-                    <div className="bg-gray-50 rounded-lg p-8 text-center">
-                        <p className="text-gray-600">No questions found with the current filters.</p>
+                    <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                        <div className="text-6xl mb-4">🔍</div>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No Questions Found</h3>
+                        <p className="text-gray-600">
+                            No questions match your current filters. Try adjusting the difficulty or sort options.
+                        </p>
                     </div>
                 )}
             </div>
