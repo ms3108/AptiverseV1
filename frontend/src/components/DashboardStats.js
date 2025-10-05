@@ -254,13 +254,21 @@ function DashboardStats() {
 
 // Activity Heatmap Component
 function ActivityHeatmap({ activityData = {} }) {
+    // Helper function to format date in local timezone as YYYY-MM-DD
+    const formatLocalDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     // Generate 12 weeks of data ending with the current week (Monday start)
     const generateHeatmapData = () => {
         const now = new Date();
         // Force to local timezone to avoid UTC date issues
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-        console.log('Heatmap Debug - Today:', today.toISOString().split('T')[0]);
+        console.log('Heatmap Debug - Today (local):', formatLocalDate(today));
         console.log('Heatmap Debug - Activity Data Keys:', Object.keys(activityData).slice(-10));
 
         const startOfWeek = new Date(today);
@@ -271,8 +279,8 @@ function ActivityHeatmap({ activityData = {} }) {
         const startDate = new Date(startOfWeek);
         startDate.setDate(startDate.getDate() - (7 * 11)); // 11 weeks back so we have 12 including current week
 
-        console.log('Heatmap Debug - Start of Current Week:', startOfWeek.toISOString().split('T')[0]);
-        console.log('Heatmap Debug - Start Date (11 weeks back):', startDate.toISOString().split('T')[0]);
+        console.log('Heatmap Debug - Start of Current Week:', formatLocalDate(startOfWeek));
+        console.log('Heatmap Debug - Start Date (11 weeks back):', formatLocalDate(startDate));
 
         const totalDays = 7 * 12;
         const weeks = [];
@@ -281,7 +289,7 @@ function ActivityHeatmap({ activityData = {} }) {
         for (let i = 0; i < totalDays; i++) {
             const currentDate = new Date(startDate);
             currentDate.setDate(startDate.getDate() + i);
-            const dateStr = currentDate.toISOString().split('T')[0];
+            const dateStr = formatLocalDate(currentDate);
 
             const normalizedDay = currentDate.getDay() === 0 ? 7 : currentDate.getDay();
 
