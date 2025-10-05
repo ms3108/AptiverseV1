@@ -55,8 +55,12 @@ app.include_router(admin_routes.router)
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 allowed_origins = [
     "http://localhost:3000",  # Local development
-    frontend_url,  # Production frontend (Vercel)
+    "https://aptiverse-v1-hg3h.vercel.app",  # Vercel production
+    frontend_url,  # Production frontend (Vercel custom domain if set)
 ]
+
+# Remove duplicates and None values
+allowed_origins = list(set(filter(None, allowed_origins)))
 
 app.add_middleware(
     CORSMiddleware,
