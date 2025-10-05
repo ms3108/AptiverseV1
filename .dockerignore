@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.pytest_cache
+.coverage
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+!README.md
+
+# Tests
+tests/
+test_*.py
+
+# Deployment configs
+docker-compose.yml
+.replit
+replit.nix
+netlify.toml
+vercel.json
+render.yaml
+
+# Scripts
+*.sh
+*.ps1
+!build.sh
+!start.sh
+
+# Frontend build (when building backend)
+frontend/node_modules
+frontend/build
