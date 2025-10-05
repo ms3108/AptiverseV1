@@ -89,16 +89,18 @@ function QuestionBank() {
         const cacheKey = params.toString();
         const cached = questionCacheRef.current.get(cacheKey);
 
-        // If we have cached data, set both questions and loading state synchronously
+        // If we have cached data, return it immediately
         if (cached) {
-            setQuestions(cached);
-            setQuestionsLoading(false);
+            // Defer state updates to next tick to ensure proper batching
+            setTimeout(() => {
+                setQuestions(cached);
+                setQuestionsLoading(false);
+            }, 0);
             return;
         }
 
-        // No cache - start loading
+        // No cache - fetch from API
         try {
-            setQuestionsLoading(true);
             const token = localStorage.getItem('token');
             const response = await axios.get(
                 `${API_URL}/question-bank/questions?${cacheKey}`,
@@ -113,11 +115,11 @@ function QuestionBank() {
             }
             questionCacheRef.current.set(cacheKey, response.data.questions);
             setQuestions(response.data.questions);
+            setQuestionsLoading(false);
         } catch (err) {
             if (!axios.isCancel(err)) {
                 console.error('Failed to load questions', err);
             }
-        } finally {
             setQuestionsLoading(false);
         }
     }, [selectedCategory, selectedTopic, filters]);
@@ -396,58 +398,60 @@ function QuestionBank() {
                     </>
                 )}
 
-                <div className="space-y-4">
-                    {questions.map((question) => (
-                        <div
-                            key={question.id}
-                            onClick={() => handleQuestionClick(question.id)}
-                            className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
-                        >
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        {question.solved ? (
-                                            <span className="text-green-600 text-xl font-bold" title="Solved correctly">
-                                                ✓
+                {!questionsLoading && (
+                    <div className="space-y-4">
+                        {questions.map((question) => (
+                            <div
+                                key={question.id}
+                                onClick={() => handleQuestionClick(question.id)}
+                                className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
+                            >
+                                <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            {question.solved ? (
+                                                <span className="text-green-600 text-xl font-bold" title="Solved correctly">
+                                                    ✓
+                                                </span>
+                                            ) : question.attempted ? (
+                                                <span className="text-orange-500 text-xl font-bold" title="Attempted but not solved">
+                                                    ◐
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-300 text-xl font-bold" title="Not attempted">
+                                                    ○
+                                                </span>
+                                            )}
+                                            <h3 className="text-xl font-semibold text-gray-800">
+                                                {question.title}
+                                            </h3>
+                                        </div>
+                                        <p className="text-gray-600 mb-3">{question.description}</p>
+                                        <div className="flex items-center gap-3">
+                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColorClass(question.difficulty)}`}>
+                                                {question.difficulty}
                                             </span>
-                                        ) : question.attempted ? (
-                                            <span className="text-orange-500 text-xl font-bold" title="Attempted but not solved">
-                                                ◐
+                                            <span className="text-sm text-gray-500">
+                                                💎 {question.xp_reward} XP
                                             </span>
-                                        ) : (
-                                            <span className="text-gray-300 text-xl font-bold" title="Not attempted">
-                                                ○
-                                            </span>
-                                        )}
-                                        <h3 className="text-xl font-semibold text-gray-800">
-                                            {question.title}
-                                        </h3>
+                                            {question.solved && (
+                                                <span className="text-xs text-green-600 font-medium">
+                                                    Solved
+                                                </span>
+                                            )}
+                                            {!question.solved && question.attempted && (
+                                                <span className="text-xs text-orange-500 font-medium">
+                                                    Attempted
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
-                                    <p className="text-gray-600 mb-3">{question.description}</p>
-                                    <div className="flex items-center gap-3">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColorClass(question.difficulty)}`}>
-                                            {question.difficulty}
-                                        </span>
-                                        <span className="text-sm text-gray-500">
-                                            💎 {question.xp_reward} XP
-                                        </span>
-                                        {question.solved && (
-                                            <span className="text-xs text-green-600 font-medium">
-                                                Solved
-                                            </span>
-                                        )}
-                                        {!question.solved && question.attempted && (
-                                            <span className="text-xs text-orange-500 font-medium">
-                                                Attempted
-                                            </span>
-                                        )}
-                                    </div>
+                                    <div className="text-blue-600 text-2xl">→</div>
                                 </div>
-                                <div className="text-blue-600 text-2xl">→</div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
 
                 {!questionsLoading && questions.length === 0 && (
                     <div className="bg-white rounded-lg shadow-sm p-12 text-center">
