@@ -23,10 +23,16 @@ app = FastAPI(title="Aptiverse API")
 # Include admin routes
 app.include_router(admin_routes.router)
 
-# CORS configuration
+# CORS configuration - support multiple origins
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+allowed_origins = [
+    "http://localhost:3000",  # Local development
+    frontend_url,  # Production frontend (Vercel)
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -145,6 +151,50 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)):
 @app.get("/me", response_model=schemas.UserResponse)
 def get_current_user_info(current_user: models.User = Depends(auth.get_current_user)):
     return current_user
+
+
+@app.get("/warnings")
+def get_user_warnings(
+    current_user: models.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get all warnings for the current user"""
+    warnings = db.query(models.UserWarning).filter(
+        models.UserWarning.user_id == current_user.id
+    ).order_by(models.UserWarning.created_at.desc()).all()
+    
+    return {
+        "total": len(warnings),
+        "unread": sum(1 for w in warnings if not w.is_read),
+        "warnings": [{
+            "id": w.id,
+            "reason": w.reason,
+            "issued_by": w.issued_by.username if w.issued_by else "Admin",
+            "is_read": w.is_read,
+            "created_at": w.created_at.isoformat()
+        } for w in warnings]
+    }
+
+
+@app.post("/warnings/{warning_id}/mark-read")
+def mark_warning_read(
+    warning_id: int,
+    current_user: models.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Mark a warning as read"""
+    warning = db.query(models.UserWarning).filter(
+        models.UserWarning.id == warning_id,
+        models.UserWarning.user_id == current_user.id
+    ).first()
+    
+    if not warning:
+        raise HTTPException(status_code=404, detail="Warning not found")
+    
+    warning.is_read = True
+    db.commit()
+    
+    return {"message": "Warning marked as read"}
 
 
 @app.get("/dashboard/stats")

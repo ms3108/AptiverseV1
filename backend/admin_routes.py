@@ -596,8 +596,7 @@ async def get_reported_posts(
 @router.post("/reports/{report_id}/resolve")
 async def resolve_report(
     report_id: int,
-    action: str,  # delete_post, warn_user, ban_user, no_action
-    ban_permanent: bool = False,
+    request: schemas.ReportResolveRequest,
     db: Session = Depends(get_db),
     current_admin: models.User = Depends(get_current_admin)
 ):
@@ -607,19 +606,19 @@ async def resolve_report(
         raise HTTPException(status_code=404, detail="Report not found")
     
     report.status = "resolved"
-    report.resolution_action = action
+    report.resolution_action = request.action
     report.resolved_by_admin_id = current_admin.id
     report.resolved_at = datetime.now(timezone.utc)
     
     # Execute action
-    if action == "ban_user":
+    if request.action == "ban_user":
         user = report.posted_by
         user.is_banned = True
         user.ban_reason = f"Posted inappropriate content (Report #{report_id})"
         user.banned_at = datetime.now(timezone.utc)
         user.banned_by_admin_id = current_admin.id
         
-        if ban_permanent:
+        if request.ban_permanent:
             user.is_permanently_banned = True
             banned_email = models.BannedEmail(
                 email=user.email,
@@ -628,7 +627,18 @@ async def resolve_report(
             )
             db.add(banned_email)
     
-    # TODO: Implement delete_post and warn_user actions when discussion system is ready
+    elif request.action == "warn_user":
+        # Create a warning for the user
+        warning = models.UserWarning(
+            user_id=report.posted_by_user_id,
+            report_id=report_id,
+            reason=f"Your post was reported and found to violate community guidelines. Report reason: {report.reason}",
+            issued_by_admin_id=current_admin.id,
+            is_read=False
+        )
+        db.add(warning)
+    
+    # TODO: Implement delete_post action when discussion system is ready
     
     db.commit()
     
@@ -639,10 +649,10 @@ async def resolve_report(
         action_type="resolve_report",
         target_type="report",
         target_id=report_id,
-        details={"action": action, "ban_permanent": ban_permanent}
+        details={"action": request.action, "ban_permanent": request.ban_permanent}
     )
     
-    return {"message": f"Report resolved with action: {action}"}
+    return {"message": f"Report resolved with action: {request.action}"}
 
 
 # ==================== Admin Action Logs ====================

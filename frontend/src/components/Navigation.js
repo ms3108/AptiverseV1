@@ -1,11 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import WarningsModal from './WarningsModal';
 
 function Navigation() {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
     const isAdmin = user?.is_admin;
+    const [warningsCount, setWarningsCount] = useState(0);
+    const [showWarningsModal, setShowWarningsModal] = useState(false);
+
+    useEffect(() => {
+        if (!isAdmin && user) {
+            fetchWarningsCount();
+        }
+    }, [user, isAdmin]);
+
+    const fetchWarningsCount = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:8000/warnings', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setWarningsCount(data.unread || 0);
+            }
+        } catch (error) {
+            console.error('Error fetching warnings:', error);
+        }
+    };
 
     const handleLogout = () => {
         logout();
@@ -130,6 +157,25 @@ function Navigation() {
                                 </button>
                             </>
                         )}
+                        {!isAdmin && warningsCount > 0 && (
+                            <button
+                                onClick={() => setShowWarningsModal(true)}
+                                className="relative px-4 py-2 text-sm font-semibold hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                style={{
+                                    border: '2px solid #F59E0B',
+                                    color: '#F59E0B',
+                                    borderRadius: '10px',
+                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                                }}
+                            >
+                                ⚠️ Warnings
+                                {warningsCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                                        {warningsCount}
+                                    </span>
+                                )}
+                            </button>
+                        )}
                         <span className="text-sm" style={{ color: '#64748B', letterSpacing: '0.3px' }}>
                             Welcome, <span className="font-semibold" style={{ color: '#1E88E5' }}>{user?.username}</span>!
                         </span>
@@ -147,6 +193,13 @@ function Navigation() {
                     </div>
                 </div>
             </div>
+            <WarningsModal
+                isOpen={showWarningsModal}
+                onClose={() => {
+                    setShowWarningsModal(false);
+                    fetchWarningsCount(); // Refresh count after closing
+                }}
+            />
         </nav>
     );
 }

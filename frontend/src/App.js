@@ -16,6 +16,7 @@ import AdminDashboard from './components/AdminDashboard';
 import AdminUsers from './components/AdminUsers';
 import AdminQuestions from './components/AdminQuestions';
 import AdminLogs from './components/AdminLogs';
+import AdminReports from './components/AdminReports';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -130,6 +131,14 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <AdminLogs />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/reports"
+                            element={
+                                <ProtectedRoute>
+                                    <AdminReports />
                                 </ProtectedRoute>
                             }
                         />

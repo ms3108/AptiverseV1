@@ -9,7 +9,14 @@ DATABASE_URL = os.getenv(
     "postgresql://aptiverse:aptiverse123@db:5432/aptiverse_db"
 )
 
-engine = create_engine(DATABASE_URL)
+# Create engine with SSL support for Neon.tech
+# Neon.tech requires SSL connections in production
+engine_args = {}
+if "neon.tech" in DATABASE_URL or "sslmode=require" in DATABASE_URL:
+    # For Neon.tech or any database requiring SSL
+    engine_args = {"connect_args": {"sslmode": "require"}}
+
+engine = create_engine(DATABASE_URL, **engine_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

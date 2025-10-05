@@ -66,6 +66,21 @@ class Question(Base):
     # Vector DB reference
     vector_id = Column(String, nullable=True)  # ID in Weaviate
     
+    # Difficulty tracking (Hybrid Approach)
+    initial_difficulty = Column(String, nullable=True)  # Original heuristic-based difficulty
+    heuristic_score = Column(Float, default=0.5)  # 0-1 scale from heuristics
+    
+    # Performance metrics
+    total_attempts = Column(Integer, default=0)
+    correct_attempts = Column(Integer, default=0)
+    total_time_seconds = Column(Float, default=0)
+    avg_time_seconds = Column(Float, default=0)
+    
+    # Dynamic difficulty calculation
+    performance_difficulty = Column(Float, nullable=True)  # 0-1 calculated from user data
+    alpha_weight = Column(Float, default=0.7)  # Weight for heuristic (starts high, decreases)
+    last_difficulty_update = Column(DateTime(timezone=True), nullable=True)
+    
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
@@ -292,3 +307,21 @@ class ReportedPost(Base):
     posted_by = relationship("User", foreign_keys=[posted_by_user_id])
     reported_by = relationship("User", foreign_keys=[reported_by_user_id])
     resolved_by = relationship("User", foreign_keys=[resolved_by_admin_id])
+
+
+class UserWarning(Base):
+    """Track warnings issued to users"""
+    __tablename__ = "user_warnings"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    report_id = Column(Integer, ForeignKey("reported_posts.id"), nullable=True)
+    reason = Column(Text, nullable=False)
+    issued_by_admin_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relationships
+    user = relationship("User", foreign_keys=[user_id], backref="warnings")
+    issued_by = relationship("User", foreign_keys=[issued_by_admin_id])
+    report = relationship("ReportedPost", foreign_keys=[report_id])

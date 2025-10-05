@@ -135,3 +135,10 @@ class BattleRoomResponse(BaseModel):
     num_questions: int
     time_per_question: int
     shareable_link: str
+
+
+# Admin Report Schemas
+
+class ReportResolveRequest(BaseModel):
+    action: str  # delete_post, warn_user, ban_user, no_action
+    ban_permanent: bool = False
