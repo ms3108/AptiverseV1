@@ -257,7 +257,11 @@ function ActivityHeatmap({ activityData = {} }) {
     // Generate 12 weeks of data ending with the current week (Monday start)
     const generateHeatmapData = () => {
         const now = new Date();
+        // Force to local timezone to avoid UTC date issues
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        console.log('Heatmap Debug - Today:', today.toISOString().split('T')[0]);
+        console.log('Heatmap Debug - Activity Data Keys:', Object.keys(activityData).slice(-10));
 
         const startOfWeek = new Date(today);
         const dayOfWeek = startOfWeek.getDay();
@@ -266,6 +270,9 @@ function ActivityHeatmap({ activityData = {} }) {
 
         const startDate = new Date(startOfWeek);
         startDate.setDate(startDate.getDate() - (7 * 11)); // 11 weeks back so we have 12 including current week
+
+        console.log('Heatmap Debug - Start of Current Week:', startOfWeek.toISOString().split('T')[0]);
+        console.log('Heatmap Debug - Start Date (11 weeks back):', startDate.toISOString().split('T')[0]);
 
         const totalDays = 7 * 12;
         const weeks = [];
