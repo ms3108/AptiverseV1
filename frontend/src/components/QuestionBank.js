@@ -20,6 +20,7 @@ function QuestionBank() {
         sortOrder: searchParams.get('sortOrder') || 'desc'
     });
     const [questionsLoading, setQuestionsLoading] = useState(false);
+    const [hasLoadedQuestions, setHasLoadedQuestions] = useState(false);
     const questionCacheRef = useRef(new Map());
     const navigate = useNavigate();
 
@@ -89,10 +90,17 @@ function QuestionBank() {
         const cacheKey = params.toString();
         const cached = questionCacheRef.current.get(cacheKey);
 
+        // Always set loading to true when starting fetch
+        setQuestionsLoading(true);
+
         // If we have cached data, return it immediately
         if (cached) {
-            setQuestions(cached);
-            setQuestionsLoading(false);
+            // Use requestAnimationFrame to ensure state updates happen in correct order
+            requestAnimationFrame(() => {
+                setQuestions(cached);
+                setQuestionsLoading(false);
+                setHasLoadedQuestions(true);
+            });
             return;
         }
 
@@ -113,6 +121,7 @@ function QuestionBank() {
             questionCacheRef.current.set(cacheKey, response.data.questions);
             setQuestions(response.data.questions);
             setQuestionsLoading(false);
+            setHasLoadedQuestions(true);
         } catch (err) {
             if (!axios.isCancel(err)) {
                 console.error('Failed to load questions', err);
@@ -133,9 +142,9 @@ function QuestionBank() {
         setSearchParams(params);
 
         if (selectedCategory || selectedTopic) {
-            // Clear previous questions immediately when topic/category changes
+            // Reset loaded state when changing topic/category
+            setHasLoadedQuestions(false);
             setQuestions([]);
-            setQuestionsLoading(true);
 
             const controller = new AbortController();
             fetchQuestions(controller.signal);
@@ -146,6 +155,7 @@ function QuestionBank() {
         questionCacheRef.current.clear();
         setQuestions([]);
         setQuestionsLoading(false);
+        setHasLoadedQuestions(false);
         return undefined;
     }, [selectedCategory, selectedTopic, filters, fetchQuestions, setSearchParams]);
 
