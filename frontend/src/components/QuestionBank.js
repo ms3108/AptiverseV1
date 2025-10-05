@@ -41,13 +41,17 @@ function QuestionBank() {
     const fetchCategories = async () => {
         try {
             const token = localStorage.getItem('token');
+            console.log('🔍 Fetching categories from:', `${API_URL}/question-bank/categories`);
             const response = await axios.get(`${API_URL}/question-bank/categories`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setCategories(response.data.categories);
+            console.log('✅ Categories response:', response.data);
+            setCategories(response.data.categories || []);
             setLoading(false);
         } catch (err) {
-            console.error('Failed to load categories', err);
+            console.error('❌ Failed to load categories:', err);
+            console.error('Error response:', err.response?.data);
+            console.error('Error status:', err.response?.status);
             setLoading(false);
         }
     };
