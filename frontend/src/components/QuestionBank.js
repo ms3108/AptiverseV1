@@ -72,39 +72,6 @@ function QuestionBank() {
         };
     }, []);
 
-    useEffect(() => {
-        // Update URL params when state changes
-        const params = new URLSearchParams();
-        if (selectedCategory) params.set('category', selectedCategory);
-        if (selectedTopic) params.set('topic', selectedTopic);
-        if (filters.difficulty) params.set('difficulty', filters.difficulty);
-        params.set('sortBy', filters.sortBy);
-        params.set('sortOrder', filters.sortOrder);
-
-        setSearchParams(params);
-
-        if (selectedCategory || selectedTopic) {
-            const controller = new AbortController();
-            fetchQuestions(controller.signal);
-            return () => controller.abort();
-        }
-
-        // When backing out to categories we can clear questions and loading state
-        questionCacheRef.current.clear();
-        setQuestions([]);
-        setQuestionsLoading(false);
-        return undefined;
-    }, [selectedCategory, selectedTopic, filters, fetchQuestions, setSearchParams]);
-
-    const fetchCategories = async (signal) => {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${API_URL}/question-bank/categories`, {
-            headers: { Authorization: `Bearer ${token}` },
-            signal
-        });
-        return response.data.categories || [];
-    };
-
     const fetchQuestions = useCallback(async (signal) => {
         if (!selectedCategory && !selectedTopic) {
             setQuestions([]);
@@ -151,6 +118,39 @@ function QuestionBank() {
             setQuestionsLoading(false);
         }
     }, [selectedCategory, selectedTopic, filters]);
+
+    useEffect(() => {
+        // Update URL params when state changes
+        const params = new URLSearchParams();
+        if (selectedCategory) params.set('category', selectedCategory);
+        if (selectedTopic) params.set('topic', selectedTopic);
+        if (filters.difficulty) params.set('difficulty', filters.difficulty);
+        params.set('sortBy', filters.sortBy);
+        params.set('sortOrder', filters.sortOrder);
+
+        setSearchParams(params);
+
+        if (selectedCategory || selectedTopic) {
+            const controller = new AbortController();
+            fetchQuestions(controller.signal);
+            return () => controller.abort();
+        }
+
+        // When backing out to categories we can clear questions and loading state
+        questionCacheRef.current.clear();
+        setQuestions([]);
+        setQuestionsLoading(false);
+        return undefined;
+    }, [selectedCategory, selectedTopic, filters, fetchQuestions, setSearchParams]);
+
+    const fetchCategories = async (signal) => {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_URL}/question-bank/categories`, {
+            headers: { Authorization: `Bearer ${token}` },
+            signal
+        });
+        return response.data.categories || [];
+    };
 
     const handleCategoryClick = (categoryName) => {
         questionCacheRef.current.clear();
