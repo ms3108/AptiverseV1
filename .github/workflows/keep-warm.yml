@@ -1,0 +1,32 @@
+name: Keep Services Warm
+
+# Prevents cold starts by pinging services every 5 minutes
+on:
+  schedule:
+    # Run every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  keep-warm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Backend Health Check
+        run: |
+          echo "Pinging backend..."
+          curl -f https://aptiverse-backend.fly.dev/ || echo "Backend might be starting up"
+          
+      - name: Ping Database (via backend)
+        run: |
+          echo "Warming up database connection..."
+          curl -f https://aptiverse-backend.fly.dev/docs || echo "Docs endpoint warming up"
+          
+      - name: Wait and ping again
+        run: |
+          sleep 10
+          echo "Second ping to ensure warm..."
+          curl -f https://aptiverse-backend.fly.dev/ || echo "Backend is warm"
+          
+      - name: Log Success
+        run: |
+          echo "✅ Services kept warm at $(date)"

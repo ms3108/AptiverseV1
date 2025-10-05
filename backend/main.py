@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException, status, WebSocket, WebSocketDisconnect, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
 from typing import Optional
+from functools import lru_cache
 import models
 import schemas
 import auth
@@ -19,6 +21,32 @@ import admin_routes
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Aptiverse API")
+
+# Add GZip compression middleware for faster responses (reduces payload size by 60-80%)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# Simple in-memory cache with TTL
+_cache = {}
+_cache_time = {}
+
+def cached_query(key: str, query_func, ttl_seconds: int = 300):
+    """
+    Simple in-memory cache with TTL
+    Args:
+        key: Cache key
+        query_func: Function that returns data to cache
+        ttl_seconds: Time to live in seconds (default 5 minutes)
+    """
+    now = datetime.now()
+    
+    if key in _cache:
+        if now - _cache_time[key] < timedelta(seconds=ttl_seconds):
+            return _cache[key]
+    
+    result = query_func()
+    _cache[key] = result
+    _cache_time[key] = now
+    return result
 
 # Include admin routes
 app.include_router(admin_routes.router)
@@ -516,48 +544,52 @@ def get_categories(
     current_user: models.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get all question categories with topic counts"""
+    """Get all question categories with topic counts (cached for 10 minutes)"""
     from sqlalchemy import distinct
     
-    # Get all categories with question counts
-    categories_data = []
-    
-    categories = db.query(models.Question.category).distinct().filter(
-        models.Question.category.isnot(None)
-    ).all()
-    
-    for (category,) in categories:
-        # Get topics for this category
-        topics = db.query(models.Question.topic).filter(
-            models.Question.category == category
-        ).distinct().all()
+    # Use cache to avoid repeated database queries (10 minute TTL)
+    def query_categories():
+        categories_data = []
         
-        topic_list = []
-        for (topic,) in topics:
-            count = db.query(models.Question).filter(
-                models.Question.category == category,
-                models.Question.topic == topic
+        categories = db.query(models.Question.category).distinct().filter(
+            models.Question.category.isnot(None)
+        ).all()
+        
+        for (category,) in categories:
+            # Get topics for this category
+            topics = db.query(models.Question.topic).filter(
+                models.Question.category == category
+            ).distinct().all()
+            
+            topic_list = []
+            for (topic,) in topics:
+                count = db.query(models.Question).filter(
+                    models.Question.category == category,
+                    models.Question.topic == topic
+                ).count()
+                topic_list.append({"name": topic, "count": count})
+            
+            # Sort topics alphabetically
+            topic_list.sort(key=lambda x: x["name"])
+            
+            total_count = db.query(models.Question).filter(
+                models.Question.category == category
             ).count()
-            topic_list.append({"name": topic, "count": count})
+            
+            categories_data.append({
+                "name": category,
+                "total_questions": total_count,
+                "topics": topic_list
+            })
         
-        # Sort topics alphabetically
-        topic_list.sort(key=lambda x: x["name"])
+        # Sort categories: Quants, Logical, Language
+        category_order = {"Quants": 0, "Logical": 1, "Language": 2}
+        categories_data.sort(key=lambda x: category_order.get(x["name"], 99))
         
-        total_count = db.query(models.Question).filter(
-            models.Question.category == category
-        ).count()
-        
-        categories_data.append({
-            "name": category,
-            "total_questions": total_count,
-            "topics": topic_list
-        })
+        return {"categories": categories_data}
     
-    # Sort categories: Quants, Logical, Language
-    category_order = {"Quants": 0, "Logical": 1, "Language": 2}
-    categories_data.sort(key=lambda x: category_order.get(x["name"], 99))
-    
-    return {"categories": categories_data}
+    # Cache the expensive query (10 minute TTL)
+    return cached_query("question_categories", query_categories, ttl_seconds=600)
 
 
 @app.get("/question-bank/questions")
