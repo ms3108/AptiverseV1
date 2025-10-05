@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import API_URL from '../config/api';
+import Navigation from './Navigation';
 
 const AdminLogs = () => {
     const { token } = useAuth();
@@ -79,20 +80,14 @@ const AdminLogs = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4">
+        <div className="min-h-screen bg-gray-50">
+            <Navigation />
+
+            <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Header */}
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Admin Action Logs</h1>
-                        <p className="text-gray-600 mt-2">Total Actions: {total}</p>
-                    </div>
-                    <button
-                        onClick={() => navigate('/admin')}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                        ← Back to Dashboard
-                    </button>
+                <div className="mb-6">
+                    <h1 className="text-3xl font-bold text-gray-900">Admin Action Logs</h1>
+                    <p className="text-gray-600 mt-2">Total Actions: {total}</p>
                 </div>
 
                 {/* Filters */}

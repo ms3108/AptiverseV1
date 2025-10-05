@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import API_URL from '../config/api';
+import Navigation from './Navigation';
 
 const AdminDashboard = () => {
     const { token, logout } = useAuth();
@@ -45,23 +46,14 @@ const AdminDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4">
+        <div className="min-h-screen bg-gray-50">
+            <Navigation />
+
+            <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Header */}
-                <div className="mb-8 flex justify-between items-start">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                        <p className="text-gray-600 mt-2">Manage users, questions, and community reports</p>
-                    </div>
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        <span>Logout</span>
-                    </button>
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                    <p className="text-gray-600 mt-2">Manage users, questions, and community reports</p>
                 </div>
 
                 {/* Stats Cards */}

@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import API_URL from '../config/api';
+import Navigation from './Navigation';
 
 const AdminQuestions = () => {
     const { token } = useAuth();
@@ -82,8 +84,10 @@ const AdminQuestions = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4">
+        <div className="min-h-screen bg-gray-50">
+            <Navigation />
+
+            <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold text-gray-900">Question Management</h1>
