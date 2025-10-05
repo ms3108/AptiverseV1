@@ -54,7 +54,7 @@ function QuestionDetail() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                '${API_URL}/submit-answer',
+                `${API_URL}/submit-answer`,
                 {
                     question_id: question.id,
                     user_answer: selectedAnswer,
@@ -264,4 +264,5 @@ function QuestionDetail() {
 }
 
 export default QuestionDetail;
+
 

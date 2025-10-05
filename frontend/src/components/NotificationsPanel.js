@@ -17,12 +17,12 @@ function NotificationsPanel({ isOpen, onClose, anchorEl }) {
             const token = localStorage.getItem('token');
 
             // Fetch warnings
-            const warningsResponse = await fetch('${API_URL}/warnings', {
+            const warningsResponse = await fetch(`${API_URL}/warnings`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
             // Fetch badges (recent earned badges)
-            const statsResponse = await fetch('${API_URL}/dashboard/stats', {
+            const statsResponse = await fetch(`${API_URL}/dashboard/stats`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -270,4 +270,5 @@ function NotificationsPanel({ isOpen, onClose, anchorEl }) {
 }
 
 export default NotificationsPanel;
+
 

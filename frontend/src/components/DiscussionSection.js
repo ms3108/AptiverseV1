@@ -47,7 +47,7 @@ function DiscussionSection({ questionId, isSolved }) {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                '${API_URL}/discussions',
+                `${API_URL}/discussions`,
                 {
                     question_id: questionId,
                     content: newDiscussion.trim()
@@ -437,4 +437,5 @@ function DiscussionSection({ questionId, isSolved }) {
 }
 
 export default DiscussionSection;
+
 

@@ -19,7 +19,7 @@ function Settings() {
 
     const fetchPreferences = async () => {
         try {
-            const response = await axios.get('${API_URL}/user/preferences', {
+            const response = await axios.get(`${API_URL}/user/preferences`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDailyPracticeCount(response.data.daily_practice_count);
@@ -186,4 +186,5 @@ function Settings() {
 }
 
 export default Settings;
+
 

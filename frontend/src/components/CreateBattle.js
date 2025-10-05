@@ -19,7 +19,7 @@ function CreateBattle() {
 
     const fetchTopics = async () => {
         try {
-            const response = await axios.get('${API_URL}/battles/topics');
+            const response = await axios.get(`${API_URL}/battles/topics`);
             setTopics(response.data.topics);
             if (response.data.topics.length > 0) {
                 setSelectedTopic(response.data.topics[0].topic);
@@ -37,7 +37,7 @@ function CreateBattle() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                '${API_URL}/battles/create',
+                `${API_URL}/battles/create`,
                 {
                     topic: selectedTopic,
                     num_questions: numQuestions,
@@ -236,4 +236,5 @@ function CreateBattle() {
 }
 
 export default CreateBattle;
+
 

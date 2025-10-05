@@ -25,7 +25,7 @@ function PracticeSet() {
     const fetchPracticeSet = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('${API_URL}/daily-practice', {
+            const response = await axios.get(`${API_URL}/daily-practice`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -64,7 +64,7 @@ function PracticeSet() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                '${API_URL}/submit-answer',
+                `${API_URL}/submit-answer`,
                 {
                     question_id: currentQuestion.id,
                     user_answer: selectedAnswer,
@@ -381,4 +381,5 @@ function PracticeSet() {
 }
 
 export default PracticeSet;
+
 

@@ -41,7 +41,7 @@ function QuestionBank() {
     const fetchCategories = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('${API_URL}/question-bank/categories', {
+            const response = await axios.get(`${API_URL}/question-bank/categories`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCategories(response.data.categories);
@@ -342,4 +342,5 @@ function QuestionBank() {
 }
 
 export default QuestionBank;
+
 

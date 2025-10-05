@@ -17,7 +17,7 @@ function BattleHistory() {
     const fetchBattleHistory = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('${API_URL}/battles/history', {
+            const response = await axios.get(`${API_URL}/battles/history`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBattles(response.data.battles);
@@ -273,4 +273,5 @@ function BattleHistory() {
 }
 
 export default BattleHistory;
+
 

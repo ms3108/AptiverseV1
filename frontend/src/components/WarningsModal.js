@@ -14,7 +14,7 @@ function WarningsModal({ isOpen, onClose }) {
     const fetchWarnings = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('${API_URL}/warnings', {
+            const response = await fetch(`${API_URL}/warnings`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -163,4 +163,5 @@ function WarningsModal({ isOpen, onClose }) {
 }
 
 export default WarningsModal;
+
 
