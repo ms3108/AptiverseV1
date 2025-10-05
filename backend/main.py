@@ -428,7 +428,8 @@ def submit_answer(
 
 def send_verification_email(email: str, token: str):
     """Send verification email using Gmail SMTP or print to console"""
-    verification_link = f"http://localhost:3000/verify?token={token}"
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    verification_link = f"{frontend_url}/verify?token={token}"
     
     # Check if we should skip email verification entirely
     skip_email_verification = os.getenv("SKIP_EMAIL_VERIFICATION", "false").lower() == "true"
