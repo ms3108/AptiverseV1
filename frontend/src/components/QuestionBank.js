@@ -91,11 +91,8 @@ function QuestionBank() {
 
         // If we have cached data, return it immediately
         if (cached) {
-            // Defer state updates to next tick to ensure proper batching
-            setTimeout(() => {
-                setQuestions(cached);
-                setQuestionsLoading(false);
-            }, 0);
+            setQuestions(cached);
+            setQuestionsLoading(false);
             return;
         }
 
