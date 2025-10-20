@@ -51,6 +51,62 @@ def cached_query(key: str, query_func, ttl_seconds: int = 300):
 # Include admin routes
 app.include_router(admin_routes.router)
 
+# 🔧 ONE-TIME MIGRATION ENDPOINT (can be removed after running)
+@app.post("/admin/migrate-difficulty-columns")
+def migrate_difficulty_columns(
+    current_user: models.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    ONE-TIME MIGRATION: Add difficulty tracking columns to questions table
+    This endpoint can be removed after successful migration
+    """
+    from sqlalchemy import text
+    
+    # Check admin status
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Check if columns already exist
+        result = db.execute(text("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name='questions' AND column_name='difficulty_score'
+        """))
+        
+        if result.fetchone():
+            return {
+                "success": True,
+                "message": "Columns already exist. Migration skipped.",
+                "status": "already_migrated"
+            }
+        
+        # Add new columns
+        migrations = [
+            "ALTER TABLE questions ADD COLUMN difficulty_score FLOAT",
+            "ALTER TABLE questions ADD COLUMN difficulty_confidence FLOAT DEFAULT 0.0",
+            "ALTER TABLE questions ADD COLUMN difficulty_history JSON DEFAULT '[]'",
+            "ALTER TABLE questions ADD COLUMN tier_stats JSON DEFAULT '{}'",
+        ]
+        
+        for migration_sql in migrations:
+            print(f"  Running: {migration_sql}")
+            db.execute(text(migration_sql))
+        
+        db.commit()
+        
+        return {
+            "success": True,
+            "message": "Migration completed successfully!",
+            "status": "completed",
+            "columns_added": ["difficulty_score", "difficulty_confidence", "difficulty_history", "tier_stats"]
+        }
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Migration failed: {str(e)}")
+
 # CORS configuration - support multiple origins
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 allowed_origins = [
