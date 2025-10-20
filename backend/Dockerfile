@@ -18,5 +18,17 @@ COPY backend/ .
 # Expose port
 EXPOSE 8000
 
+# Create startup script
+COPY <<EOF /app/start.sh
+#!/bin/bash
+set -e
+echo "🌱 Running database migrations and seeding..."
+python seed_data.py || echo "⚠️  Seeding skipped (may already be seeded)"
+echo "🚀 Starting server..."
+exec uvicorn main:app --host 0.0.0.0 --port 8000
+EOF
+
+RUN chmod +x /app/start.sh
+
 # Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["/app/start.sh"]
