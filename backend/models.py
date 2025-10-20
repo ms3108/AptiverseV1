@@ -81,21 +81,6 @@ class Question(Base):
     alpha_weight = Column(Float, default=0.7)  # Weight for heuristic (starts high, decreases)
     last_difficulty_update = Column(DateTime(timezone=True), nullable=True)
     
-    # NEW: Skill-weighted difficulty tracking
-    difficulty_score = Column(Float, nullable=True)  # 0-100 fine-grained score
-    difficulty_confidence = Column(Float, default=0.0)  # 0-1 confidence level
-    difficulty_history = Column(JSON, default=[])  # Historical difficulty changes
-    tier_stats = Column(JSON, default={})  # Per-tier success/failure stats
-    """
-    tier_stats format:
-    {
-        "beginner": {"solved": 15, "failed": 5, "success_rate": 0.75, "avg_time": 120},
-        "intermediate": {"solved": 20, "failed": 10, "success_rate": 0.67, "avg_time": 90},
-        "advanced": {"solved": 12, "failed": 3, "success_rate": 0.80, "avg_time": 60},
-        "expert": {"solved": 8, "failed": 0, "success_rate": 1.0, "avg_time": 45}
-    }
-    """
-    
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
