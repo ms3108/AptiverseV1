@@ -60,7 +60,17 @@ const AdminQuestions = () => {
             fetchQuestions();
         } catch (error) {
             console.error('Upload failed:', error);
-            alert(error.response?.data?.detail || 'Upload failed');
+            // Show backend error in the Errors section
+            if (error.response && error.response.data && error.response.data.detail) {
+                setUploadResult({
+                    total: 0,
+                    added: 0,
+                    duplicates: 0,
+                    errors: [error.response.data.detail]
+                });
+            } else {
+                alert('Upload failed');
+            }
         } finally {
             setUploading(false);
         }
@@ -104,16 +114,23 @@ const AdminQuestions = () => {
                         <pre className="text-xs text-gray-600 overflow-x-auto">
                             {`[
   {
-    "question": "If a train runs at 60 km/h for 2 hours, how far does it travel?",
-    "options": ["100 km", "120 km", "110 km", "130 km"],
-    "answer": "120 km",
-    "difficulty": "easy",
-    "topic": "quants",
-    "subtopic": "speed_distance_time",
-    "solution": "Distance = Speed × Time = 60 × 2 = 120 km"
+    "title": "Speed and Distance",
+    "description": "If a train runs at 60 km/h for 2 hours, how far does it travel?",
+    "difficulty": "Easy",
+    "topic": "Speed and Distance",
+    "option_a": "100 km",
+    "option_b": "120 km",
+    "option_c": "110 km",
+    "option_d": "130 km",
+    "correct_answer": "B",
+    "explanation": "Distance = Speed × Time = 60 × 2 = 120 km",
+    "xp_reward": 10
   }
 ]`}
                         </pre>
+                        <div className="mt-2 text-xs text-gray-600">
+                            <strong>Required fields:</strong> title, description, difficulty (Easy/Medium/Hard), topic, option_a, option_b, option_c, option_d, correct_answer (A/B/C/D), explanation, xp_reward (10/15/20)
+                        </div>
                     </div>
 
                     {/* Upload Form */}
