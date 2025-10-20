@@ -8,6 +8,7 @@ on:
       - 'backend/**'
       - 'fly.backend.toml'
       - '.github/workflows/fly-deploy.yml'
+  workflow_dispatch:
 
 jobs:
   deploy:
