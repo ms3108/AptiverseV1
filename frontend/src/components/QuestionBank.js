@@ -3,6 +3,8 @@ import API_URL from '../config/api';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navigation from './Navigation';
+import AdminQuestionForm from './AdminQuestionForm';
+import { useAuth } from '../context/AuthContext';
 
 const CATEGORY_CACHE_KEY = 'aptiverse.question.categories';
 const CATEGORY_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
@@ -22,8 +24,11 @@ function QuestionBank() {
     const [questionsLoading, setQuestionsLoading] = useState(false);
     const [hasLoadedQuestions, setHasLoadedQuestions] = useState(false);
     const [error, setError] = useState(null);
+    const [showAddQuestionModal, setShowAddQuestionModal] = useState(false);
     const questionCacheRef = useRef(new Map());
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const isAdmin = user?.is_admin;
 
     useEffect(() => {
         let isActive = true;
@@ -205,6 +210,62 @@ function QuestionBank() {
         setQuestions([]);
     };
 
+    const handleAddQuestionClick = () => {
+        setShowAddQuestionModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowAddQuestionModal(false);
+    };
+
+    const handleBackdropClick = (e) => {
+        // Only close if clicking the backdrop itself, not its children
+        if (e.target === e.currentTarget) {
+            handleCloseModal();
+        }
+    };
+
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        if (showAddQuestionModal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        // Cleanup on unmount
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showAddQuestionModal]);
+
+    const handleQuestionCreated = (data) => {
+        // Clear caches to force refresh
+        sessionStorage.removeItem(CATEGORY_CACHE_KEY);
+        questionCacheRef.current.clear();
+        
+        // Reload categories to get updated counts
+        const controller = new AbortController();
+        fetchCategories(controller.signal)
+            .then(categoryData => {
+                setCategories(categoryData);
+                sessionStorage.setItem(
+                    CATEGORY_CACHE_KEY,
+                    JSON.stringify({ data: categoryData, timestamp: Date.now() })
+                );
+            })
+            .catch(error => {
+                if (!axios.isCancel(error)) {
+                    console.error('Failed to reload categories', error);
+                }
+            });
+        
+        // If we're viewing questions, reload them
+        if (selectedCategory || selectedTopic) {
+            fetchQuestions(controller.signal);
+        }
+    };
+
     const difficultyColorMap = useMemo(() => ({
         Easy: 'text-green-600 bg-green-100',
         Medium: 'text-yellow-600 bg-yellow-100',
@@ -336,6 +397,17 @@ function QuestionBank() {
                             )}
                         </p>
                     </div>
+                    {isAdmin && (
+                        <button
+                            onClick={handleAddQuestionClick}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Question
+                        </button>
+                    )}
                 </div>
 
                 {/* Filters and Sorting */}
@@ -482,6 +554,32 @@ function QuestionBank() {
                     <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-6">
                         <h3 className="text-lg font-semibold mb-2">We ran into an issue</h3>
                         <p>{error}</p>
+                    </div>
+                )}
+
+                {/* Add Question Modal */}
+                {showAddQuestionModal && (
+                    <div 
+                        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+                        onClick={handleBackdropClick}
+                    >
+                        <div className="relative max-h-[90vh] overflow-y-auto">
+                            <button
+                                onClick={handleCloseModal}
+                                className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 hover:bg-gray-100 shadow-lg"
+                                aria-label="Close modal"
+                            >
+                                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            <AdminQuestionForm
+                                onClose={handleCloseModal}
+                                onSuccess={handleQuestionCreated}
+                                defaultCategory={selectedCategory}
+                                defaultTopic={selectedTopic}
+                            />
+                        </div>
                     </div>
                 )}
             </div>

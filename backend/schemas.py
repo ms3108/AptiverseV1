@@ -60,6 +60,21 @@ class DashboardStatsResponse(BaseModel):
     activity_data: Dict[str, Dict[str, int]]
 
 
+class QuestionCreate(BaseModel):
+    title: str
+    description: str
+    difficulty: str
+    topic: str
+    subtopic: Optional[str] = None  # Optional field
+    option_a: str
+    option_b: str
+    option_c: str
+    option_d: str
+    correct_answer: str
+    explanation: str
+    xp_reward: int
+
+
 class QuestionResponse(BaseModel):
     id: int
     title: str
@@ -142,3 +157,31 @@ class BattleRoomResponse(BaseModel):
 class ReportResolveRequest(BaseModel):
     action: str  # delete_post, warn_user, ban_user, no_action
     ban_permanent: bool = False
+
+
+# Admin Question Creation Schemas
+
+class AdminQuestionCreate(BaseModel):
+    title: str = Field(..., min_length=5, max_length=500)
+    description: str = Field(..., min_length=10, max_length=5000)
+    category: str = Field(..., pattern="^(Quants|Logical|Language)$")
+    topic: str = Field(..., min_length=2, max_length=100)
+    sub_topic: Optional[str] = Field(None, max_length=100)
+    difficulty: str = Field(..., pattern="^(Easy|Medium|Hard)$")
+    option_a: str = Field(..., min_length=1, max_length=1000)
+    option_b: str = Field(..., min_length=1, max_length=1000)
+    option_c: str = Field(..., min_length=1, max_length=1000)
+    option_d: str = Field(..., min_length=1, max_length=1000)
+    correct_answer: str = Field(..., pattern="^[A-D]$")
+    explanation: str = Field(..., min_length=10, max_length=5000)
+    xp_reward: int = Field(default=10, ge=5, le=100)
+
+
+class AdminQuestionResponse(BaseModel):
+    id: int
+    title: str
+    category: str
+    topic: str
+    difficulty: str
+    created_at: datetime
+    message: str

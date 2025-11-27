@@ -1,0 +1,36 @@
+[
+  {
+    "title": "Synonym: Recalcitrant",
+    "description": "Identify the word closest in meaning to 'recalcitrant':",
+    "difficulty": "Hard",
+    "category": "Linguistics",
+    "topic": "Synonyms",
+    "subtopic": "Advanced Vocabulary",
+    "option_a": "Obedient",
+    "option_b": "Stubborn",
+    "option_c": "Passive",
+    "option_d": "Flexible",
+    "correct_answer": "B",
+    "explanation": "'Recalcitrant' means resistant to authority, difficult to manage, or stubbornly uncooperative.",
+    "xp_reward": 20
+  },
+  {
+    "title": "Synonym: Lachrymose",
+    "description": "Select the synonym for 'lachrymose':",
+    "difficulty": "Hard",
+    "category": "Linguistics",
+    "topic": "Synonyms",
+    "subtopic": "Advanced Vocabulary",
+    "option_a": "Tearful",
+    "option_b": "Joyful",
+    "option_c": "Angry",
+    "option_d": "Calm",
+    "correct_answer": "A",
+    "explanation": "'Lachrymose' means given to tears or weeping; tearful or very sad. It can also describe something that induces tears.",
+    "xp_reward": 20
+  }
+]   "correct_answer": "A",
+"explanation": "'Lachrymose' means given to tears or weeping; tearful or very sad. It can also describe something that induces tears.",
+"xp_reward": 20
+}
+]

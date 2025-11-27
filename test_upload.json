@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Test Question 1",
+    "description": "This is a test question",
+    "difficulty": "Easy",
+    "category": "Language",
+    "topic": "Test",
+    "option_a": "A",
+    "option_b": "B",
+    "option_c": "C",
+    "option_d": "D",
+    "correct_answer": "A",
+    "explanation": "Test explanation",
+    "xp_reward": 10
+  }
+]

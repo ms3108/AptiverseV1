@@ -10,6 +10,7 @@ import models
 import schemas
 import auth
 from database import engine, get_db
+from cache import _cache, _cache_time, cached_query
 import os
 import smtplib
 from email.mime.text import MIMEText
@@ -17,39 +18,26 @@ from email.mime.multipart import MIMEMultipart
 import asyncio
 import random
 import admin_routes
+import admin_questions
 
-models.Base.metadata.create_all(bind=engine)
+# Create database tables - wrap in try-except to allow app to start even if DB connection fails temporarily
+try:
+    models.Base.metadata.create_all(bind=engine)
+    print("✓ Database tables created/verified successfully")
+except Exception as e:
+    print(f"⚠️ Warning: Could not create database tables: {e}")
+    print("The app will start, but database operations may fail until connection is established")
 
 app = FastAPI(title="Aptiverse API")
 
 # Add GZip compression middleware for faster responses (reduces payload size by 60-80%)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# Simple in-memory cache with TTL
-_cache = {}
-_cache_time = {}
-
-def cached_query(key: str, query_func, ttl_seconds: int = 300):
-    """
-    Simple in-memory cache with TTL
-    Args:
-        key: Cache key
-        query_func: Function that returns data to cache
-        ttl_seconds: Time to live in seconds (default 5 minutes)
-    """
-    now = datetime.now()
-    
-    if key in _cache:
-        if now - _cache_time[key] < timedelta(seconds=ttl_seconds):
-            return _cache[key]
-    
-    result = query_func()
-    _cache[key] = result
-    _cache_time[key] = now
-    return result
+# Cache is now imported from cache.py module
 
 # Include admin routes
 app.include_router(admin_routes.router)
+app.include_router(admin_questions.router)
 
 # CORS configuration - support multiple origins
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
