@@ -2,7 +2,8 @@ app = "aptiverse-backend"
 primary_region = "bom"
 
 [build]
-  dockerfile = "backend/Dockerfile"
+  dockerfile = "./backend/Dockerfile"
+  build_target = ""
 
 [http_service]
   internal_port = 8000

@@ -131,14 +131,14 @@ def verify_email(token: str, db: Session = Depends(get_db)):
             detail="Invalid or expired verification token. Please request a new verification email."
         )
     
-    if db_user.is_verified:
+    if db_user.is_verified:  # type: ignore
         print(f"✅ User {db_user.email} is already verified")
         return {"message": "Email already verified. You can now log in."}
     
     # Verify the user
     print(f"✅ Verifying user: {db_user.email}")
-    db_user.is_verified = True
-    db_user.verification_token = None
+    db_user.is_verified = True  # type: ignore
+    db_user.verification_token = None  # type: ignore
     db.commit()
     
     return {"message": "Email verified successfully"}
@@ -150,14 +150,14 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)):
         models.User.email == user_credentials.email
     ).first()
     
-    if not user or not auth.verify_password(user_credentials.password, user.hashed_password):
+    if not user or not auth.verify_password(user_credentials.password, user.hashed_password):  # type: ignore
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    if not user.is_verified:
+    if not user.is_verified:  # type: ignore
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Please verify your email before logging in"
@@ -185,7 +185,7 @@ def get_user_warnings(
     
     return {
         "total": len(warnings),
-        "unread": sum(1 for w in warnings if not w.is_read),
+        "unread": sum(1 for w in warnings if not w.is_read),  # type: ignore
         "warnings": [{
             "id": w.id,
             "reason": w.reason,
@@ -211,7 +211,7 @@ def mark_warning_read(
     if not warning:
         raise HTTPException(status_code=404, detail="Warning not found")
     
-    warning.is_read = True
+    warning.is_read = True  # type: ignore
     db.commit()
     
     return {"message": "Warning marked as read"}
@@ -238,7 +238,7 @@ def get_dashboard_stats(
                 "name": badge.name,
                 "description": badge.description,
                 "icon": badge.icon,
-                "earned_at": user_badge.earned_at.isoformat() if user_badge.earned_at else None
+                "earned_at": user_badge.earned_at.isoformat() if user_badge.earned_at else None  # type: ignore
             })
     
     # Get activity data for heatmap (last 365 days)
@@ -299,7 +299,7 @@ def get_daily_practice_set(
         func.date(models.ActivityLog.activity_date) == today
     ).first()
     
-    if today_activity and today_activity.questions_solved > 0:
+    if today_activity and today_activity.questions_solved > 0:  # type: ignore
         return {
             "already_completed": True,
             "message": "You've already completed your practice for today! Come back tomorrow for a new set.",
@@ -307,18 +307,19 @@ def get_daily_practice_set(
             "xp_earned_today": today_activity.xp_earned
         }
     
-    # Use user's preferred question count (defaults to 10)
-    questions = ml_service.generate_daily_practice_set(db, current_user.id)
+    # Use new Smart Practice ML system with Naive Bayes classifier
+    result = ml_service.generate_smart_practice_set(db, current_user.id, current_user.daily_practice_count)  # type: ignore
     
     # Format questions for frontend
     questions_data = []
-    for q in questions:
+    for q in result["questions"]:
         questions_data.append({
             "id": q.id,
             "title": q.title,
             "description": q.description,
             "difficulty": q.difficulty,
             "topic": q.topic,
+            "category": q.category,
             "option_a": q.option_a,
             "option_b": q.option_b,
             "option_c": q.option_c,
@@ -330,7 +331,28 @@ def get_daily_practice_set(
         "already_completed": False,
         "questions": questions_data,
         "total_questions": len(questions_data),
-        "user_preference": current_user.daily_practice_count
+        "user_preference": current_user.daily_practice_count,
+        "weak_areas": result["weak_areas"],
+        "classifier_used": result["classifier_used"],
+        "selection_method": result["selection_method"]
+    }
+
+
+@app.get("/weak-areas")
+def get_weak_areas(
+    current_user: models.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get user's weak areas analysis with ML-based classification"""
+    import ml_service
+    
+    # Get weak areas from the ML service (uses Redis caching)
+    weak_areas = ml_service.get_user_weak_areas(db, current_user.id)  # type: ignore
+    
+    return {
+        "weak_areas": weak_areas,
+        "total_weak_categories": len(weak_areas),
+        "recommendation": "Focus on your weakest areas to improve your aptitude skills!"
     }
 
 
@@ -361,7 +383,7 @@ def update_user_preferences(
             detail="Daily practice count must be between 5 and 50 questions"
         )
     
-    current_user.daily_practice_count = daily_practice_count
+    current_user.daily_practice_count = daily_practice_count  # type: ignore
     db.commit()
     db.refresh(current_user)
     
@@ -413,10 +435,10 @@ def submit_answer(
     
     # Update user stats
     if is_correct:
-        ml_service.update_user_stats_after_practice(db, current_user.id, 1, xp_earned)
+        ml_service.update_user_stats_after_practice(db, current_user.id, 1, xp_earned)  # type: ignore
         
         # Check and award badges
-        newly_earned_badges = ml_service.check_and_award_badges(db, current_user.id)
+        newly_earned_badges = ml_service.check_and_award_badges(db, current_user.id)  # type: ignore
         
         # Get badge details for newly earned badges
         new_badges_data = []
@@ -575,8 +597,8 @@ def get_categories(
                 "topics": topic_list
             })
         
-        # Sort categories: Quants, Logical, Language
-        category_order = {"Quants": 0, "Logical": 1, "Language": 2}
+        # Sort categories: Quantitative, Logical, Linguistic
+        category_order = {"Quantitative": 0, "Logical": 1, "Linguistic": 2}
         categories_data.sort(key=lambda x: category_order.get(x["name"], 99))
         
         return {"categories": categories_data}
@@ -613,7 +635,7 @@ def get_questions_by_filters(
         difficulty_order = {"Easy": 1, "Medium": 2, "Hard": 3}
         questions = query.all()
         questions.sort(
-            key=lambda q: difficulty_order.get(q.difficulty, 99),
+            key=lambda q: difficulty_order.get(q.difficulty, 99),  # type: ignore
             reverse=(sort_order == "desc")
         )
     elif sort_by == "title":
@@ -823,23 +845,23 @@ def toggle_vote(
     
     if existing_vote:
         # If clicking the same vote type, remove it
-        if existing_vote.vote_type == vote_type:
+        if existing_vote.vote_type == vote_type:  # type: ignore
             # Remove vote
-            if existing_vote.vote_type == 1:
-                discussion.upvotes = max(0, discussion.upvotes - 1)
+            if existing_vote.vote_type == 1:  # type: ignore
+                discussion.upvotes = max(0, discussion.upvotes - 1)  # type: ignore
             else:
-                discussion.downvotes = max(0, discussion.downvotes - 1)
+                discussion.downvotes = max(0, discussion.downvotes - 1)  # type: ignore
             db.delete(existing_vote)
             new_vote_type = 0
         else:
             # Switch from upvote to downvote or vice versa
-            if existing_vote.vote_type == 1:
-                discussion.upvotes = max(0, discussion.upvotes - 1)
-                discussion.downvotes += 1
+            if existing_vote.vote_type == 1:  # type: ignore
+                discussion.upvotes = max(0, discussion.upvotes - 1)  # type: ignore
+                discussion.downvotes += 1  # type: ignore
             else:
-                discussion.downvotes = max(0, discussion.downvotes - 1)
-                discussion.upvotes += 1
-            existing_vote.vote_type = vote_type
+                discussion.downvotes = max(0, discussion.downvotes - 1)  # type: ignore
+                discussion.upvotes += 1  # type: ignore
+            existing_vote.vote_type = vote_type  # type: ignore
             new_vote_type = vote_type
     else:
         # Add new vote
@@ -850,9 +872,9 @@ def toggle_vote(
         )
         db.add(vote)
         if vote_type == 1:
-            discussion.upvotes += 1
+            discussion.upvotes += 1  # type: ignore
         else:
-            discussion.downvotes += 1
+            discussion.downvotes += 1  # type: ignore
         new_vote_type = vote_type
     
     db.commit()
@@ -881,7 +903,7 @@ def delete_discussion(
     if not discussion:
         raise HTTPException(status_code=404, detail="Discussion not found")
     
-    if discussion.user_id != current_user.id:
+    if discussion.user_id != current_user.id:  # type: ignore
         raise HTTPException(status_code=403, detail="You can only delete your own posts")
     
     db.delete(discussion)
@@ -908,7 +930,7 @@ def report_discussion(
         raise HTTPException(status_code=404, detail="Discussion not found")
     
     # Prevent self-reporting
-    if discussion.user_id == current_user.id:
+    if discussion.user_id == current_user.id:  # type: ignore
         raise HTTPException(status_code=400, detail="You cannot report your own post")
     
     # Check if user already reported this post
@@ -1076,7 +1098,7 @@ def join_battle_room(
     if not battle:
         raise HTTPException(status_code=404, detail="Battle room not found")
     
-    if battle.status != "waiting":
+    if battle.status != "waiting":  # type: ignore
         raise HTTPException(status_code=400, detail="Battle has already started or completed")
     
     # Check if already joined
@@ -1119,10 +1141,10 @@ def start_battle(
     if not battle:
         raise HTTPException(status_code=404, detail="Battle room not found")
     
-    if battle.creator_id != current_user.id:
+    if battle.creator_id != current_user.id:  # type: ignore
         raise HTTPException(status_code=403, detail="Only the creator can start the battle")
     
-    if battle.status != "waiting":
+    if battle.status != "waiting":  # type: ignore
         raise HTTPException(status_code=400, detail="Battle already started or completed")
     
     # Get random questions from the topic
@@ -1130,11 +1152,11 @@ def start_battle(
         models.Question.topic == battle.topic
     ).all()
     
-    if len(questions) < battle.num_questions:
+    if len(questions) < battle.num_questions:  # type: ignore
         raise HTTPException(status_code=400, detail="Not enough questions available")
     
     # Randomly select questions
-    selected_questions = random.sample(questions, battle.num_questions)
+    selected_questions = random.sample(questions, battle.num_questions)  # type: ignore
     
     # Store battle questions
     for i, question in enumerate(selected_questions):
@@ -1146,8 +1168,8 @@ def start_battle(
         db.add(battle_question)
     
     # Update battle status
-    battle.status = "in_progress"
-    battle.started_at = datetime.now()
+    battle.status = "in_progress"  # type: ignore
+    battle.started_at = datetime.now()  # type: ignore
     db.commit()
     
     return {"message": "Battle started", "started_at": battle.started_at}
@@ -1246,11 +1268,11 @@ async def battle_websocket(
         return
     
     # Connect to room
-    await manager.connect(websocket, room_code, user.id, user.username)
+    await manager.connect(websocket, room_code, user.id, user.username)  # type: ignore
     
     try:
         # If battle is in progress, send current state
-        if battle.status == "in_progress":
+        if battle.status == "in_progress":  # type: ignore
             battle_state = manager.get_battle_state(room_code)
             
             # If state not initialized, initialize it
@@ -1263,19 +1285,20 @@ async def battle_websocket(
                 questions_data = []
                 for bq in battle_questions:
                     q = db.query(models.Question).filter(models.Question.id == bq.question_id).first()
-                    questions_data.append({
-                        "id": q.id,
-                        "title": q.title,
-                        "description": q.description,
-                        "option_a": q.option_a,
-                        "option_b": q.option_b,
-                        "option_c": q.option_c,
-                        "option_d": q.option_d,
-                        "correct_answer": q.correct_answer,
-                        "difficulty": q.difficulty
-                    })
+                    if q:  # Ensure question exists
+                        questions_data.append({
+                            "id": q.id,
+                            "title": q.title,
+                            "description": q.description,
+                            "option_a": q.option_a,
+                            "option_b": q.option_b,
+                            "option_c": q.option_c,
+                            "option_d": q.option_d,
+                            "correct_answer": q.correct_answer,
+                            "difficulty": q.difficulty
+                        })
                 
-                manager.initialize_battle_state(room_code, questions_data, battle.num_questions)
+                manager.initialize_battle_state(room_code, questions_data, battle.num_questions)  # type: ignore
                 battle_state = manager.get_battle_state(room_code)
             
             # Send current question
@@ -1312,7 +1335,7 @@ async def battle_websocket(
             if message_type == "start_battle":
                 print(f"🚀 Start battle requested by user {user.id} (creator: {battle.creator_id})")
                 # Only creator can start
-                if battle.creator_id == user.id and battle.status == "waiting":
+                if battle.creator_id == user.id and battle.status == "waiting":  # type: ignore
                     print(f"✅ Starting battle {room_code}")
                     # Get questions and initialize state
                     battle_questions = db.query(models.BattleQuestion).filter(
@@ -1323,23 +1346,24 @@ async def battle_websocket(
                     questions_data = []
                     for bq in battle_questions:
                         q = db.query(models.Question).filter(models.Question.id == bq.question_id).first()
-                        questions_data.append({
-                            "id": q.id,
-                            "title": q.title,
-                            "description": q.description,
-                            "option_a": q.option_a,
-                            "option_b": q.option_b,
-                            "option_c": q.option_c,
-                            "option_d": q.option_d,
-                            "correct_answer": q.correct_answer,
-                            "difficulty": q.difficulty
-                        })
+                        if q:  # Ensure question exists
+                            questions_data.append({
+                                "id": q.id,
+                                "title": q.title,
+                                "description": q.description,
+                                "option_a": q.option_a,
+                                "option_b": q.option_b,
+                                "option_c": q.option_c,
+                                "option_d": q.option_d,
+                                "correct_answer": q.correct_answer,
+                                "difficulty": q.difficulty
+                            })
                     
-                    manager.initialize_battle_state(room_code, questions_data, battle.num_questions)
+                    manager.initialize_battle_state(room_code, questions_data, battle.num_questions)  # type: ignore
                     
                     # Update battle status
-                    battle.status = "in_progress"
-                    battle.started_at = datetime.now()
+                    battle.status = "in_progress"  # type: ignore
+                    battle.started_at = datetime.now()  # type: ignore
                     db.commit()
                     
                     # Send first question to all participants
@@ -1376,10 +1400,10 @@ async def battle_websocket(
                 
                 # Get correct answer
                 question = db.query(models.Question).filter(models.Question.id == question_id).first()
-                is_correct = (user_answer == question.correct_answer)
+                is_correct = (user_answer == question.correct_answer) if question else False  # type: ignore
                 
                 # Calculate score using battle room's time_per_question
-                points = calculate_score(is_correct, time_taken, battle.time_per_question)
+                points = calculate_score(is_correct, time_taken, battle.time_per_question)  # type: ignore
                 
                 # Save answer
                 battle_answer = models.BattleAnswer(
@@ -1393,23 +1417,23 @@ async def battle_websocket(
                 db.add(battle_answer)
                 
                 # Update participant stats
-                participant.score += points
-                participant.total_time_seconds += time_taken
+                participant.score += points  # type: ignore
+                participant.total_time_seconds += time_taken  # type: ignore
                 if is_correct:
-                    participant.correct_answers += 1
+                    participant.correct_answers += 1  # type: ignore
                 
                 db.commit()
                 
                 # Update leaderboard
-                manager.update_leaderboard(room_code, user.id, user.username, is_correct, time_taken, points)
+                manager.update_leaderboard(room_code, user.id, user.username, is_correct, time_taken, points)  # type: ignore
                 
                 # Send feedback to user
                 await manager.send_personal_message(websocket, {
                     "type": "answer_result",
                     "is_correct": is_correct,
-                    "correct_answer": question.correct_answer,
+                    "correct_answer": question.correct_answer if question else "",  # type: ignore
                     "points_earned": points,
-                    "explanation": question.explanation
+                    "explanation": question.explanation if question else ""  # type: ignore
                 })
                 
                 # Broadcast updated leaderboard
@@ -1461,8 +1485,8 @@ async def battle_websocket(
                         })
                     else:
                         # Battle completed
-                        battle.status = "completed"
-                        battle.completed_at = datetime.now()
+                        battle.status = "completed"  # type: ignore
+                        battle.completed_at = datetime.now()  # type: ignore
                         
                         # Update ranks
                         final_leaderboard = manager.get_sorted_leaderboard(room_code)
