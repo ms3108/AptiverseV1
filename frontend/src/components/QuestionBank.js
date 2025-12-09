@@ -243,7 +243,7 @@ function QuestionBank() {
         // Clear caches to force refresh
         sessionStorage.removeItem(CATEGORY_CACHE_KEY);
         questionCacheRef.current.clear();
-        
+
         // Reload categories to get updated counts
         const controller = new AbortController();
         fetchCategories(controller.signal)
@@ -259,7 +259,7 @@ function QuestionBank() {
                     console.error('Failed to reload categories', error);
                 }
             });
-        
+
         // If we're viewing questions, reload them
         if (selectedCategory || selectedTopic) {
             fetchQuestions(controller.signal);
@@ -276,55 +276,169 @@ function QuestionBank() {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+            <div className="flex justify-center items-center min-h-screen" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #EEF2FF 100%)' }}>
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600 font-medium">Loading Question Bank...</p>
+                </div>
             </div>
         );
     }
+
+    // Category card styles for visual variety
+    const categoryStyles = {
+        'Quants': {
+            gradient: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+            bgLight: '#EFF6FF',
+            border: '#BFDBFE',
+            icon: '🔢',
+            iconBg: 'rgba(59, 130, 246, 0.15)'
+        },
+        'Quantitative': {
+            gradient: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+            bgLight: '#EFF6FF',
+            border: '#BFDBFE',
+            icon: '🔢',
+            iconBg: 'rgba(59, 130, 246, 0.15)'
+        },
+        'Logical': {
+            gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+            bgLight: '#ECFDF5',
+            border: '#A7F3D0',
+            icon: '🧩',
+            iconBg: 'rgba(16, 185, 129, 0.15)'
+        },
+        'Language': {
+            gradient: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+            bgLight: '#F5F3FF',
+            border: '#DDD6FE',
+            icon: '📝',
+            iconBg: 'rgba(139, 92, 246, 0.15)'
+        },
+        'Linguistic': {
+            gradient: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+            bgLight: '#F5F3FF',
+            border: '#DDD6FE',
+            icon: '📝',
+            iconBg: 'rgba(139, 92, 246, 0.15)'
+        }
+    };
+
+    const getStyle = (name) => categoryStyles[name] || {
+        gradient: 'linear-gradient(135deg, #6B7280 0%, #374151 100%)',
+        bgLight: '#F9FAFB',
+        border: '#E5E7EB',
+        icon: '📚',
+        iconBg: 'rgba(107, 114, 128, 0.15)'
+    };
 
     // Category Selection View
     if (!selectedCategory) {
         return (
             <>
                 <Navigation />
-                <div className="max-w-7xl mx-auto mt-8 px-4">
-                    <div className="mb-6">
+                <div style={{ background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 50%, #F8FAFC 100%)', minHeight: 'calc(100vh - 64px)' }}>
+                    <div className="max-w-7xl mx-auto pt-10 pb-16 px-4">
+                        {/* Back button */}
                         <button
                             onClick={() => navigate('/dashboard')}
-                            className="text-blue-600 hover:text-blue-800 flex items-center"
+                            className="group flex items-center gap-2 mb-8 text-gray-600 hover:text-blue-600 transition-colors"
                         >
-                            ← Back to Dashboard
+                            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm group-hover:shadow group-hover:bg-blue-50 transition-all">
+                                ←
+                            </span>
+                            <span className="font-medium">Back to Dashboard</span>
                         </button>
-                    </div>
 
-                    <h1 className="text-3xl font-bold text-gray-800 mb-6">📚 Question Bank</h1>
-                    <p className="text-gray-600 mb-8">Select a category to explore questions</p>
+                        {/* Header */}
+                        <div className="text-center mb-12">
+                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6" style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)', boxShadow: '0 10px 40px rgba(59, 130, 246, 0.3)' }}>
+                                <span className="text-4xl">📚</span>
+                            </div>
+                            <h1 className="text-4xl font-bold mb-3" style={{ color: '#1F2937', letterSpacing: '-1px' }}>Question Bank</h1>
+                            <p className="text-lg" style={{ color: '#6B7280' }}>Select a category to explore questions and test your skills</p>
+                        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {categories.map((category) => (
-                            <div
-                                key={category.name}
-                                onClick={() => handleCategoryClick(category.name)}
-                                className="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow border-2 border-transparent hover:border-blue-500"
-                            >
-                                <div className="text-center">
-                                    <div className="text-5xl mb-4">
-                                        {category.name === 'Quants' && '🔢'}
-                                        {category.name === 'Logical' && '🧩'}
-                                        {category.name === 'Language' && '📝'}
+                        {/* Category Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {categories.map((category) => {
+                                const style = getStyle(category.name);
+                                return (
+                                    <div
+                                        key={category.name}
+                                        onClick={() => handleCategoryClick(category.name)}
+                                        className="group relative bg-white rounded-2xl cursor-pointer transition-all duration-300 overflow-hidden"
+                                        style={{
+                                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                                            border: `2px solid ${style.border}`,
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-8px)';
+                                            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.15)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
+                                        }}
+                                    >
+                                        {/* Gradient header bar */}
+                                        <div className="h-2" style={{ background: style.gradient }}></div>
+
+                                        <div className="p-8">
+                                            {/* Icon */}
+                                            <div className="flex justify-center mb-6">
+                                                <div className="flex items-center justify-center w-20 h-20 rounded-2xl transition-transform group-hover:scale-110" style={{ background: style.iconBg }}>
+                                                    <span className="text-5xl">{style.icon}</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="text-center">
+                                                <h3 className="text-2xl font-bold mb-3" style={{ color: '#1F2937' }}>
+                                                    {category.name}
+                                                </h3>
+                                                <p className="text-3xl font-black mb-1" style={{ color: style.gradient.includes('3B82F6') ? '#3B82F6' : style.gradient.includes('10B981') ? '#10B981' : '#8B5CF6' }}>
+                                                    {category.total_questions}
+                                                </p>
+                                                <p className="text-sm font-medium mb-4" style={{ color: '#6B7280' }}>questions available</p>
+
+                                                {/* Topics badge */}
+                                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ backgroundColor: style.bgLight }}>
+                                                    <span className="text-sm">📁</span>
+                                                    <span className="text-sm font-semibold" style={{ color: '#4B5563' }}>{category.topics.length} topics</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Arrow indicator */}
+                                            <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ background: style.gradient }}>
+                                                <span className="text-white text-lg">→</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                                        {category.name}
-                                    </h3>
-                                    <p className="text-gray-600 mb-4">
-                                        {category.total_questions} questions
-                                    </p>
-                                    <div className="text-sm text-gray-500">
-                                        {category.topics.length} topics
-                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Stats summary */}
+                        <div className="mt-12 text-center">
+                            <div className="inline-flex items-center gap-6 px-8 py-4 rounded-2xl bg-white" style={{ boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)' }}>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-2xl">📊</span>
+                                    <span className="font-bold text-lg" style={{ color: '#1F2937' }}>
+                                        {categories.reduce((sum, cat) => sum + cat.total_questions, 0)}
+                                    </span>
+                                    <span className="text-gray-500">total questions</span>
+                                </div>
+                                <div className="w-px h-8 bg-gray-200"></div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-2xl">📁</span>
+                                    <span className="font-bold text-lg" style={{ color: '#1F2937' }}>
+                                        {categories.reduce((sum, cat) => sum + cat.topics.length, 0)}
+                                    </span>
+                                    <span className="text-gray-500">topics</span>
                                 </div>
                             </div>
-                        ))}
+                        </div>
                     </div>
                 </div>
             </>
@@ -334,38 +448,109 @@ function QuestionBank() {
     // Topic Selection View
     if (selectedCategory && !selectedTopic) {
         const category = categories.find(c => c.name === selectedCategory);
+        const style = getStyle(selectedCategory);
         return (
             <>
                 <Navigation />
-                <div className="max-w-7xl mx-auto mt-8 px-4">
-                    <div className="mb-6">
+                <div style={{ background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 50%, #F8FAFC 100%)', minHeight: 'calc(100vh - 64px)' }}>
+                    <div className="max-w-7xl mx-auto pt-10 pb-16 px-4">
+                        {/* Back button */}
                         <button
                             onClick={handleBackToCategories}
-                            className="text-blue-600 hover:text-blue-800 flex items-center"
+                            className="group flex items-center gap-2 mb-8 text-gray-600 hover:text-blue-600 transition-colors"
                         >
-                            ← Back to Categories
+                            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm group-hover:shadow group-hover:bg-blue-50 transition-all">
+                                ←
+                            </span>
+                            <span className="font-medium">Back to Categories</span>
                         </button>
-                    </div>
 
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                        {selectedCategory === 'Quants' && '🔢'}
-                        {selectedCategory === 'Logical' && '🧩'}
-                        {selectedCategory === 'Language' && '📝'}
-                        {selectedCategory}
-                    </h1>
-                    <p className="text-gray-600 mb-8">Select a topic to view questions</p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {category.topics.map((topic) => (
-                            <div
-                                key={topic.name}
-                                onClick={() => handleTopicClick(topic.name)}
-                                className="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition-shadow border border-gray-200 hover:border-blue-500"
-                            >
-                                <h4 className="font-semibold text-gray-800 mb-2">{topic.name}</h4>
-                                <p className="text-sm text-gray-600">{topic.count} questions</p>
+                        {/* Header */}
+                        <div className="flex items-center gap-6 mb-10">
+                            <div className="flex items-center justify-center w-16 h-16 rounded-2xl" style={{ background: style.iconBg }}>
+                                <span className="text-4xl">{style.icon}</span>
                             </div>
-                        ))}
+                            <div>
+                                <h1 className="text-3xl font-bold" style={{ color: '#1F2937', letterSpacing: '-0.5px' }}>{selectedCategory}</h1>
+                                <p className="text-gray-500 mt-1">Select a topic to start practicing</p>
+                            </div>
+                        </div>
+
+                        {/* Topics Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                            {category.topics.map((topic, index) => {
+                                // Alternate colors for visual interest
+                                const colors = [
+                                    { bg: '#EFF6FF', border: '#BFDBFE', accent: '#3B82F6' },
+                                    { bg: '#ECFDF5', border: '#A7F3D0', accent: '#10B981' },
+                                    { bg: '#F5F3FF', border: '#DDD6FE', accent: '#8B5CF6' },
+                                    { bg: '#FEF3C7', border: '#FDE68A', accent: '#F59E0B' },
+                                    { bg: '#FCE7F3', border: '#FBCFE8', accent: '#EC4899' },
+                                    { bg: '#CCFBF1', border: '#99F6E4', accent: '#14B8A6' },
+                                ];
+                                const color = colors[index % colors.length];
+
+                                return (
+                                    <div
+                                        key={topic.name}
+                                        onClick={() => handleTopicClick(topic.name)}
+                                        className="group relative bg-white rounded-xl cursor-pointer transition-all duration-300 overflow-hidden"
+                                        style={{
+                                            boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
+                                            border: `1px solid ${color.border}`,
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                            e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.12)';
+                                            e.currentTarget.style.borderColor = color.accent;
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 2px 12px rgba(0, 0, 0, 0.06)';
+                                            e.currentTarget.style.borderColor = color.border;
+                                        }}
+                                    >
+                                        {/* Colored top accent */}
+                                        <div className="h-1" style={{ backgroundColor: color.accent }}></div>
+
+                                        <div className="p-5">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <h4 className="font-bold text-gray-800 mb-2 group-hover:text-gray-900 transition-colors">{topic.name}</h4>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold" style={{ backgroundColor: color.bg, color: color.accent }}>
+                                                            {topic.count} questions
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: color.bg }}>
+                                                    <span style={{ color: color.accent }}>→</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Category summary */}
+                        <div className="mt-10 p-6 rounded-2xl bg-white" style={{ boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)' }}>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: style.gradient }}>
+                                        <span className="text-2xl text-white">📊</span>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-500">Category Statistics</p>
+                                        <p className="font-bold text-gray-800">{category.total_questions} questions across {category.topics.length} topics</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-sm text-gray-500">Ready to practice?</p>
+                                    <p className="font-semibold" style={{ color: style.gradient.includes('3B82F6') ? '#3B82F6' : style.gradient.includes('10B981') ? '#10B981' : '#8B5CF6' }}>Select a topic above</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>
@@ -373,216 +558,286 @@ function QuestionBank() {
     }
 
     // Questions List View
+    const style = getStyle(selectedCategory);
     return (
         <>
             <Navigation />
-            <div className="max-w-7xl mx-auto mt-8 px-4">
-                <div className="mb-6">
+            <div style={{ background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 50%, #F8FAFC 100%)', minHeight: 'calc(100vh - 64px)' }}>
+                <div className="max-w-7xl mx-auto pt-10 pb-16 px-4">
+                    {/* Back button */}
                     <button
                         onClick={handleBackToTopics}
-                        className="text-blue-600 hover:text-blue-800 flex items-center"
+                        className="group flex items-center gap-2 mb-8 text-gray-600 hover:text-blue-600 transition-colors"
                     >
-                        ← Back to Topics
+                        <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm group-hover:shadow group-hover:bg-blue-50 transition-all">
+                            ←
+                        </span>
+                        <span className="font-medium">Back to Topics</span>
                     </button>
-                </div>
 
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-800">{selectedTopic}</h1>
-                        <p className="text-gray-600">
-                            {(questionsLoading || !hasLoadedQuestions) ? (
-                                <span className="animate-pulse">Loading questions...</span>
-                            ) : (
-                                `${questions.length} question${questions.length !== 1 ? 's' : ''}`
-                            )}
-                        </p>
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-5">
+                            <div className="flex items-center justify-center w-14 h-14 rounded-xl" style={{ background: style.gradient, boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)' }}>
+                                <span className="text-2xl text-white">📝</span>
+                            </div>
+                            <div>
+                                <h1 className="text-3xl font-bold" style={{ color: '#1F2937', letterSpacing: '-0.5px' }}>{selectedTopic}</h1>
+                                <p className="text-gray-500 mt-1">
+                                    {(questionsLoading || !hasLoadedQuestions) ? (
+                                        <span className="animate-pulse">Loading questions...</span>
+                                    ) : (
+                                        <span className="flex items-center gap-2">
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold" style={{ backgroundColor: style.bgLight, color: style.gradient.includes('3B82F6') ? '#3B82F6' : style.gradient.includes('10B981') ? '#10B981' : '#8B5CF6' }}>
+                                                {questions.length} question{questions.length !== 1 ? 's' : ''}
+                                            </span>
+                                        </span>
+                                    )}
+                                </p>
+                            </div>
+                        </div>
+                        {isAdmin && (
+                            <button
+                                onClick={handleAddQuestionClick}
+                                className="flex items-center gap-2 px-5 py-3 rounded-xl text-white font-semibold transition-all hover:shadow-lg"
+                                style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)' }}
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                Add Question
+                            </button>
+                        )}
                     </div>
-                    {isAdmin && (
-                        <button
-                            onClick={handleAddQuestionClick}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            Add Question
-                        </button>
+
+                    {/* Filters and Sorting */}
+                    <div className="bg-white rounded-2xl p-5 mb-8" style={{ boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)' }}>
+                        <div className="flex flex-wrap gap-6 items-center">
+                            <div className="flex items-center gap-3">
+                                <span className="text-lg">🎯</span>
+                                <label className="text-sm font-semibold text-gray-600">Difficulty</label>
+                                <select
+                                    value={filters.difficulty}
+                                    onChange={(e) => setFilters({ ...filters, difficulty: e.target.value })}
+                                    className="border-2 border-gray-200 rounded-lg px-4 py-2 font-medium text-gray-700 focus:border-blue-400 focus:outline-none transition-colors bg-gray-50 hover:bg-white"
+                                >
+                                    <option value="">All Levels</option>
+                                    <option value="Easy">🟢 Easy</option>
+                                    <option value="Medium">🟡 Medium</option>
+                                    <option value="Hard">🔴 Hard</option>
+                                </select>
+                            </div>
+
+                            <div className="w-px h-8 bg-gray-200 hidden md:block"></div>
+
+                            <div className="flex items-center gap-3">
+                                <span className="text-lg">📊</span>
+                                <label className="text-sm font-semibold text-gray-600">Sort by</label>
+                                <select
+                                    value={filters.sortBy}
+                                    onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
+                                    className="border-2 border-gray-200 rounded-lg px-4 py-2 font-medium text-gray-700 focus:border-blue-400 focus:outline-none transition-colors bg-gray-50 hover:bg-white"
+                                >
+                                    <option value="created_at">Date Added</option>
+                                    <option value="difficulty">Difficulty</option>
+                                    <option value="title">Title</option>
+                                </select>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <span className="text-lg">↕️</span>
+                                <label className="text-sm font-semibold text-gray-600">Order</label>
+                                <select
+                                    value={filters.sortOrder}
+                                    onChange={(e) => setFilters({ ...filters, sortOrder: e.target.value })}
+                                    className="border-2 border-gray-200 rounded-lg px-4 py-2 font-medium text-gray-700 focus:border-blue-400 focus:outline-none transition-colors bg-gray-50 hover:bg-white"
+                                >
+                                    <option value="desc">Newest First</option>
+                                    <option value="asc">Oldest First</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Questions List */}
+                    {questionsLoading && (
+                        <>
+                            <div className="flex items-center justify-center mb-6">
+                                <div className="text-center">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-3" style={{ borderColor: '#1E88E5' }}></div>
+                                    <p className="text-gray-600 font-medium">Loading questions...</p>
+                                </div>
+                            </div>
+                            <div className="space-y-4 mb-6" aria-live="polite" aria-busy="true">
+                                {[...Array(3)].map((_, idx) => (
+                                    <div
+                                        key={`question-skeleton-${idx}`}
+                                        className="bg-white rounded-lg shadow p-6 animate-pulse"
+                                    >
+                                        <div className="flex items-start gap-3 mb-3">
+                                            <div className="w-6 h-6 bg-gray-200 rounded-full"></div>
+                                            <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+                                        </div>
+                                        <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+                                        <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                                        <div className="flex gap-2">
+                                            <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                                            <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+
+                    {!questionsLoading && !error && hasLoadedQuestions && (
+                        <div className="space-y-4">
+                            {questions.map((question, index) => {
+                                const difficultyStyles = {
+                                    'Easy': { bg: '#ECFDF5', color: '#059669', border: '#A7F3D0', icon: '🟢' },
+                                    'Medium': { bg: '#FEF3C7', color: '#D97706', border: '#FDE68A', icon: '🟡' },
+                                    'Hard': { bg: '#FEE2E2', color: '#DC2626', border: '#FECACA', icon: '🔴' }
+                                };
+                                const diffStyle = difficultyStyles[question.difficulty] || difficultyStyles['Medium'];
+
+                                return (
+                                    <div
+                                        key={question.id}
+                                        onClick={() => handleQuestionClick(question.id)}
+                                        className="group bg-white rounded-2xl cursor-pointer transition-all duration-300 overflow-hidden"
+                                        style={{
+                                            boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
+                                            border: question.solved ? '2px solid #A7F3D0' : '1px solid #E5E7EB',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 2px 12px rgba(0, 0, 0, 0.06)';
+                                        }}
+                                    >
+                                        {/* Status indicator bar */}
+                                        <div className="h-1" style={{
+                                            background: question.solved ? 'linear-gradient(90deg, #10B981, #34D399)' :
+                                                question.attempted ? 'linear-gradient(90deg, #F59E0B, #FBBF24)' :
+                                                    '#E5E7EB'
+                                        }}></div>
+
+                                        <div className="p-6">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-4 mb-3">
+                                                        {/* Status icon */}
+                                                        <div className="flex items-center justify-center w-10 h-10 rounded-xl" style={{
+                                                            backgroundColor: question.solved ? '#ECFDF5' : question.attempted ? '#FEF3C7' : '#F3F4F6',
+                                                        }}>
+                                                            {question.solved ? (
+                                                                <span className="text-xl" title="Solved correctly">✅</span>
+                                                            ) : question.attempted ? (
+                                                                <span className="text-xl" title="Attempted but not solved">🔄</span>
+                                                            ) : (
+                                                                <span className="text-xl text-gray-400" title="Not attempted">○</span>
+                                                            )}
+                                                        </div>
+                                                        <h3 className="text-xl font-bold text-gray-800 group-hover:text-gray-900 transition-colors">
+                                                            {question.title}
+                                                        </h3>
+                                                    </div>
+                                                    <p className="text-gray-600 mb-4 ml-14">{question.description}</p>
+                                                    <div className="flex items-center gap-3 ml-14">
+                                                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: diffStyle.bg, color: diffStyle.color }}>
+                                                            {diffStyle.icon} {question.difficulty}
+                                                        </span>
+                                                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#EEF2FF', color: '#4F46E5' }}>
+                                                            💎 {question.xp_reward} XP
+                                                        </span>
+                                                        {question.solved && (
+                                                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#ECFDF5', color: '#059669' }}>
+                                                                ✓ Solved
+                                                            </span>
+                                                        )}
+                                                        {!question.solved && question.attempted && (
+                                                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#FEF3C7', color: '#D97706' }}>
+                                                                In Progress
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="w-12 h-12 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: '#EEF2FF' }}>
+                                                    <span className="text-xl" style={{ color: '#4F46E5' }}>→</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {!questionsLoading && hasLoadedQuestions && !error && questions.length === 0 && (
+                        <div className="bg-white rounded-2xl p-16 text-center" style={{ boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)' }}>
+                            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-6" style={{ backgroundColor: '#F3F4F6' }}>
+                                <span className="text-5xl">🔍</span>
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-3">No Questions Found</h3>
+                            <p className="text-gray-500 max-w-md mx-auto">
+                                No questions match your current filters. Try adjusting the difficulty or sort options.
+                            </p>
+                            <button
+                                onClick={() => setFilters({ difficulty: '', sortBy: 'created_at', sortOrder: 'desc' })}
+                                className="mt-6 px-6 py-3 rounded-xl font-semibold text-white transition-all hover:shadow-lg"
+                                style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)' }}
+                            >
+                                Reset Filters
+                            </button>
+                        </div>
+                    )}
+
+                    {!questionsLoading && error && (
+                        <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-8">
+                            <div className="flex items-start gap-4">
+                                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-100">
+                                    <span className="text-2xl">⚠️</span>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-red-800 mb-2">We ran into an issue</h3>
+                                    <p className="text-red-600">{error}</p>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
+            </div>
 
-                {/* Filters and Sorting */}
-                <div className="bg-white rounded-lg shadow p-4 mb-6">
-                    <div className="flex flex-wrap gap-4 items-center">
-                        <div>
-                            <label className="text-sm font-medium text-gray-700 mr-2">Difficulty:</label>
-                            <select
-                                value={filters.difficulty}
-                                onChange={(e) => setFilters({ ...filters, difficulty: e.target.value })}
-                                className="border border-gray-300 rounded px-3 py-1"
-                            >
-                                <option value="">All</option>
-                                <option value="Easy">Easy</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Hard">Hard</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="text-sm font-medium text-gray-700 mr-2">Sort by:</label>
-                            <select
-                                value={filters.sortBy}
-                                onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
-                                className="border border-gray-300 rounded px-3 py-1"
-                            >
-                                <option value="created_at">Date Added</option>
-                                <option value="difficulty">Difficulty</option>
-                                <option value="title">Title</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="text-sm font-medium text-gray-700 mr-2">Order:</label>
-                            <select
-                                value={filters.sortOrder}
-                                onChange={(e) => setFilters({ ...filters, sortOrder: e.target.value })}
-                                className="border border-gray-300 rounded px-3 py-1"
-                            >
-                                <option value="desc">Descending</option>
-                                <option value="asc">Ascending</option>
-                            </select>
-                        </div>
+            {/* Add Question Modal */}
+            {showAddQuestionModal && (
+                <div
+                    className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto"
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
+                    onClick={handleBackdropClick}
+                >
+                    <div className="relative max-h-[90vh] overflow-y-auto rounded-2xl">
+                        <button
+                            onClick={handleCloseModal}
+                            className="absolute top-4 right-4 z-10 bg-white rounded-xl p-2.5 hover:bg-gray-100 transition-colors"
+                            style={{ boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' }}
+                            aria-label="Close modal"
+                        >
+                            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <AdminQuestionForm
+                            onClose={handleCloseModal}
+                            onSuccess={handleQuestionCreated}
+                            defaultCategory={selectedCategory}
+                            defaultTopic={selectedTopic}
+                        />
                     </div>
                 </div>
-
-                {/* Questions List */}
-                {questionsLoading && (
-                    <>
-                        <div className="flex items-center justify-center mb-6">
-                            <div className="text-center">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-3" style={{ borderColor: '#1E88E5' }}></div>
-                                <p className="text-gray-600 font-medium">Loading questions...</p>
-                            </div>
-                        </div>
-                        <div className="space-y-4 mb-6" aria-live="polite" aria-busy="true">
-                            {[...Array(3)].map((_, idx) => (
-                                <div
-                                    key={`question-skeleton-${idx}`}
-                                    className="bg-white rounded-lg shadow p-6 animate-pulse"
-                                >
-                                    <div className="flex items-start gap-3 mb-3">
-                                        <div className="w-6 h-6 bg-gray-200 rounded-full"></div>
-                                        <div className="h-5 bg-gray-200 rounded w-1/3"></div>
-                                    </div>
-                                    <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-                                    <div className="flex gap-2">
-                                        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-                                        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )}
-
-                {!questionsLoading && !error && hasLoadedQuestions && (
-                    <div className="space-y-4">
-                        {questions.map((question) => (
-                            <div
-                                key={question.id}
-                                onClick={() => handleQuestionClick(question.id)}
-                                className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            {question.solved ? (
-                                                <span className="text-green-600 text-xl font-bold" title="Solved correctly">
-                                                    ✓
-                                                </span>
-                                            ) : question.attempted ? (
-                                                <span className="text-orange-500 text-xl font-bold" title="Attempted but not solved">
-                                                    ◐
-                                                </span>
-                                            ) : (
-                                                <span className="text-gray-300 text-xl font-bold" title="Not attempted">
-                                                    ○
-                                                </span>
-                                            )}
-                                            <h3 className="text-xl font-semibold text-gray-800">
-                                                {question.title}
-                                            </h3>
-                                        </div>
-                                        <p className="text-gray-600 mb-3">{question.description}</p>
-                                        <div className="flex items-center gap-3">
-                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColorClass(question.difficulty)}`}>
-                                                {question.difficulty}
-                                            </span>
-                                            <span className="text-sm text-gray-500">
-                                                💎 {question.xp_reward} XP
-                                            </span>
-                                            {question.solved && (
-                                                <span className="text-xs text-green-600 font-medium">
-                                                    Solved
-                                                </span>
-                                            )}
-                                            {!question.solved && question.attempted && (
-                                                <span className="text-xs text-orange-500 font-medium">
-                                                    Attempted
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="text-blue-600 text-2xl">→</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {!questionsLoading && hasLoadedQuestions && !error && questions.length === 0 && (
-                    <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                        <div className="text-6xl mb-4">🔍</div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No Questions Found</h3>
-                        <p className="text-gray-600">
-                            No questions match your current filters. Try adjusting the difficulty or sort options.
-                        </p>
-                    </div>
-                )}
-
-                {!questionsLoading && error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-6">
-                        <h3 className="text-lg font-semibold mb-2">We ran into an issue</h3>
-                        <p>{error}</p>
-                    </div>
-                )}
-
-                {/* Add Question Modal */}
-                {showAddQuestionModal && (
-                    <div 
-                        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
-                        onClick={handleBackdropClick}
-                    >
-                        <div className="relative max-h-[90vh] overflow-y-auto">
-                            <button
-                                onClick={handleCloseModal}
-                                className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 hover:bg-gray-100 shadow-lg"
-                                aria-label="Close modal"
-                            >
-                                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                            <AdminQuestionForm
-                                onClose={handleCloseModal}
-                                onSuccess={handleQuestionCreated}
-                                defaultCategory={selectedCategory}
-                                defaultTopic={selectedTopic}
-                            />
-                        </div>
-                    </div>
-                )}
-            </div>
+            )}
         </>
     );
 }
