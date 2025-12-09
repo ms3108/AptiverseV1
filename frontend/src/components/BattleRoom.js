@@ -358,8 +358,8 @@ function BattleRoom() {
                                     </button>
                                 )}
                                 {!isCreator && (
-                                    <div className="text-center py-3 px-4 rounded-lg" style={{ backgroundColor: '#FEF3C7' }}>
-                                        <p className="font-semibold" style={{ color: '#92400E' }}>
+                                    <div className="text-center py-3 px-4 rounded-lg" style={{ backgroundColor: '#EFF6FF' }}>
+                                        <p className="font-semibold" style={{ color: '#1E40AF' }}>
                                             Waiting for the creator to start the battle...
                                         </p>
                                     </div>
@@ -418,15 +418,15 @@ function BattleRoom() {
                                 <div className="flex items-center gap-3">
                                     <div className="text-right">
                                         <p className="text-2xl font-black" style={{
-                                            color: timeLeft <= Math.min(10, Math.floor(timePerQuestion * 0.16)) ? '#DC2626' : '#1E88E5'
+                                            color: timeLeft <= Math.min(10, Math.floor(timePerQuestion * 0.16)) ? '#1E40AF' : '#1E88E5'
                                         }}>
                                             {timeLeft}s
                                         </p>
                                     </div>
                                     <div className="w-16 h-16 rounded-full flex items-center justify-center"
                                         style={{
-                                            backgroundColor: timeLeft <= Math.min(10, Math.floor(timePerQuestion * 0.16)) ? 'rgba(220, 38, 38, 0.1)' : 'rgba(30, 136, 229, 0.1)',
-                                            border: `3px solid ${timeLeft <= Math.min(10, Math.floor(timePerQuestion * 0.16)) ? '#DC2626' : '#1E88E5'}`
+                                            backgroundColor: timeLeft <= Math.min(10, Math.floor(timePerQuestion * 0.16)) ? 'rgba(30, 64, 175, 0.15)' : 'rgba(30, 136, 229, 0.1)',
+                                            border: `3px solid ${timeLeft <= Math.min(10, Math.floor(timePerQuestion * 0.16)) ? '#1E40AF' : '#1E88E5'}`
                                         }}>
                                         <span className="text-2xl">⏱️</span>
                                     </div>
@@ -438,12 +438,12 @@ function BattleRoom() {
                                 <div className="mb-4">
                                     <span className="px-3 py-1 rounded-full text-sm font-bold"
                                         style={{
-                                            backgroundColor: currentQuestion.difficulty === 'Easy' ? 'rgba(34, 197, 94, 0.1)' :
-                                                currentQuestion.difficulty === 'Medium' ? 'rgba(251, 146, 60, 0.1)' :
-                                                    'rgba(239, 68, 68, 0.1)',
-                                            color: currentQuestion.difficulty === 'Easy' ? '#16A34A' :
-                                                currentQuestion.difficulty === 'Medium' ? '#EA580C' :
-                                                    '#DC2626'
+                                            backgroundColor: currentQuestion.difficulty === 'Easy' ? 'rgba(59, 130, 246, 0.1)' :
+                                                currentQuestion.difficulty === 'Medium' ? 'rgba(30, 64, 175, 0.15)' :
+                                                    'rgba(30, 58, 138, 0.2)',
+                                            color: currentQuestion.difficulty === 'Easy' ? '#3B82F6' :
+                                                currentQuestion.difficulty === 'Medium' ? '#1E40AF' :
+                                                    '#1E3A8A'
                                         }}>
                                         {currentQuestion.difficulty}
                                     </span>
@@ -469,8 +469,8 @@ function BattleRoom() {
                                             style={{
                                                 border: selectedAnswer === option ? '3px solid #1E88E5' : '2px solid #E2E8F0',
                                                 backgroundColor: answerResult ?
-                                                    (option === answerResult.correct_answer ? 'rgba(34, 197, 94, 0.1)' :
-                                                        option === selectedAnswer && !answerResult.is_correct ? 'rgba(239, 68, 68, 0.1)' :
+                                                    (option === answerResult.correct_answer ? 'rgba(59, 130, 246, 0.15)' :
+                                                        option === selectedAnswer && !answerResult.is_correct ? 'rgba(30, 64, 175, 0.1)' :
                                                             '#FFFFFF') :
                                                     (selectedAnswer === option ? 'rgba(30, 136, 229, 0.1)' : '#FFFFFF'),
                                                 cursor: answerResult ? 'default' : 'pointer'
@@ -502,11 +502,11 @@ function BattleRoom() {
                                 {answerResult && (
                                     <div className={`mt-6 p-4 rounded-lg`}
                                         style={{
-                                            backgroundColor: answerResult.is_correct ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                                            border: `2px solid ${answerResult.is_correct ? '#16A34A' : '#DC2626'}`
+                                            backgroundColor: answerResult.is_correct ? 'rgba(59, 130, 246, 0.1)' : 'rgba(30, 64, 175, 0.1)',
+                                            border: `2px solid ${answerResult.is_correct ? '#3B82F6' : '#1E40AF'}`
                                         }}>
                                         <p className="font-bold text-lg mb-2" style={{
-                                            color: answerResult.is_correct ? '#16A34A' : '#DC2626'
+                                            color: answerResult.is_correct ? '#3B82F6' : '#1E40AF'
                                         }}>
                                             {answerResult.is_correct ? '✓ Correct!' : '✗ Incorrect'}
                                         </p>

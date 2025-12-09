@@ -267,9 +267,9 @@ function QuestionBank() {
     };
 
     const difficultyColorMap = useMemo(() => ({
-        Easy: 'text-green-600 bg-green-100',
-        Medium: 'text-yellow-600 bg-yellow-100',
-        Hard: 'text-red-600 bg-red-100'
+        Easy: 'text-blue-600 bg-blue-100',
+        Medium: 'text-blue-700 bg-blue-200',
+        Hard: 'text-blue-900 bg-blue-300'
     }), []);
 
     const getDifficultyColorClass = (difficulty) => difficultyColorMap[difficulty] || 'text-gray-600 bg-gray-100';
@@ -285,51 +285,51 @@ function QuestionBank() {
         );
     }
 
-    // Category card styles for visual variety
+    // Category card styles - unified blue palette
     const categoryStyles = {
         'Quants': {
-            gradient: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
-            bgLight: '#EFF6FF',
-            border: '#BFDBFE',
+            gradient: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+            bgLight: '#DBEAFE',
+            border: '#93C5FD',
             icon: '🔢',
-            iconBg: 'rgba(59, 130, 246, 0.15)'
+            iconBg: 'rgba(30, 64, 175, 0.12)'
         },
         'Quantitative': {
-            gradient: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
-            bgLight: '#EFF6FF',
-            border: '#BFDBFE',
+            gradient: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+            bgLight: '#DBEAFE',
+            border: '#93C5FD',
             icon: '🔢',
-            iconBg: 'rgba(59, 130, 246, 0.15)'
+            iconBg: 'rgba(30, 64, 175, 0.12)'
         },
         'Logical': {
-            gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-            bgLight: '#ECFDF5',
-            border: '#A7F3D0',
+            gradient: 'linear-gradient(135deg, #0369A1 0%, #0284C7 100%)',
+            bgLight: '#E0F2FE',
+            border: '#7DD3FC',
             icon: '🧩',
-            iconBg: 'rgba(16, 185, 129, 0.15)'
+            iconBg: 'rgba(3, 105, 161, 0.12)'
         },
         'Language': {
-            gradient: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
-            bgLight: '#F5F3FF',
-            border: '#DDD6FE',
+            gradient: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
+            bgLight: '#EFF6FF',
+            border: '#BFDBFE',
             icon: '📝',
-            iconBg: 'rgba(139, 92, 246, 0.15)'
+            iconBg: 'rgba(59, 130, 246, 0.12)'
         },
         'Linguistic': {
-            gradient: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
-            bgLight: '#F5F3FF',
-            border: '#DDD6FE',
+            gradient: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
+            bgLight: '#EFF6FF',
+            border: '#BFDBFE',
             icon: '📝',
-            iconBg: 'rgba(139, 92, 246, 0.15)'
+            iconBg: 'rgba(59, 130, 246, 0.12)'
         }
     };
 
     const getStyle = (name) => categoryStyles[name] || {
-        gradient: 'linear-gradient(135deg, #6B7280 0%, #374151 100%)',
-        bgLight: '#F9FAFB',
-        border: '#E5E7EB',
+        gradient: 'linear-gradient(135deg, #475569 0%, #64748B 100%)',
+        bgLight: '#F1F5F9',
+        border: '#CBD5E1',
         icon: '📚',
-        iconBg: 'rgba(107, 114, 128, 0.15)'
+        iconBg: 'rgba(71, 85, 105, 0.12)'
     };
 
     // Category Selection View
@@ -394,7 +394,7 @@ function QuestionBank() {
                                                 <h3 className="text-2xl font-bold mb-3" style={{ color: '#1F2937' }}>
                                                     {category.name}
                                                 </h3>
-                                                <p className="text-3xl font-black mb-1" style={{ color: style.gradient.includes('3B82F6') ? '#3B82F6' : style.gradient.includes('10B981') ? '#10B981' : '#8B5CF6' }}>
+                                                <p className="text-3xl font-black mb-1" style={{ color: '#1E40AF' }}>
                                                     {category.total_questions}
                                                 </p>
                                                 <p className="text-sm font-medium mb-4" style={{ color: '#6B7280' }}>questions available</p>

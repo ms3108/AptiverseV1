@@ -103,9 +103,9 @@ function QuestionDetail() {
 
     const getDifficultyColor = (difficulty) => {
         switch (difficulty) {
-            case 'Easy': return 'bg-green-100 text-green-800';
-            case 'Medium': return 'bg-yellow-100 text-yellow-800';
-            case 'Hard': return 'bg-red-100 text-red-800';
+            case 'Easy': return 'bg-blue-100 text-blue-700';
+            case 'Medium': return 'bg-blue-200 text-blue-800';
+            case 'Hard': return 'bg-blue-300 text-blue-900';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
@@ -121,7 +121,7 @@ function QuestionDetail() {
     if (!question) {
         return (
             <div className="max-w-2xl mx-auto mt-8 px-4">
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
                     Question not found
                 </div>
             </div>
@@ -157,7 +157,7 @@ function QuestionDetail() {
                             {question.difficulty}
                         </span>
                         {question.solved && (
-                            <span className="text-green-600 text-xl" title="Solved">✓</span>
+                            <span className="text-blue-600 text-xl" title="Solved">✓</span>
                         )}
                     </div>
                     <span className="text-sm text-gray-500">
@@ -189,9 +189,9 @@ function QuestionDetail() {
                             disabled={isAnswered}
                             className={`w-full text-left p-4 rounded-lg border-2 transition-all ${isAnswered
                                 ? option.label === answerResult?.correct_answer
-                                    ? 'border-green-500 bg-green-50'
+                                    ? 'border-blue-500 bg-blue-50'
                                     : option.label === selectedAnswer
-                                        ? 'border-red-500 bg-red-50'
+                                        ? 'border-blue-300 bg-blue-100'
                                         : 'border-gray-200 bg-gray-50'
                                 : selectedAnswer === option.label
                                     ? 'border-blue-500 bg-blue-50'
@@ -202,10 +202,10 @@ function QuestionDetail() {
                                 <span className="font-bold mr-3 text-lg">{option.label}.</span>
                                 <span className="text-gray-800">{option.text}</span>
                                 {isAnswered && option.label === answerResult?.correct_answer && (
-                                    <span className="ml-auto text-green-600">✓</span>
+                                    <span className="ml-auto text-blue-600">✓</span>
                                 )}
                                 {isAnswered && option.label === selectedAnswer && option.label !== answerResult?.correct_answer && (
-                                    <span className="ml-auto text-red-600">✗</span>
+                                    <span className="ml-auto text-blue-400">✗</span>
                                 )}
                             </div>
                         </button>
@@ -215,14 +215,14 @@ function QuestionDetail() {
                 {/* Explanation (shown after answering) */}
                 {isAnswered && answerResult && (
                     <div className={`mt-6 p-4 rounded-lg ${answerResult.is_correct
-                        ? 'bg-green-50 border border-green-200'
-                        : 'bg-red-50 border border-red-200'
+                        ? 'bg-blue-50 border border-blue-200'
+                        : 'bg-blue-100 border border-blue-300'
                         }`}>
                         <div className="flex items-center mb-2">
                             <span className="text-2xl mr-2">
                                 {answerResult.is_correct ? '✅' : '❌'}
                             </span>
-                            <span className={`font-bold ${answerResult.is_correct ? 'text-green-800' : 'text-red-800'
+                            <span className={`font-bold ${answerResult.is_correct ? 'text-blue-800' : 'text-blue-700'
                                 }`}>
                                 {answerResult.is_correct ? 'Correct!' : 'Incorrect'}
                             </span>

@@ -120,26 +120,26 @@ function PracticeSet() {
         return (
             <div className="max-w-2xl mx-auto mt-8">
                 <div className={`${isCompletionMessage
-                    ? 'bg-green-50 border border-green-200'
-                    : 'bg-red-50 border border-red-200'} rounded-lg p-6`}>
+                    ? 'bg-blue-50 border border-blue-200'
+                    : 'bg-blue-50 border border-blue-300'} rounded-lg p-6`}>
                     {isCompletionMessage ? (
                         <div className="text-center">
                             <div className="text-6xl mb-4">🎉</div>
-                            <h2 className="text-2xl font-bold text-green-800 mb-2">
+                            <h2 className="text-2xl font-bold text-blue-800 mb-2">
                                 Practice Complete!
                             </h2>
-                            <p className="text-green-700 mb-6">
+                            <p className="text-blue-700 mb-6">
                                 {error}
                             </p>
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold"
+                                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
                             >
                                 Back to Dashboard
                             </button>
                         </div>
                     ) : (
-                        <div className="text-red-700">
+                        <div className="text-blue-800">
                             {error}
                         </div>
                     )}
@@ -186,7 +186,7 @@ function PracticeSet() {
     if (questions.length === 0) {
         return (
             <div className="max-w-2xl mx-auto mt-8">
-                <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
+                <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
                     No questions available for practice at the moment.
                 </div>
             </div>
@@ -275,9 +275,9 @@ function PracticeSet() {
                         <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded">
                             {currentQuestion.topic}
                         </span>
-                        <span className={`inline-block px-3 py-1 text-sm font-semibold rounded ${currentQuestion.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
-                            currentQuestion.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-red-100 text-red-800'
+                        <span className={`inline-block px-3 py-1 text-sm font-semibold rounded ${currentQuestion.difficulty === 'Easy' ? 'bg-blue-100 text-blue-700' :
+                            currentQuestion.difficulty === 'Medium' ? 'bg-blue-200 text-blue-800' :
+                                'bg-blue-300 text-blue-900'
                             }`}>
                             {currentQuestion.difficulty}
                         </span>
@@ -300,9 +300,9 @@ function PracticeSet() {
                                 disabled={isAnswered}
                                 className={`w-full text-left p-4 rounded-lg border-2 transition-all ${isAnswered
                                     ? option.label === answerResult?.correct_answer
-                                        ? 'border-green-500 bg-green-50'
+                                        ? 'border-blue-500 bg-blue-50'
                                         : option.label === selectedAnswer
-                                            ? 'border-red-500 bg-red-50'
+                                            ? 'border-blue-300 bg-blue-100'
                                             : 'border-gray-200 bg-gray-50'
                                     : selectedAnswer === option.label
                                         ? 'border-blue-500 bg-blue-50'
@@ -313,10 +313,10 @@ function PracticeSet() {
                                     <span className="font-bold mr-3 text-lg">{option.label}.</span>
                                     <span className="text-gray-800">{option.text}</span>
                                     {isAnswered && option.label === answerResult?.correct_answer && (
-                                        <span className="ml-auto text-green-600">✓</span>
+                                        <span className="ml-auto text-blue-600">✓</span>
                                     )}
                                     {isAnswered && option.label === selectedAnswer && option.label !== answerResult?.correct_answer && (
-                                        <span className="ml-auto text-red-600">✗</span>
+                                        <span className="ml-auto text-blue-400">✗</span>
                                     )}
                                 </div>
                             </button>
@@ -325,13 +325,13 @@ function PracticeSet() {
 
                     {/* Explanation (shown after answering) */}
                     {isAnswered && answerResult && (
-                        <div className={`mt-6 p-4 rounded-lg ${answerResult.is_correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+                        <div className={`mt-6 p-4 rounded-lg ${answerResult.is_correct ? 'bg-blue-50 border border-blue-200' : 'bg-blue-100 border border-blue-300'
                             }`}>
                             <div className="flex items-center mb-2">
                                 <span className="text-2xl mr-2">
                                     {answerResult.is_correct ? '✅' : '❌'}
                                 </span>
-                                <span className={`font-bold ${answerResult.is_correct ? 'text-green-800' : 'text-red-800'
+                                <span className={`font-bold ${answerResult.is_correct ? 'text-blue-800' : 'text-blue-700'
                                     }`}>
                                     {answerResult.is_correct ? 'Correct!' : 'Incorrect'}
                                 </span>

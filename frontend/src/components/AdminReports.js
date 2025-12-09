@@ -70,9 +70,9 @@ function AdminReports() {
 
     const getStatusBadge = (status) => {
         const styles = {
-            pending: 'bg-yellow-100 text-yellow-800',
-            resolved: 'bg-green-100 text-green-800',
-            rejected: 'bg-red-100 text-red-800'
+            pending: 'bg-blue-100 text-blue-700',
+            resolved: 'bg-blue-200 text-blue-800',
+            rejected: 'bg-blue-300 text-blue-900'
         };
 
         return (
@@ -171,7 +171,7 @@ function AdminReports() {
                                     </div>
 
                                     {/* Report Reason */}
-                                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                                         <div className="text-sm font-medium text-gray-700 mb-1">Report Reason:</div>
                                         <div className="text-gray-900">{report.reason}</div>
                                     </div>
@@ -189,7 +189,7 @@ function AdminReports() {
 
                                     {/* Admin Action Section */}
                                     {report.status === 'resolved' ? (
-                                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                             <div className="text-sm font-medium text-gray-700 mb-1">
                                                 Admin Action: Resolved
                                             </div>
@@ -210,7 +210,7 @@ function AdminReports() {
                                                             handleReportAction(report.id, 'resolve', 'no_action');
                                                         }
                                                     }}
-                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
                                                 >
                                                     ✓ No Action Needed
                                                 </button>
@@ -220,7 +220,7 @@ function AdminReports() {
                                                             handleReportAction(report.id, 'resolve', 'warn_user');
                                                         }
                                                     }}
-                                                    className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium"
+                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                                                 >
                                                     ⚠️ Warn User
                                                 </button>
@@ -230,7 +230,7 @@ function AdminReports() {
                                                             handleReportAction(report.id, 'resolve', 'delete_post');
                                                         }
                                                     }}
-                                                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+                                                    className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors font-medium"
                                                 >
                                                     🗑️ Delete Post
                                                 </button>
@@ -240,7 +240,7 @@ function AdminReports() {
                                                             handleReportAction(report.id, 'resolve', 'ban_user');
                                                         }
                                                     }}
-                                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                                                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-950 transition-colors font-medium"
                                                 >
                                                     🚫 Ban User
                                                 </button>

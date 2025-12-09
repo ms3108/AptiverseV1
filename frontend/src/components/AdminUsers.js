@@ -171,21 +171,21 @@ const AdminUsers = () => {
                                                         </span>
                                                     )}
                                                     {user.is_verified ? (
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                                                             Verified
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600">
                                                             Unverified
                                                         </span>
                                                     )}
                                                     {user.is_permanently_banned && (
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-900 text-white">
                                                             Permanent Ban
                                                         </span>
                                                     )}
                                                     {user.is_banned && !user.is_permanently_banned && (
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-200 text-blue-800">
                                                             Banned
                                                         </span>
                                                     )}
@@ -205,7 +205,7 @@ const AdminUsers = () => {
                                                         {user.is_banned ? (
                                                             <button
                                                                 onClick={() => handleAction(user, 'unban')}
-                                                                className="text-green-600 hover:text-green-900"
+                                                                className="text-blue-500 hover:text-blue-700"
                                                             >
                                                                 Unban
                                                             </button>
@@ -213,13 +213,13 @@ const AdminUsers = () => {
                                                             <>
                                                                 <button
                                                                     onClick={() => handleAction(user, 'ban')}
-                                                                    className="text-orange-600 hover:text-orange-900"
+                                                                    className="text-blue-600 hover:text-blue-800"
                                                                 >
                                                                     Ban
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleAction(user, 'ban_permanent')}
-                                                                    className="text-red-600 hover:text-red-900"
+                                                                    className="text-blue-800 hover:text-blue-900"
                                                                 >
                                                                     Permanent Ban
                                                                 </button>
@@ -227,13 +227,13 @@ const AdminUsers = () => {
                                                         )}
                                                         <button
                                                             onClick={() => handleAction(user, 'reset_password')}
-                                                            className="text-blue-600 hover:text-blue-900"
+                                                            className="text-blue-600 hover:text-blue-800"
                                                         >
                                                             Reset Password
                                                         </button>
                                                         <button
                                                             onClick={() => handleAction(user, 'delete')}
-                                                            className="text-red-600 hover:text-red-900"
+                                                            className="text-blue-900 hover:text-blue-950"
                                                         >
                                                             Delete
                                                         </button>
@@ -256,7 +256,7 @@ const AdminUsers = () => {
                             <p className="text-gray-600 mb-6">
                                 Are you sure you want to {actionType?.replace('_', ' ')} user <strong>{selectedUser?.username}</strong>?
                                 {actionType === 'ban_permanent' && (
-                                    <span className="block mt-2 text-red-600 font-medium">
+                                    <span className="block mt-2 text-blue-800 font-medium">
                                         This will prevent them from ever registering again with this email!
                                     </span>
                                 )}
@@ -273,7 +273,7 @@ const AdminUsers = () => {
                                 </button>
                                 <button
                                     onClick={confirmAction}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                                 >
                                     Confirm
                                 </button>

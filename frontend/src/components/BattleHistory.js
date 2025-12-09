@@ -189,11 +189,11 @@ function BattleHistory() {
                                                 <span
                                                     className="px-3 py-1 rounded-full text-xs font-bold"
                                                     style={{
-                                                        backgroundColor: battle.status === 'completed' ? 'rgba(34, 197, 94, 0.1)' :
-                                                            battle.status === 'in_progress' ? 'rgba(251, 146, 60, 0.1)' :
+                                                        backgroundColor: battle.status === 'completed' ? 'rgba(30, 64, 175, 0.1)' :
+                                                            battle.status === 'in_progress' ? 'rgba(59, 130, 246, 0.1)' :
                                                                 'rgba(100, 116, 139, 0.1)',
-                                                        color: battle.status === 'completed' ? '#16A34A' :
-                                                            battle.status === 'in_progress' ? '#EA580C' :
+                                                        color: battle.status === 'completed' ? '#1E40AF' :
+                                                            battle.status === 'in_progress' ? '#3B82F6' :
                                                                 '#64748B'
                                                     }}
                                                 >
@@ -227,7 +227,7 @@ function BattleHistory() {
                                                         <p className="text-xs font-semibold mb-1" style={{ color: '#64748B' }}>
                                                             CORRECT
                                                         </p>
-                                                        <p className="text-2xl font-black" style={{ color: '#16A34A' }}>
+                                                        <p className="text-2xl font-black" style={{ color: '#3B82F6' }}>
                                                             {battle.correct_answers}/{battle.num_questions}
                                                         </p>
                                                     </div>
