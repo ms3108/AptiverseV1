@@ -232,42 +232,42 @@ function BattleHistory() {
                                                         </p>
                                                     </div>
                                                     <div>
-                                                        <p className="text-xs font-semibold mb-1\" style={{ color: '#64748B' }}>
+                                                        <p className="text-xs font-semibold mb-1" style={{ color: '#64748B' }}>
                                                             ACCURACY
                                                         </p>
-                                                        <p className=\"text-2xl font-black\" style={{ color: '#1565C0' }}>
-                                                        {((battle.correct_answers / battle.num_questions) * 100).toFixed(0)}%
-                                                    </p>
-                                                </div>
+                                                        <p className="text-2xl font-black" style={{ color: '#1565C0' }}>
+                                                            {((battle.correct_answers / battle.num_questions) * 100).toFixed(0)}%
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             )}
 
-                                        {/* Date */}
-                                        <p className="text-xs mt-3" style={{ color: '#64748B' }}>
-                                            {battle.completed_at ?
-                                                `Completed: ${formatDate(battle.completed_at)}` :
-                                                `Created: ${formatDate(battle.created_at)}`
-                                            }
-                                        </p>
-                                    </div>
+                                            {/* Date */}
+                                            <p className="text-xs mt-3" style={{ color: '#64748B' }}>
+                                                {battle.completed_at ?
+                                                    `Completed: ${formatDate(battle.completed_at)}` :
+                                                    `Created: ${formatDate(battle.created_at)}`
+                                                }
+                                            </p>
+                                        </div>
 
-                                    {/* Action Button */}
-                                    {battle.status === 'in_progress' && (
-                                        <button
-                                            onClick={() => navigate(`/battle/${battle.room_code}`)}
-                                            className="flex-shrink-0 px-6 py-3 font-bold rounded-lg hover-scale"
-                                            style={{ backgroundColor: '#1E88E5', color: '#FFFFFF' }}
-                                        >
-                                            Rejoin
-                                        </button>
-                                    )}
+                                        {/* Action Button */}
+                                        {battle.status === 'in_progress' && (
+                                            <button
+                                                onClick={() => navigate(`/battle/${battle.room_code}`)}
+                                                className="flex-shrink-0 px-6 py-3 font-bold rounded-lg hover-scale"
+                                                style={{ backgroundColor: '#1E88E5', color: '#FFFFFF' }}
+                                            >
+                                                Rejoin
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                                </div>
-                    ))}
-                </div>
+                            ))}
+                        </div>
                     )}
-            </div>
-        </div >
+                </div>
+            </div >
         </>
     );
 }
