@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import API_URL from '../config/api';
@@ -14,25 +14,59 @@ const AdminQuestions = () => {
     const [uploading, setUploading] = useState(false);
     const [uploadResult, setUploadResult] = useState(null);
 
-    useEffect(() => {
-        fetchQuestions();
-    }, []);
+    // Search and filter state
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedDifficulty, setSelectedDifficulty] = useState('');
+    const [selectedTopic, setSelectedTopic] = useState('');
+    const [topics, setTopics] = useState([]);
 
-    const fetchQuestions = async () => {
+    const fetchQuestions = useCallback(async () => {
         setLoading(true);
         try {
+            const params = { limit: 100 };
+            if (searchQuery) params.search = searchQuery;
+            if (selectedCategory) params.category = selectedCategory;
+            if (selectedDifficulty) params.difficulty = selectedDifficulty;
+            if (selectedTopic) params.topic = selectedTopic;
+
             const response = await axios.get(`${API_URL}/admin/questions`, {
-                params: { limit: 100 },
+                params,
                 headers: { Authorization: `Bearer ${token}` }
             });
             setQuestions(response.data.questions);
             setTotal(response.data.total);
+
+            // Extract unique topics from questions for filter dropdown
+            if (!selectedCategory && !selectedDifficulty && !searchQuery && !selectedTopic) {
+                const uniqueTopics = [...new Set(response.data.questions.map(q => q.topic).filter(Boolean))];
+                setTopics(uniqueTopics.sort());
+            }
         } catch (error) {
             console.error('Failed to fetch questions:', error);
             alert('Failed to load questions');
         } finally {
             setLoading(false);
         }
+    }, [token, searchQuery, selectedCategory, selectedDifficulty, selectedTopic]);
+
+    useEffect(() => {
+        fetchQuestions();
+    }, [fetchQuestions]);
+
+    // Debounced search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchQuestions();
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const clearFilters = () => {
+        setSearchQuery('');
+        setSelectedCategory('');
+        setSelectedDifficulty('');
+        setSelectedTopic('');
     };
 
     const handleFileUpload = async (e) => {
@@ -189,7 +223,82 @@ const AdminQuestions = () => {
                 {/* Questions List */}
                 <div className="bg-white rounded-lg shadow overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200">
-                        <h2 className="text-lg font-semibold text-gray-900">All Questions</h2>
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                            <h2 className="text-lg font-semibold text-gray-900">
+                                All Questions
+                                <span className="text-sm font-normal text-gray-500 ml-2">
+                                    ({total} {total === 1 ? 'result' : 'results'})
+                                </span>
+                            </h2>
+
+                            {/* Clear Filters Button */}
+                            {(searchQuery || selectedCategory || selectedDifficulty || selectedTopic) && (
+                                <button
+                                    onClick={clearFilters}
+                                    className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                                >
+                                    Clear all filters
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Search and Filters */}
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {/* Search Input */}
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search questions..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                />
+                                <svg
+                                    className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+
+                            {/* Category Filter */}
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                            >
+                                <option value="">All Categories</option>
+                                <option value="Quantitative">Quantitative</option>
+                                <option value="Logical">Logical</option>
+                                <option value="Linguistic">Linguistic</option>
+                            </select>
+
+                            {/* Difficulty Filter */}
+                            <select
+                                value={selectedDifficulty}
+                                onChange={(e) => setSelectedDifficulty(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                            >
+                                <option value="">All Difficulties</option>
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+
+                            {/* Topic Filter */}
+                            <select
+                                value={selectedTopic}
+                                onChange={(e) => setSelectedTopic(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                            >
+                                <option value="">All Topics</option>
+                                {topics.map((topic) => (
+                                    <option key={topic} value={topic}>{topic}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     {loading ? (
@@ -201,6 +310,7 @@ const AdminQuestions = () => {
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topic</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Difficulty</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
@@ -208,41 +318,60 @@ const AdminQuestions = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {questions.map((question) => (
-                                        <tr key={question.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                #{question.id}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900">
-                                                <div className="max-w-md truncate">{question.title}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <div>{question.topic}</div>
-                                                {question.sub_topic && (
-                                                    <div className="text-xs text-gray-400">{question.sub_topic}</div>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${question.difficulty === 'easy' ? 'bg-green-100 text-green-800' :
-                                                    question.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                                        'bg-red-100 text-red-800'
-                                                    }`}>
-                                                    {question.difficulty}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {new Date(question.created_at).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button
-                                                    onClick={() => handleDeleteQuestion(question.id)}
-                                                    className="text-red-600 hover:text-red-900"
-                                                >
-                                                    Delete
-                                                </button>
+                                    {questions.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                                                {searchQuery || selectedCategory || selectedDifficulty || selectedTopic
+                                                    ? 'No questions match your filters'
+                                                    : 'No questions found'}
                                             </td>
                                         </tr>
-                                    ))}
+                                    ) : (
+                                        questions.map((question) => (
+                                            <tr key={question.id} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    #{question.id}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-gray-900">
+                                                    <div className="max-w-md truncate">{question.title}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${question.category === 'Quantitative' ? 'bg-blue-100 text-blue-800' :
+                                                            question.category === 'Logical' ? 'bg-purple-100 text-purple-800' :
+                                                                question.category === 'Linguistic' ? 'bg-green-100 text-green-800' :
+                                                                    'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        {question.category || 'N/A'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <div>{question.topic}</div>
+                                                    {question.sub_topic && (
+                                                        <div className="text-xs text-gray-400">{question.sub_topic}</div>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${question.difficulty === 'easy' || question.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+                                                        question.difficulty === 'medium' || question.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                                                            'bg-red-100 text-red-800'
+                                                        }`}>
+                                                        {question.difficulty}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {new Date(question.created_at).toLocaleDateString()}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <button
+                                                        onClick={() => handleDeleteQuestion(question.id)}
+                                                        className="text-red-600 hover:text-red-900"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
                         </div>

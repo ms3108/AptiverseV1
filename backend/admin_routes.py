@@ -463,16 +463,27 @@ async def get_all_questions(
     limit: int = 50,
     topic: Optional[str] = None,
     difficulty: Optional[str] = None,
+    category: Optional[str] = None,
+    search: Optional[str] = None,
     db: Session = Depends(get_db),
     current_admin: models.User = Depends(get_current_admin)
 ):
-    """Get all questions with optional filters"""
+    """Get all questions with optional filters and search"""
     query = db.query(models.Question)
     
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            (models.Question.title.ilike(search_term)) |
+            (models.Question.description.ilike(search_term)) |
+            (models.Question.topic.ilike(search_term))
+        )
     if topic:
         query = query.filter(models.Question.topic == topic)
     if difficulty:
-        query = query.filter(models.Question.difficulty == difficulty)
+        query = query.filter(models.Question.difficulty.ilike(difficulty))
+    if category:
+        query = query.filter(models.Question.category.ilike(category))
     
     total = query.count()
     questions = query.order_by(desc(models.Question.created_at)).offset(skip).limit(limit).all()
