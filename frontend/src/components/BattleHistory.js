@@ -82,7 +82,7 @@ function BattleHistory() {
                     <div className="mb-8">
                         <div className="flex items-center justify-between mb-4">
                             <h1 className="text-4xl font-black" style={{
-                                background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
+                                background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-1px'
@@ -93,7 +93,7 @@ function BattleHistory() {
                                 onClick={() => navigate('/battle/create')}
                                 className="px-6 py-3 font-bold rounded-lg hover-scale"
                                 style={{
-                                    background: 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)',
+                                    background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                     color: '#FFFFFF'
                                 }}
                             >

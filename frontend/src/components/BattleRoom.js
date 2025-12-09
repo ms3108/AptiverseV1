@@ -298,7 +298,7 @@ function BattleRoom() {
                                 ⚔️ Battle Room
                             </h1>
                             <p className="text-lg font-medium" style={{ color: '#64748B' }}>
-                                Room Code: <span style={{ color: '#1E88E5', fontWeight: 'bold' }}>{roomCode}</span>
+                                Room Code: <span style={{ color: '#000000', fontWeight: 'bold' }}>{roomCode}</span>
                             </p>
                         </div>
 
@@ -311,7 +311,7 @@ function BattleRoom() {
                                 <div className="grid grid-cols-3 gap-4 mb-6">
                                     <div>
                                         <p className="text-sm font-semibold mb-1" style={{ color: '#64748B' }}>Topic</p>
-                                        <p className="text-xl font-bold" style={{ color: '#1E88E5' }}>{battleInfo.topic}</p>
+                                        <p className="text-xl font-bold" style={{ color: '#000000' }}>{battleInfo.topic}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold mb-1" style={{ color: '#64748B' }}>Questions</p>
@@ -350,7 +350,7 @@ function BattleRoom() {
                                         onClick={handleStartBattle}
                                         className="w-full py-3 font-bold text-lg rounded-lg hover-scale"
                                         style={{
-                                            background: 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)',
+                                            background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                             color: '#FFFFFF'
                                         }}
                                     >

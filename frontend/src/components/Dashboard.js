@@ -52,7 +52,7 @@ function Dashboard() {
     };
 
     return (
-        <div className="min-vh-100" style={{ background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)' }}>
+        <div className="min-vh-100" style={{ background: '#FFFFFF' }}>
             {/* Modern Navbar */}
             <Navbar
                 expand="lg"

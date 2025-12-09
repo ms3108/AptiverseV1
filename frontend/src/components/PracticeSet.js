@@ -110,7 +110,7 @@ function PracticeSet() {
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black"></div>
             </div>
         );
     }
@@ -120,8 +120,8 @@ function PracticeSet() {
         return (
             <div className="max-w-2xl mx-auto mt-8">
                 <div className={`${isCompletionMessage
-                    ? 'bg-blue-50 border border-blue-200'
-                    : 'bg-blue-50 border border-blue-300'} rounded-lg p-6`}>
+                    ? 'bg-gray-50 border border-gray-200'
+                    : 'bg-gray-50 border border-gray-300'} rounded-lg p-6`}>
                     {isCompletionMessage ? (
                         <div className="text-center">
                             <div className="text-6xl mb-4">🎉</div>
@@ -202,7 +202,7 @@ function PracticeSet() {
     ];
 
     return (
-        <>
+        <div style={{ background: '#FFFFFF', minHeight: '100vh' }}>
             <Navigation />
             <div className="max-w-4xl mx-auto mt-8 px-4">
                 {/* AI-Powered Practice Header */}
@@ -376,7 +376,7 @@ function PracticeSet() {
                     💎 Earn {currentQuestion.xp_reward} XP for solving this question
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 

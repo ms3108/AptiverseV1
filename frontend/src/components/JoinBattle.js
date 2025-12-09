@@ -60,7 +60,7 @@ function JoinBattle() {
                         {loading && (
                             <>
                                 <div className="animate-spin rounded-full h-16 w-16 border-b-4 mx-auto mb-4"
-                                    style={{ borderColor: '#1E88E5' }}></div>
+                                    style={{ borderColor: '#000000' }}></div>
                                 <p className="text-lg font-semibold" style={{ color: '#1A202C' }}>
                                     Joining battle room...
                                 </p>
@@ -82,7 +82,7 @@ function JoinBattle() {
                                 <button
                                     onClick={() => navigate('/dashboard')}
                                     className="px-6 py-3 font-bold rounded-lg hover-scale"
-                                    style={{ backgroundColor: '#1E88E5', color: '#FFFFFF' }}
+                                    style={{ backgroundColor: '#000000', color: '#FFFFFF' }}
                                 >
                                     Back to Dashboard
                                 </button>

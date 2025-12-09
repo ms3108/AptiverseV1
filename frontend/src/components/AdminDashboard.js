@@ -39,10 +39,10 @@ const AdminDashboard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #000000 0%, #333333 100%)' }}>
+            <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}>
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-black mx-auto mb-4"></div>
-                    <p className="text-gray-600 font-medium">Loading admin dashboard...</p>
+                    <p className="text-gray-900 font-medium">Loading admin dashboard...</p>
                 </div>
             </div>
         );
@@ -146,7 +146,7 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #000000 0%, #333333 50%, #000000 100%)' }}>
+        <div className="min-h-screen" style={{ background: '#FFFFFF' }}>
             <Navigation />
 
             <div className="max-w-7xl mx-auto px-4 py-10">

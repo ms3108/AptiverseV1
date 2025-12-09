@@ -93,7 +93,7 @@ function Login() {
     return (
         <div className="min-vh-100 d-flex align-items-center justify-content-center py-5 position-relative overflow-hidden"
             style={{
-                background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)',
+                background: '#FFFFFF',
             }}>
             {/* Animated Background Elements */}
             <motion.div

@@ -94,7 +94,7 @@ function Signup() {
 
     return (
         <div className="min-vh-100 d-flex align-items-center justify-content-center py-5" style={{
-            background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)',
+            background: '#FFFFFF',
             position: 'relative',
             overflow: 'hidden'
         }}>
