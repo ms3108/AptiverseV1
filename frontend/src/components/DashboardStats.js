@@ -47,258 +47,203 @@ function DashboardStats() {
 
     return (
         <div className="space-y-6">
-            {/* User Header - with gradient accent */}
+            {/* User Header */}
             <div className="relative overflow-hidden bg-white p-8" style={{
-                borderRadius: '20px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+                borderRadius: '16px',
+                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)'
             }}>
-                <div className="absolute top-0 right-0 w-64 h-64 opacity-10" style={{
-                    background: 'radial-gradient(circle, #6366F1 0%, transparent 70%)',
-                    transform: 'translate(30%, -30%)'
-                }}></div>
                 <div className="relative z-10">
-                    <h2 className="text-3xl font-bold mb-2" style={{ color: '#1F2937', letterSpacing: '-0.5px' }}>
-                        Welcome back, {stats.username}! <span className="inline-block animate-bounce">👋</span>
+                    <h2 className="text-2xl font-bold mb-1" style={{ color: '#1F2937' }}>
+                        Welcome back, {stats.username}!
                     </h2>
-                    <p className="text-base" style={{ color: '#6B7280' }}>Ready to level up your skills today?</p>
+                    <p className="text-sm" style={{ color: '#6B7280' }}>Ready to level up your skills today?</p>
                 </div>
             </div>
 
-            {/* XP and Level Progress - Premium Card */}
+            {/* XP and Level Progress */}
             <div className="relative overflow-hidden" style={{
-                borderRadius: '20px',
-                padding: '32px',
-                background: 'linear-gradient(135deg, #1E3A5F 0%, #2D5A87 50%, #3B7CB8 100%)',
-                boxShadow: '0 10px 40px rgba(30, 58, 95, 0.3)'
+                borderRadius: '16px',
+                padding: '28px',
+                background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+                boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3)'
             }}>
-                {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-40 h-40 opacity-20" style={{
-                    background: 'radial-gradient(circle, #60A5FA 0%, transparent 70%)',
-                }}></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 opacity-10" style={{
-                    background: 'radial-gradient(circle, #F59E0B 0%, transparent 70%)',
-                }}></div>
-
                 <div className="relative z-10">
-                    <div className="flex items-start justify-between mb-8">
-                        <div className="flex items-center gap-5">
-                            {/* Level Badge - Golden accent */}
-                            <div className="relative" style={{
-                                width: '72px',
-                                height: '72px',
-                                background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                                borderRadius: '16px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 8px 24px rgba(245, 158, 11, 0.4)'
+                    <div className="flex items-start justify-between mb-6">
+                        <div className="flex items-center gap-4">
+                            {/* Level Badge */}
+                            <div className="relative flex items-center justify-center" style={{
+                                width: '64px',
+                                height: '64px',
+                                background: 'rgba(255, 255, 255, 0.2)',
+                                borderRadius: '14px',
+                                border: '2px solid rgba(255, 255, 255, 0.3)'
                             }}>
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                                <div className="absolute -bottom-2 -right-2 bg-white rounded-full px-3 py-1 text-sm font-black" style={{
-                                    color: '#D97706',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                                }}>
-                                    {stats.level}
-                                </div>
+                                <span className="text-3xl font-black text-white">{stats.level}</span>
                             </div>
                             <div>
-                                <p className="text-xs font-semibold mb-1 tracking-wider" style={{ color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' }}>Current XP</p>
-                                <p className="text-5xl font-black" style={{ color: 'white', fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px' }}>{stats.xp}</p>
+                                <p className="text-xs font-medium mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>Current XP</p>
+                                <p className="text-4xl font-bold text-white">{stats.xp}</p>
                             </div>
                         </div>
                         <div className="text-right">
-                            <p className="text-xs font-semibold mb-1 tracking-wider" style={{ color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' }}>Next Level</p>
-                            <p className="text-5xl font-black" style={{ color: '#60A5FA', fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px' }}>{stats.xp_for_next_level}</p>
+                            <p className="text-xs font-medium mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>Next Level</p>
+                            <p className="text-4xl font-bold" style={{ color: '#BFDBFE' }}>{stats.xp_for_next_level}</p>
                         </div>
                     </div>
 
-                    {/* Enhanced Progress Bar */}
-                    <div className="relative w-full rounded-full h-4" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+                    {/* Progress Bar */}
+                    <div className="relative w-full rounded-full h-3" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
                         <div
-                            className="rounded-full h-4 transition-all duration-700 ease-out relative overflow-hidden"
+                            className="rounded-full h-3 transition-all duration-700"
                             style={{
                                 width: `${Math.min(xpPercentage, 100)}%`,
-                                background: 'linear-gradient(90deg, #34D399 0%, #10B981 50%, #059669 100%)',
-                                boxShadow: '0 0 20px rgba(52, 211, 153, 0.5)'
+                                backgroundColor: '#BFDBFE'
                             }}
-                        >
-                            <div className="absolute inset-0 opacity-40" style={{
-                                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
-                                animation: 'shimmer 2s infinite'
-                            }}></div>
-                        </div>
+                        />
                     </div>
-                    <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                        {stats.xp_progress} / {stats.xp_for_next_level - (stats.level * 100)} XP to reach Level {stats.level + 1}
+                    <p className="text-sm mt-2" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                        {stats.xp_progress} / {stats.xp_for_next_level - (stats.level * 100)} XP to Level {stats.level + 1}
                     </p>
                 </div>
             </div>
 
-            <style>{`
-                @keyframes shimmer {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(100%); }
-                }
-            `}</style>
-
-            {/* Stats Grid - Colorful Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {/* Current Streak - Orange/Amber theme */}
-                <div className="relative overflow-hidden bg-white hover-lift" style={{
-                    borderRadius: '20px',
-                    padding: '28px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
-                    border: '1px solid #FEF3C7',
-                    transition: 'all 0.3s ease'
+            {/* Stats Grid - Blue palette */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Current Streak */}
+                <div className="bg-white p-6" style={{
+                    borderRadius: '16px',
+                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
+                    border: '1px solid #E5E7EB'
                 }}>
-                    <div className="absolute top-0 right-0 w-24 h-24 opacity-20" style={{
-                        background: 'radial-gradient(circle, #F59E0B 0%, transparent 70%)',
-                    }}></div>
-                    <div className="flex items-center justify-center mb-4" style={{
-                        width: '48px',
-                        height: '48px',
-                        background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
-                        borderRadius: '12px'
-                    }}>
-                        <span className="text-2xl">🔥</span>
-                    </div>
-                    <p className="text-xs font-semibold mb-2 tracking-wider" style={{ color: '#92400E', textTransform: 'uppercase' }}>Current Streak</p>
-                    <p className="text-4xl font-black mb-1" style={{ color: '#D97706', fontVariantNumeric: 'tabular-nums' }}>
-                        {stats.current_streak}
-                    </p>
-                    <p className="text-sm font-medium" style={{ color: '#B45309' }}>days in a row</p>
-                </div>
-
-                {/* Longest Streak - Purple theme */}
-                <div className="relative overflow-hidden bg-white hover-lift" style={{
-                    borderRadius: '20px',
-                    padding: '28px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
-                    border: '1px solid #EDE9FE',
-                    transition: 'all 0.3s ease'
-                }}>
-                    <div className="absolute top-0 right-0 w-24 h-24 opacity-20" style={{
-                        background: 'radial-gradient(circle, #8B5CF6 0%, transparent 70%)',
-                    }}></div>
-                    {/* "Best" badge */}
-                    <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white" style={{
-                        background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)'
-                    }}>
-                        ⭐ BEST
-                    </div>
-                    <div className="flex items-center justify-center mb-4" style={{
-                        width: '48px',
-                        height: '48px',
-                        background: 'linear-gradient(135deg, #EDE9FE 0%, #DDD6FE 100%)',
-                        borderRadius: '12px'
-                    }}>
-                        <span className="text-2xl">⚡</span>
-                    </div>
-                    <p className="text-xs font-semibold mb-2 tracking-wider" style={{ color: '#5B21B6', textTransform: 'uppercase' }}>Longest Streak</p>
-                    <p className="text-4xl font-black mb-1" style={{ color: '#7C3AED', fontVariantNumeric: 'tabular-nums' }}>
-                        {stats.longest_streak}
-                    </p>
-                    <p className="text-sm font-medium" style={{ color: '#6D28D9' }}>personal best</p>
-                </div>
-
-                {/* Total Questions - Green theme */}
-                <div className="relative overflow-hidden bg-white hover-lift" style={{
-                    borderRadius: '20px',
-                    padding: '28px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
-                    border: '1px solid #D1FAE5',
-                    transition: 'all 0.3s ease'
-                }}>
-                    <div className="absolute top-0 right-0 w-24 h-24 opacity-20" style={{
-                        background: 'radial-gradient(circle, #10B981 0%, transparent 70%)',
-                    }}></div>
-                    <div className="flex items-center justify-center mb-4" style={{
-                        width: '48px',
-                        height: '48px',
-                        background: 'linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)',
-                        borderRadius: '12px'
-                    }}>
-                        <span className="text-2xl">✅</span>
-                    </div>
-                    <p className="text-xs font-semibold mb-2 tracking-wider" style={{ color: '#047857', textTransform: 'uppercase' }}>Problems Solved</p>
-                    <p className="text-4xl font-black mb-1" style={{ color: '#059669', fontVariantNumeric: 'tabular-nums' }}>
-                        {stats.total_questions_solved}
-                    </p>
-                    <p className="text-sm font-medium" style={{ color: '#047857' }}>total questions</p>
-                </div>
-            </div>
-
-            {/* Badges Section - Redesigned */}
-            {stats.badges && stats.badges.length > 0 && (
-                <div className="bg-white p-8" style={{
-                    borderRadius: '20px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)'
-                }}>
-                    <div className="flex items-center gap-3 mb-6">
+                    <div className="flex items-center gap-3 mb-3">
                         <div className="flex items-center justify-center" style={{
                             width: '40px',
                             height: '40px',
-                            background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+                            backgroundColor: '#EFF6FF',
+                            borderRadius: '10px'
+                        }}>
+                            <span className="text-xl">🔥</span>
+                        </div>
+                        <p className="text-sm font-medium" style={{ color: '#6B7280' }}>Current Streak</p>
+                    </div>
+                    <p className="text-3xl font-bold" style={{ color: '#1E40AF' }}>
+                        {stats.current_streak}
+                    </p>
+                    <p className="text-sm" style={{ color: '#6B7280' }}>days</p>
+                </div>
+
+                {/* Longest Streak */}
+                <div className="bg-white p-6" style={{
+                    borderRadius: '16px',
+                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
+                    border: '1px solid #E5E7EB'
+                }}>
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center" style={{
+                            width: '40px',
+                            height: '40px',
+                            backgroundColor: '#EFF6FF',
+                            borderRadius: '10px'
+                        }}>
+                            <span className="text-xl">⚡</span>
+                        </div>
+                        <p className="text-sm font-medium" style={{ color: '#6B7280' }}>Best Streak</p>
+                    </div>
+                    <p className="text-3xl font-bold" style={{ color: '#1E40AF' }}>
+                        {stats.longest_streak}
+                    </p>
+                    <p className="text-sm" style={{ color: '#6B7280' }}>personal best</p>
+                </div>
+
+                {/* Total Questions */}
+                <div className="bg-white p-6" style={{
+                    borderRadius: '16px',
+                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
+                    border: '1px solid #E5E7EB'
+                }}>
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center" style={{
+                            width: '40px',
+                            height: '40px',
+                            backgroundColor: '#EFF6FF',
+                            borderRadius: '10px'
+                        }}>
+                            <span className="text-xl">✓</span>
+                        </div>
+                        <p className="text-sm font-medium" style={{ color: '#6B7280' }}>Solved</p>
+                    </div>
+                    <p className="text-3xl font-bold" style={{ color: '#1E40AF' }}>
+                        {stats.total_questions_solved}
+                    </p>
+                    <p className="text-sm" style={{ color: '#6B7280' }}>questions</p>
+                </div>
+            </div>
+
+            {/* Badges Section */}
+            {stats.badges && stats.badges.length > 0 && (
+                <div className="bg-white p-6" style={{
+                    borderRadius: '16px',
+                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)'
+                }}>
+                    <div className="flex items-center gap-3 mb-5">
+                        <div className="flex items-center justify-center" style={{
+                            width: '40px',
+                            height: '40px',
+                            backgroundColor: '#EFF6FF',
                             borderRadius: '10px'
                         }}>
                             <span className="text-xl">🏆</span>
                         </div>
-                        <h3 className="text-xl font-bold" style={{ color: '#1F2937' }}>
-                            Achievements <span className="text-base font-normal" style={{ color: '#6B7280' }}>({stats.badges.length})</span>
+                        <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>
+                            Achievements ({stats.badges.length})
                         </h3>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {stats.badges.map((badge, index) => (
                             <div
                                 key={index}
-                                className="hover-lift p-5 text-center transition-all"
+                                className="p-4 text-center"
                                 style={{
-                                    background: 'linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%)',
-                                    borderRadius: '16px',
-                                    border: '2px solid #E5E7EB'
+                                    backgroundColor: '#F9FAFB',
+                                    borderRadius: '12px',
+                                    border: '1px solid #E5E7EB'
                                 }}
                                 title={badge.description}
                             >
-                                <div className="text-4xl mb-3">{badge.icon}</div>
-                                <p className="text-sm font-bold" style={{ color: '#1F2937' }}>{badge.name}</p>
+                                <div className="text-3xl mb-2">{badge.icon}</div>
+                                <p className="text-sm font-semibold" style={{ color: '#1F2937' }}>{badge.name}</p>
                                 <p className="text-xs mt-1" style={{ color: '#6B7280' }}>{badge.description}</p>
-                                {badge.earned_at && (
-                                    <p className="text-xs mt-2 font-medium" style={{ color: '#9CA3AF' }}>
-                                        {new Date(badge.earned_at).toLocaleDateString()}
-                                    </p>
-                                )}
                             </div>
                         ))}
                     </div>
                 </div>
             )}
 
-            {/* Activity Heatmap - Cleaner design */}
-            <div className="bg-white p-8" style={{
-                borderRadius: '20px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)'
+            {/* Activity Heatmap */}
+            <div className="bg-white p-6" style={{
+                borderRadius: '16px',
+                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)'
             }}>
                 <div className="flex items-center gap-3 mb-2">
                     <div className="flex items-center justify-center" style={{
                         width: '40px',
                         height: '40px',
-                        background: 'linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)',
+                        backgroundColor: '#EFF6FF',
                         borderRadius: '10px'
                     }}>
                         <span className="text-xl">📊</span>
                     </div>
-                    <h3 className="text-xl font-bold" style={{ color: '#1F2937' }}>
-                        Activity Heatmap
+                    <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>
+                        Activity
                     </h3>
                 </div>
-                <p className="text-sm mb-6 ml-13" style={{ color: '#6B7280', marginLeft: '52px' }}>
+                <p className="text-sm mb-4" style={{ color: '#6B7280', marginLeft: '52px' }}>
                     Your practice activity over the past 6 months
                 </p>
                 <ActivityHeatmap activityData={stats.activity_data} />
             </div>
         </div>
+        </div >
     );
 }
 
@@ -358,17 +303,17 @@ function ActivityHeatmap({ activityData = {} }) {
 
     const weeks = generateHeatmapData();
 
-    // Get color intensity based on questions solved - gradient from gray to green
+    // Get color intensity based on questions solved - blue palette
     const getColorStyle = (day) => {
         if (!day) return { backgroundColor: '#F3F4F6' };
         if (day.isFuture) return { backgroundColor: '#F3F4F6', opacity: 0.4 };
 
         const { questions } = day;
         if (questions === 0) return { backgroundColor: '#F3F4F6' };
-        if (questions <= 3) return { backgroundColor: '#BBF7D0' }; // Light green
-        if (questions <= 6) return { backgroundColor: '#4ADE80' }; // Medium green
-        if (questions <= 9) return { backgroundColor: '#16A34A' }; // Darker green
-        return { backgroundColor: '#15803D' }; // Full dark green
+        if (questions <= 3) return { backgroundColor: '#BFDBFE' }; // Light blue
+        if (questions <= 6) return { backgroundColor: '#60A5FA' }; // Medium blue
+        if (questions <= 9) return { backgroundColor: '#3B82F6' }; // Darker blue
+        return { backgroundColor: '#1E40AF' }; // Full dark blue
     };
 
     const dayLabels = {
@@ -448,7 +393,7 @@ function ActivityHeatmap({ activityData = {} }) {
                                 style={{
                                     borderRadius: '3px',
                                     ...getColorStyle(day),
-                                    boxShadow: day.questions > 0 ? '0 1px 3px rgba(22, 163, 74, 0.3)' : 'none'
+                                    boxShadow: day.questions > 0 ? '0 1px 3px rgba(59, 130, 246, 0.3)' : 'none'
                                 }}
                                 onMouseEnter={(e) => {
                                     if (!day.isFuture) {
