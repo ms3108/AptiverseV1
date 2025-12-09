@@ -307,12 +307,13 @@ def get_daily_practice_set(
             "xp_earned_today": today_activity.xp_earned
         }
     
-    # Use new Smart Practice ML system with Naive Bayes classifier
-    result = ml_service.generate_smart_practice_set(db, current_user.id, current_user.daily_practice_count)  # type: ignore
+    # Get weak areas and generate practice set
+    weak_areas = ml_service.predict_weak_areas(db, current_user.id)
+    questions = ml_service.generate_daily_practice_set(db, current_user.id, current_user.daily_practice_count)  # type: ignore
     
     # Format questions for frontend
     questions_data = []
-    for q in result["questions"]:
+    for q in questions:
         questions_data.append({
             "id": q.id,
             "title": q.title,
@@ -332,9 +333,8 @@ def get_daily_practice_set(
         "questions": questions_data,
         "total_questions": len(questions_data),
         "user_preference": current_user.daily_practice_count,
-        "weak_areas": result["weak_areas"],
-        "classifier_used": result["classifier_used"],
-        "selection_method": result["selection_method"]
+        "weak_areas": weak_areas,
+        "selection_method": "ml_weak_area_prediction"
     }
 
 
