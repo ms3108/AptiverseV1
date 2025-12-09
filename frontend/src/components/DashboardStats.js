@@ -382,109 +382,109 @@ function ActivityHeatmap({ activityData = {} }) {
     };
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    // Calculate cell size based on number of weeks to fill container
-    const cellSize = 'minmax(10px, 1fr)';
-
     return (
         <div className="w-full py-4">
-            <div className="w-full">
-                {/* Month labels */}
-                <div className="flex mb-2" style={{ marginLeft: '48px' }}>
+            {/* Month labels */}
+            <div
+                className="grid gap-[3px] mb-2"
+                style={{
+                    gridTemplateColumns: `40px repeat(${weeks.length}, 1fr)`,
+                }}
+            >
+                <div></div>
+                {weeks.map((week, weekIndex) => {
+                    const firstDayEntry = week ? week.find(day => day) : null;
+                    if (!firstDayEntry) return <div key={weekIndex}></div>;
+                    const firstDay = new Date(firstDayEntry.date);
+                    const showMonth = weekIndex === 0 || firstDay.getDate() <= 7;
+                    return (
+                        <div key={weekIndex} className="text-center">
+                            {showMonth && (
+                                <span className="text-xs font-medium" style={{ color: '#6B7280' }}>
+                                    {months[firstDay.getMonth()]}
+                                </span>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Heatmap grid */}
+            {[1, 2, 3, 4, 5, 6, 7].map((dayOfWeek) => (
+                <div
+                    key={dayOfWeek}
+                    className="grid gap-[3px] mb-[3px]"
+                    style={{
+                        gridTemplateColumns: `40px repeat(${weeks.length}, 1fr)`,
+                    }}
+                >
+                    <div className="text-xs font-medium flex items-center" style={{ color: '#6B7280' }}>
+                        {dayLabels[dayOfWeek]}
+                    </div>
                     {weeks.map((week, weekIndex) => {
-                        const firstDayEntry = week ? week.find(day => day) : null;
-                        if (!firstDayEntry) return <div key={weekIndex} className="flex-1" style={{ minWidth: '10px' }}></div>;
-                        const firstDay = new Date(firstDayEntry.date);
-                        const showMonth = weekIndex === 0 || firstDay.getDate() <= 7;
+                        const day = week ? week[dayOfWeek - 1] : null;
+                        if (!day) return <div key={weekIndex} className="aspect-square rounded-sm" style={{ backgroundColor: '#F3F4F6' }}></div>;
+
+                        const isTopRow = dayOfWeek <= 3;
+                        const isLeftEdge = weekIndex < 2;
+                        const isRightEdge = weekIndex >= weeks.length - 2;
+
+                        let tooltipClasses = isTopRow
+                            ? "absolute top-full mt-2"
+                            : "absolute bottom-full mb-2";
+
+                        if (isLeftEdge) {
+                            tooltipClasses += " left-0";
+                        } else if (isRightEdge) {
+                            tooltipClasses += " right-0";
+                        } else {
+                            tooltipClasses += " left-1/2 transform -translate-x-1/2";
+                        }
+
                         return (
-                            <div key={weekIndex} className="flex-1 flex justify-center" style={{ minWidth: '10px' }}>
-                                {showMonth && (
-                                    <span className="text-xs font-medium" style={{ color: '#64748B' }}>
-                                        {months[firstDay.getMonth()]}
-                                    </span>
-                                )}
+                            <div
+                                key={weekIndex}
+                                className={`aspect-square transition-all relative group ${day.isFuture ? 'cursor-default' : 'cursor-pointer'}`}
+                                style={{
+                                    borderRadius: '3px',
+                                    ...getColorStyle(day),
+                                    boxShadow: day.questions > 0 ? '0 1px 3px rgba(22, 163, 74, 0.3)' : 'none'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!day.isFuture) {
+                                        e.currentTarget.style.transform = 'scale(1.2)';
+                                        e.currentTarget.style.zIndex = '10';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'scale(1)';
+                                    e.currentTarget.style.zIndex = '1';
+                                }}
+                            >
+                                <div className={`${tooltipClasses} px-3 py-2 text-xs font-medium text-white rounded-lg opacity-0 ${day.isFuture ? '' : 'group-hover:opacity-100'} transition-opacity pointer-events-none whitespace-nowrap`}
+                                    style={{
+                                        backgroundColor: '#1F2937',
+                                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                        zIndex: '50'
+                                    }}>
+                                    <div className="font-semibold mb-1">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                                    {day.isFuture ? (
+                                        <div style={{ color: '#94A3B8' }}>Upcoming</div>
+                                    ) : (
+                                        <>
+                                            <div style={{ color: '#60A5FA' }}>{day.questions} question{day.questions !== 1 ? 's' : ''}</div>
+                                            <div style={{ color: '#F472B6' }}>{day.xp} XP</div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         );
                     })}
                 </div>
-
-                {/* Heatmap grid - rows are days of week, columns are weeks */}
-                {[1, 2, 3, 4, 5, 6, 7].map((dayOfWeek) => (
-                    <div key={dayOfWeek} className="flex gap-1 items-center mb-1">
-                        <div className="w-12 text-xs font-medium flex-shrink-0" style={{ color: '#64748B' }}>
-                            {dayLabels[dayOfWeek]}
-                        </div>
-                        {weeks.map((week, weekIndex) => {
-                            const day = week ? week[dayOfWeek - 1] : null;
-                            if (!day) return <div key={weekIndex} className="flex-1 aspect-square rounded-sm" style={{ minWidth: '10px', maxWidth: '18px', backgroundColor: '#F3F4F6' }}></div>;
-
-                            // Position tooltip below for top rows (0, 1), above for bottom rows (2, 3, 4)
-                            // Also handle left/right edges for better visibility
-                            const isTopRow = dayOfWeek <= 3;
-                            const isLeftEdge = weekIndex < 2;
-                            const isRightEdge = weekIndex >= weeks.length - 2;
-
-                            let tooltipClasses = isTopRow
-                                ? "absolute top-full mt-2"
-                                : "absolute bottom-full mb-2";
-
-                            // Adjust horizontal positioning for edges
-                            if (isLeftEdge) {
-                                tooltipClasses += " left-0";
-                            } else if (isRightEdge) {
-                                tooltipClasses += " right-0";
-                            } else {
-                                tooltipClasses += " left-1/2 transform -translate-x-1/2";
-                            }
-
-                            return (
-                                <div
-                                    key={weekIndex}
-                                    className={`flex-1 aspect-square transition-all relative group ${day.isFuture ? 'cursor-default' : 'cursor-pointer'}`}
-                                    style={{
-                                        minWidth: '10px',
-                                        maxWidth: '18px',
-                                        borderRadius: '3px',
-                                        ...getColorStyle(day),
-                                        transform: 'scale(1)',
-                                        boxShadow: day.questions > 0 ? '0 1px 3px rgba(22, 163, 74, 0.3)' : 'none'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        if (!day.isFuture) {
-                                            e.currentTarget.style.transform = 'scale(1.3)';
-                                            e.currentTarget.style.zIndex = '10';
-                                        }
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'scale(1)';
-                                        e.currentTarget.style.zIndex = '1';
-                                    }}
-                                >
-                                    {/* Tooltip - position dynamically based on row */}
-                                    <div className={`${tooltipClasses} px-3 py-2 text-xs font-medium text-white rounded-lg opacity-0 ${day.isFuture ? '' : 'group-hover:opacity-100'} transition-opacity pointer-events-none whitespace-nowrap`}
-                                        style={{
-                                            backgroundColor: '#1F2937',
-                                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                                            zIndex: '50'
-                                        }}>
-                                        <div className="font-semibold mb-1">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
-                                        {day.isFuture ? (
-                                            <div style={{ color: '#94A3B8' }}>Upcoming</div>
-                                        ) : (
-                                            <>
-                                                <div style={{ color: '#60A5FA' }}>{day.questions} question{day.questions !== 1 ? 's' : ''}</div>
-                                                <div style={{ color: '#F472B6' }}>{day.xp} XP</div>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                ))}
-            </div>
+            ))}
 
             {/* Legend */}
-            <div className="flex items-center justify-end gap-2 mt-6 text-xs" style={{ color: '#64748B' }}>
+            <div className="flex items-center justify-end gap-2 mt-4 text-xs" style={{ color: '#6B7280' }}>
                 <span>Less</span>
                 <div className="flex gap-1">
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#F3F4F6' }}></div>
