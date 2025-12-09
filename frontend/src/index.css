@@ -85,3 +85,20 @@ code {
 .neomorph-hover:hover {
     box-shadow: var(--shadow-hover);
 }
+
+/* Animations */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slideDown {
+    animation: slideDown 0.2s ease-out;
+}
