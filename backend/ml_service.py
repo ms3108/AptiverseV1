@@ -11,6 +11,11 @@ from sqlalchemy.sql import func
 
 import models
 
+
+def get_weaviate_client():
+    '''Stub function - Weaviate not used, returns None'''
+    return None
+
 # Simple in-process caches
 _weak_topic_cache: Dict[int, Tuple[datetime, List[str]]] = {}
 _practice_set_cache: Dict[Tuple[int, int], Tuple[datetime, List[int]]] = {}
@@ -278,3 +283,4 @@ def check_and_award_badges(db: Session, user_id: int):
         db.commit()
     
     return newly_earned
+
