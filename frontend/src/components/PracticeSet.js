@@ -159,7 +159,7 @@ function PracticeSet() {
                     <p className="text-xl text-gray-600 mb-6">
                         You answered {score.correct} out of {score.total} questions correctly
                     </p>
-                    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-6 mb-6">
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-lg p-6 mb-6">
                         <p className="text-lg mb-2">Your Performance</p>
                         <p className="text-4xl font-bold">
                             {Math.round((score.correct / score.total) * 100)}%

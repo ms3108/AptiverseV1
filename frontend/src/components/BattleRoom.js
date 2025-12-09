@@ -290,7 +290,7 @@ function BattleRoom() {
                         {/* Header */}
                         <div className="text-center mb-8">
                             <h1 className="text-4xl font-black mb-2" style={{
-                                background: 'linear-gradient(135deg, #1E88E5 0%, #EC4899 100%)',
+                                background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-1px'
@@ -315,11 +315,11 @@ function BattleRoom() {
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold mb-1" style={{ color: '#64748B' }}>Questions</p>
-                                        <p className="text-xl font-bold" style={{ color: '#EC4899' }}>{battleInfo.num_questions}</p>
+                                        <p className="text-xl font-bold" style={{ color: '#42A5F5' }}>{battleInfo.num_questions}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold mb-1" style={{ color: '#64748B' }}>Time/Question</p>
-                                        <p className="text-xl font-bold" style={{ color: '#10B981' }}>{timePerQuestion}s</p>
+                                        <p className="text-xl font-bold" style={{ color: '#0D47A1' }}>{timePerQuestion}s</p>
                                     </div>
                                 </div>
 
@@ -350,7 +350,7 @@ function BattleRoom() {
                                         onClick={handleStartBattle}
                                         className="w-full py-3 font-bold text-lg rounded-lg hover-scale"
                                         style={{
-                                            background: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
+                                            background: 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)',
                                             color: '#FFFFFF'
                                         }}
                                     >
@@ -386,7 +386,7 @@ function BattleRoom() {
                                         <p className="font-semibold" style={{ color: '#1A202C' }}>{p.username}</p>
                                         {battleInfo && p.user_id === battleInfo.creator_id && (
                                             <span className="text-xs px-2 py-1 rounded-full font-bold"
-                                                style={{ backgroundColor: '#EC4899', color: '#FFFFFF' }}>
+                                                style={{ backgroundColor: '#1565C0', color: '#FFFFFF' }}>
                                                 CREATOR
                                             </span>
                                         )}
@@ -489,7 +489,7 @@ function BattleRoom() {
                                         disabled={!selectedAnswer}
                                         className="w-full mt-6 py-3 font-bold text-lg rounded-lg hover-scale"
                                         style={{
-                                            background: selectedAnswer ? 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)' : '#E2E8F0',
+                                            background: selectedAnswer ? 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)' : '#E2E8F0',
                                             color: selectedAnswer ? '#FFFFFF' : '#64748B',
                                             cursor: selectedAnswer ? 'pointer' : 'not-allowed'
                                         }}
@@ -535,15 +535,15 @@ function BattleRoom() {
                                             key={entry.user_id}
                                             className="flex items-center gap-3 p-3 rounded-lg"
                                             style={{
-                                                backgroundColor: index === 0 ? 'rgba(236, 72, 153, 0.1)' : '#F8FAFF',
-                                                border: index === 0 ? '2px solid #EC4899' : 'none'
+                                                backgroundColor: index === 0 ? 'rgba(30, 136, 229, 0.1)' : '#F8FAFF',
+                                                border: index === 0 ? '2px solid #1E88E5' : 'none'
                                             }}
                                         >
                                             <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
                                                 style={{
-                                                    background: index === 0 ? 'linear-gradient(135deg, #EC4899, #F472B6)' :
-                                                        index === 1 ? '#C0C0C0' :
-                                                            index === 2 ? '#CD7F32' : '#E2E8F0',
+                                                    background: index === 0 ? 'linear-gradient(135deg, #1565C0, #1E88E5)' :
+                                                        index === 1 ? '#64B5F6' :
+                                                            index === 2 ? '#90CAF9' : '#E2E8F0',
                                                     color: index < 3 ? '#FFFFFF' : '#64748B'
                                                 }}>
                                                 {index + 1}
@@ -584,7 +584,7 @@ function BattleRoom() {
                     <div className="max-w-4xl mx-auto">
                         <div className="text-center mb-8">
                             <h1 className="text-5xl font-black mb-4" style={{
-                                background: 'linear-gradient(135deg, #1E88E5 0%, #EC4899 100%)',
+                                background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent'
                             }}>
@@ -606,19 +606,19 @@ function BattleRoom() {
                                         key={entry.user_id}
                                         className="flex items-center gap-4 p-4 rounded-lg hover-lift"
                                         style={{
-                                            backgroundColor: index === 0 ? 'rgba(236, 72, 153, 0.1)' :
-                                                index === 1 ? 'rgba(192, 192, 192, 0.1)' :
-                                                    index === 2 ? 'rgba(205, 127, 50, 0.1)' : '#F8FAFF',
-                                            border: index < 3 ? `3px solid ${index === 0 ? '#EC4899' :
-                                                index === 1 ? '#C0C0C0' : '#CD7F32'
+                                            backgroundColor: index === 0 ? 'rgba(30, 136, 229, 0.1)' :
+                                                index === 1 ? 'rgba(100, 181, 246, 0.1)' :
+                                                    index === 2 ? 'rgba(144, 202, 249, 0.1)' : '#F8FAFF',
+                                            border: index < 3 ? `3px solid ${index === 0 ? '#1E88E5' :
+                                                index === 1 ? '#64B5F6' : '#90CAF9'
                                                 }` : '2px solid #E2E8F0'
                                         }}
                                     >
                                         <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl"
                                             style={{
-                                                background: index === 0 ? 'linear-gradient(135deg, #EC4899, #F472B6)' :
-                                                    index === 1 ? '#C0C0C0' :
-                                                        index === 2 ? '#CD7F32' : '#E2E8F0',
+                                                background: index === 0 ? 'linear-gradient(135deg, #1565C0, #1E88E5)' :
+                                                    index === 1 ? '#64B5F6' :
+                                                        index === 2 ? '#90CAF9' : '#E2E8F0',
                                                 color: index < 3 ? '#FFFFFF' : '#64748B'
                                             }}>
                                             {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}

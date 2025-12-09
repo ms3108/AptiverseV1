@@ -71,7 +71,7 @@ function CreateBattle() {
                     {/* Header */}
                     <div className="text-center mb-8">
                         <h1 className="text-4xl font-black mb-2" style={{
-                            background: 'linear-gradient(135deg, #1E88E5 0%, #EC4899 100%)',
+                            background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             letterSpacing: '-1px'
@@ -151,10 +151,10 @@ function CreateBattle() {
                                         value={timePerQuestion}
                                         onChange={(e) => setTimePerQuestion(parseInt(e.target.value))}
                                         className="flex-1"
-                                        style={{ accentColor: '#EC4899' }}
+                                        style={{ accentColor: '#42A5F5' }}
                                     />
                                     <div className="w-16 h-16 rounded-full flex items-center justify-center font-black text-xl"
-                                        style={{ backgroundColor: 'rgba(236, 72, 153, 0.1)', color: '#EC4899' }}>
+                                        style={{ backgroundColor: 'rgba(66, 165, 245, 0.1)', color: '#42A5F5' }}>
                                         {timePerQuestion}s
                                     </div>
                                 </div>
@@ -197,7 +197,7 @@ function CreateBattle() {
                                     disabled={loading || !selectedTopic}
                                     className="flex-1 py-3 font-bold rounded-lg hover-scale"
                                     style={{
-                                        background: loading ? '#E2E8F0' : 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
+                                        background: loading ? '#E2E8F0' : 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)',
                                         color: loading ? '#64748B' : '#FFFFFF',
                                         cursor: loading ? 'not-allowed' : 'pointer'
                                     }}

@@ -54,7 +54,7 @@ function Dashboard() {
                     <div className="flex justify-between h-16">
                         <div className="flex items-center space-x-4">
                             <h1 className="text-2xl font-bold tracking-tight" style={{
-                                background: 'linear-gradient(135deg, #1E88E5 0%, #EC4899 100%)',
+                                background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 backgroundClip: 'text',
@@ -66,8 +66,8 @@ function Dashboard() {
                                 onClick={() => navigate('/dashboard')}
                                 className="px-5 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                                 style={{
-                                    border: '2px solid #6366F1',
-                                    color: '#6366F1',
+                                    border: '2px solid #1E88E5',
+                                    color: '#1E88E5',
                                     borderRadius: '10px',
                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                 }}
@@ -80,9 +80,9 @@ function Dashboard() {
                                 onClick={handleStartPractice}
                                 className="px-6 py-2 text-sm font-semibold hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2 text-white"
                                 style={{
-                                    background: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
+                                    background: 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)',
                                     borderRadius: '10px',
-                                    boxShadow: '0px 4px 10px rgba(236, 72, 153, 0.3)',
+                                    boxShadow: '0px 4px 10px rgba(30, 136, 229, 0.3)',
                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                 }}
                             >
@@ -104,8 +104,8 @@ function Dashboard() {
                                 onClick={() => navigate('/battle/history')}
                                 className="px-6 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                                 style={{
-                                    border: '2px solid #EC4899',
-                                    color: '#EC4899',
+                                    border: '2px solid #0D47A1',
+                                    color: '#0D47A1',
                                     borderRadius: '10px',
                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                 }}
@@ -116,7 +116,7 @@ function Dashboard() {
                             {/* Notification Bell */}
                             <button
                                 onClick={() => setShowNotifications(!showNotifications)}
-                                className="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="relative p-2 rounded-full hover:bg-blue-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -133,7 +133,7 @@ function Dashboard() {
                                     />
                                 </svg>
                                 {notificationCount > 0 && (
-                                    <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full animate-pulse">
+                                    <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-600 rounded-full animate-pulse">
                                         {notificationCount > 9 ? '9+' : notificationCount}
                                     </span>
                                 )}
@@ -146,7 +146,7 @@ function Dashboard() {
                                 onClick={handleLogout}
                                 className="px-4 py-2 text-sm font-semibold text-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                                 style={{
-                                    backgroundColor: '#DC2626',
+                                    backgroundColor: '#1565C0',
                                     borderRadius: '10px',
                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                 }}

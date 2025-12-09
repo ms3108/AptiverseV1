@@ -28,7 +28,7 @@ function DashboardStats() {
     if (loading) {
         return (
             <div className="flex justify-center items-center p-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#4B0082' }}></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#1E88E5' }}></div>
             </div>
         );
     }
@@ -70,12 +70,12 @@ function DashboardStats() {
                             <div className="relative" style={{
                                 width: '64px',
                                 height: '64px',
-                                background: 'linear-gradient(135deg, #4B0082 0%, #6A0DAD 100%)',
+                                background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
                                 borderRadius: '12px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                boxShadow: '0 4px 12px rgba(75, 0, 130, 0.3)'
+                                boxShadow: '0 4px 12px rgba(30, 136, 229, 0.3)'
                             }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                                     <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" strokeLinecap="round" strokeLinejoin="round" />
@@ -101,7 +101,7 @@ function DashboardStats() {
                             className="rounded-full h-4 transition-all duration-700 ease-out relative overflow-hidden"
                             style={{
                                 width: `${Math.min(xpPercentage, 100)}%`,
-                                background: 'linear-gradient(90deg, #1E88E5 0%, #42A5F5 50%, #EC4899 100%)',
+                                background: 'linear-gradient(90deg, #0D47A1 0%, #1E88E5 50%, #42A5F5 100%)',
                                 boxShadow: '0 2px 8px rgba(30, 136, 229, 0.4)'
                             }}
                         >
@@ -129,14 +129,14 @@ function DashboardStats() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Current Streak */}
                 <div className="relative bg-white neomorph neomorph-hover hover-lift" style={{ borderRadius: '12px', padding: '32px 24px' }}>
-                    {/* Floating icon with pink accent */}
+                    {/* Floating icon with blue accent */}
                     <div className="absolute top-4 left-4 flex items-center justify-center" style={{
                         width: '40px',
                         height: '40px',
-                        backgroundColor: 'rgba(236, 72, 153, 0.15)',
+                        backgroundColor: 'rgba(30, 136, 229, 0.15)',
                         borderRadius: '10px'
                     }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EC4899" strokeWidth="2">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1E88E5" strokeWidth="2">
                             <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
@@ -156,20 +156,20 @@ function DashboardStats() {
                     border: '2px solid rgba(30, 136, 229, 0.15)',
                     backgroundColor: 'rgba(30, 136, 229, 0.02)'
                 }}>
-                    {/* Floating icon with pink accent */}
+                    {/* Floating icon with blue accent */}
                     <div className="absolute top-4 left-4 flex items-center justify-center" style={{
                         width: '40px',
                         height: '40px',
-                        backgroundColor: 'rgba(236, 72, 153, 0.15)',
+                        backgroundColor: 'rgba(30, 136, 229, 0.15)',
                         borderRadius: '10px'
                     }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EC4899" strokeWidth="2">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1E88E5" strokeWidth="2">
                             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
                     {/* "Best" badge */}
                     <div className="absolute top-4 right-4 px-2 py-1 rounded-md text-xs font-bold text-white" style={{
-                        background: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)'
+                        background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)'
                     }}>
                         BEST
                     </div>
@@ -184,14 +184,14 @@ function DashboardStats() {
 
                 {/* Total Questions */}
                 <div className="relative bg-white neomorph neomorph-hover hover-lift" style={{ borderRadius: '12px', padding: '32px 24px' }}>
-                    {/* Floating icon with pink accent */}
+                    {/* Floating icon with blue accent */}
                     <div className="absolute top-4 left-4 flex items-center justify-center" style={{
                         width: '40px',
                         height: '40px',
-                        backgroundColor: 'rgba(236, 72, 153, 0.15)',
+                        backgroundColor: 'rgba(30, 136, 229, 0.15)',
                         borderRadius: '10px'
                     }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EC4899" strokeWidth="2">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1E88E5" strokeWidth="2">
                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeLinecap="round" strokeLinejoin="round" />
                             <polyline points="22 4 12 14.01 9 11.01" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
@@ -218,8 +218,8 @@ function DashboardStats() {
                                 key={index}
                                 className="neomorph-hover hover-lift p-4 text-center transition-all border-2"
                                 style={{
-                                    backgroundColor: 'rgba(236, 72, 153, 0.08)',
-                                    borderColor: '#EC4899',
+                                    backgroundColor: 'rgba(30, 136, 229, 0.08)',
+                                    borderColor: '#1E88E5',
                                     borderRadius: '12px'
                                 }}
                                 title={badge.description}
@@ -314,17 +314,17 @@ function ActivityHeatmap({ activityData = {} }) {
 
     const weeks = generateHeatmapData();
 
-    // Get color intensity based on questions solved - blue to pink gradient
+    // Get color intensity based on questions solved - light to dark blue gradient
     const getColorStyle = (day) => {
         if (!day) return { backgroundColor: '#E2E8F0' };
         if (day.isFuture) return { backgroundColor: '#E2E8F0', opacity: 0.4 };
 
         const { questions } = day;
         if (questions === 0) return { backgroundColor: '#E2E8F0' };
-        if (questions <= 3) return { backgroundColor: 'rgba(30, 136, 229, 0.3)' }; // Light blue
+        if (questions <= 3) return { backgroundColor: 'rgba(66, 165, 245, 0.4)' }; // Light blue
         if (questions <= 6) return { backgroundColor: 'rgba(30, 136, 229, 0.6)' }; // Medium blue
-        if (questions <= 9) return { backgroundColor: 'rgba(236, 72, 153, 0.8)' }; // Light pink
-        return { backgroundColor: '#EC4899' }; // Full pink
+        if (questions <= 9) return { backgroundColor: 'rgba(21, 101, 192, 0.8)' }; // Darker blue
+        return { backgroundColor: '#0D47A1' }; // Full dark blue
     };
 
     const dayLabels = {

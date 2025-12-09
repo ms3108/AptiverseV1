@@ -43,9 +43,9 @@ function BattleHistory() {
     };
 
     const getRankColor = (rank) => {
-        if (rank === 1) return '#EC4899';
-        if (rank === 2) return '#C0C0C0';
-        if (rank === 3) return '#CD7F32';
+        if (rank === 1) return '#1E88E5';
+        if (rank === 2) return '#64B5F6';
+        if (rank === 3) return '#90CAF9';
         return '#64748B';
     };
 
@@ -82,7 +82,7 @@ function BattleHistory() {
                     <div className="mb-8">
                         <div className="flex items-center justify-between mb-4">
                             <h1 className="text-4xl font-black" style={{
-                                background: 'linear-gradient(135deg, #1E88E5 0%, #EC4899 100%)',
+                                background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-1px'
@@ -93,7 +93,7 @@ function BattleHistory() {
                                 onClick={() => navigate('/battle/create')}
                                 className="px-6 py-3 font-bold rounded-lg hover-scale"
                                 style={{
-                                    background: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
+                                    background: 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)',
                                     color: '#FFFFFF'
                                 }}
                             >
@@ -232,42 +232,42 @@ function BattleHistory() {
                                                         </p>
                                                     </div>
                                                     <div>
-                                                        <p className="text-xs font-semibold mb-1" style={{ color: '#64748B' }}>
+                                                        <p className="text-xs font-semibold mb-1\" style={{ color: '#64748B' }}>
                                                             ACCURACY
                                                         </p>
-                                                        <p className="text-2xl font-black" style={{ color: '#EC4899' }}>
-                                                            {((battle.correct_answers / battle.num_questions) * 100).toFixed(0)}%
-                                                        </p>
-                                                    </div>
+                                                        <p className=\"text-2xl font-black\" style={{ color: '#1565C0' }}>
+                                                        {((battle.correct_answers / battle.num_questions) * 100).toFixed(0)}%
+                                                    </p>
+                                                </div>
                                                 </div>
                                             )}
 
-                                            {/* Date */}
-                                            <p className="text-xs mt-3" style={{ color: '#64748B' }}>
-                                                {battle.completed_at ?
-                                                    `Completed: ${formatDate(battle.completed_at)}` :
-                                                    `Created: ${formatDate(battle.created_at)}`
-                                                }
-                                            </p>
-                                        </div>
-
-                                        {/* Action Button */}
-                                        {battle.status === 'in_progress' && (
-                                            <button
-                                                onClick={() => navigate(`/battle/${battle.room_code}`)}
-                                                className="flex-shrink-0 px-6 py-3 font-bold rounded-lg hover-scale"
-                                                style={{ backgroundColor: '#1E88E5', color: '#FFFFFF' }}
-                                            >
-                                                Rejoin
-                                            </button>
-                                        )}
+                                        {/* Date */}
+                                        <p className="text-xs mt-3" style={{ color: '#64748B' }}>
+                                            {battle.completed_at ?
+                                                `Completed: ${formatDate(battle.completed_at)}` :
+                                                `Created: ${formatDate(battle.created_at)}`
+                                            }
+                                        </p>
                                     </div>
+
+                                    {/* Action Button */}
+                                    {battle.status === 'in_progress' && (
+                                        <button
+                                            onClick={() => navigate(`/battle/${battle.room_code}`)}
+                                            className="flex-shrink-0 px-6 py-3 font-bold rounded-lg hover-scale"
+                                            style={{ backgroundColor: '#1E88E5', color: '#FFFFFF' }}
+                                        >
+                                            Rejoin
+                                        </button>
+                                    )}
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                                </div>
+                    ))}
                 </div>
+                    )}
             </div>
+        </div >
         </>
     );
 }

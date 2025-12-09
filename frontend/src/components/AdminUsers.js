@@ -166,7 +166,7 @@ const AdminUsers = () => {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex flex-col space-y-1">
                                                     {user.is_admin && (
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                                                             Admin
                                                         </span>
                                                     )}

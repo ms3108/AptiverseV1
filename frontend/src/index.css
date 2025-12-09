@@ -8,16 +8,15 @@
     --blue-primary: #1E88E5;
     --blue-dark: #1565C0;
     --blue-light: #42A5F5;
-    --pink-accent: #EC4899;
-    --pink-light: #F472B6;
-    --pink-dark: #DB2777;
+    --blue-accent: #0D47A1;
+    --blue-sky: #64B5F6;
+    --blue-pale: #90CAF9;
     --bg-white: #FFFFFF;
     --bg-main: #F8FAFF;
     --bg-card: #FAFCFF;
     --text-primary: #1A202C;
     --text-secondary: #64748B;
     --border-light: #E2E8F0;
-    --red-muted: #DC2626;
     --shadow-soft: 0px 4px 10px rgba(30, 136, 229, 0.08);
     --shadow-hover: 0px 6px 16px rgba(30, 136, 229, 0.12);
 }
@@ -48,12 +47,12 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--blue-primary), var(--pink-accent));
+    background: linear-gradient(180deg, var(--blue-primary), var(--blue-dark));
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, var(--blue-dark), var(--pink-dark));
+    background: linear-gradient(180deg, var(--blue-dark), var(--blue-accent));
 }
 
 /* Micro-interactions */

@@ -49,7 +49,7 @@ function Navigation() {
                             className="text-2xl font-bold tracking-tight cursor-pointer"
                             onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')}
                             style={{
-                                background: 'linear-gradient(135deg, #1E88E5 0%, #EC4899 100%)',
+                                background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 backgroundClip: 'text',
@@ -63,8 +63,8 @@ function Navigation() {
                                 onClick={() => navigate('/dashboard')}
                                 className="px-5 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                                 style={{
-                                    border: '2px solid #6366F1',
-                                    color: '#6366F1',
+                                    border: '2px solid #1E88E5',
+                                    color: '#1E88E5',
                                     borderRadius: '10px',
                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                 }}
@@ -80,9 +80,9 @@ function Navigation() {
                                     onClick={() => navigate('/practice')}
                                     className="px-6 py-2 text-sm font-semibold hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2 text-white"
                                     style={{
-                                        background: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
+                                        background: 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)',
                                         borderRadius: '10px',
-                                        boxShadow: '0px 4px 10px rgba(236, 72, 153, 0.3)',
+                                        boxShadow: '0px 4px 10px rgba(30, 136, 229, 0.3)',
                                         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                     }}
                                 >
@@ -108,8 +108,8 @@ function Navigation() {
                                     onClick={() => navigate('/battle/history')}
                                     className="px-6 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                                     style={{
-                                        border: '2px solid #EC4899',
-                                        color: '#EC4899',
+                                        border: '2px solid #0D47A1',
+                                        color: '#0D47A1',
                                         borderRadius: '10px',
                                         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                     }}
@@ -124,9 +124,9 @@ function Navigation() {
                                     onClick={() => navigate('/admin')}
                                     className="px-4 py-2 text-sm font-semibold text-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                                     style={{
-                                        background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+                                        background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
                                         borderRadius: '10px',
-                                        boxShadow: '0px 4px 10px rgba(139, 92, 246, 0.3)',
+                                        boxShadow: '0px 4px 10px rgba(21, 101, 192, 0.3)',
                                         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                     }}
                                 >
@@ -136,8 +136,8 @@ function Navigation() {
                                     onClick={() => navigate('/admin/users')}
                                     className="px-4 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                                     style={{
-                                        border: '2px solid #8B5CF6',
-                                        color: '#8B5CF6',
+                                        border: '2px solid #1E88E5',
+                                        color: '#1E88E5',
                                         borderRadius: '10px',
                                         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                     }}
@@ -148,8 +148,8 @@ function Navigation() {
                                     onClick={() => navigate('/admin/questions')}
                                     className="px-4 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                                     style={{
-                                        border: '2px solid #10B981',
-                                        color: '#10B981',
+                                        border: '2px solid #42A5F5',
+                                        color: '#42A5F5',
                                         borderRadius: '10px',
                                         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                     }}
@@ -163,15 +163,15 @@ function Navigation() {
                                 onClick={() => setShowWarningsModal(true)}
                                 className="relative px-4 py-2 text-sm font-semibold hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                                 style={{
-                                    border: '2px solid #F59E0B',
-                                    color: '#F59E0B',
+                                    border: '2px solid #1565C0',
+                                    color: '#1565C0',
                                     borderRadius: '10px',
                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                                 }}
                             >
                                 ⚠️ Warnings
                                 {warningsCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                                    <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
                                         {warningsCount}
                                     </span>
                                 )}
@@ -184,7 +184,7 @@ function Navigation() {
                             onClick={handleLogout}
                             className="px-4 py-2 text-sm font-semibold text-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
                             style={{
-                                backgroundColor: '#DC2626',
+                                backgroundColor: '#1565C0',
                                 borderRadius: '10px',
                                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                             }}
