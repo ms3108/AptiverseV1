@@ -351,12 +351,9 @@ function QuestionBank() {
                         </button>
 
                         {/* Header */}
-                        <div className="text-center mb-12">
-                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6" style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)', boxShadow: '0 10px 40px rgba(59, 130, 246, 0.3)' }}>
-                                <span className="text-4xl">📚</span>
-                            </div>
-                            <h1 className="text-4xl font-bold mb-3" style={{ color: '#1F2937', letterSpacing: '-1px' }}>Question Bank</h1>
-                            <p className="text-lg" style={{ color: '#6B7280' }}>Select a category to explore questions and test your skills</p>
+                        <div className="mb-10">
+                            <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937', letterSpacing: '-0.5px' }}>Question Bank</h1>
+                            <p className="text-base" style={{ color: '#6B7280' }}>Select a category to explore questions</p>
                         </div>
 
                         {/* Category Cards */}
@@ -417,27 +414,6 @@ function QuestionBank() {
                                     </div>
                                 );
                             })}
-                        </div>
-
-                        {/* Stats summary */}
-                        <div className="mt-12 text-center">
-                            <div className="inline-flex items-center gap-6 px-8 py-4 rounded-2xl bg-white" style={{ boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)' }}>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-2xl">📊</span>
-                                    <span className="font-bold text-lg" style={{ color: '#1F2937' }}>
-                                        {categories.reduce((sum, cat) => sum + cat.total_questions, 0)}
-                                    </span>
-                                    <span className="text-gray-500">total questions</span>
-                                </div>
-                                <div className="w-px h-8 bg-gray-200"></div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-2xl">📁</span>
-                                    <span className="font-bold text-lg" style={{ color: '#1F2937' }}>
-                                        {categories.reduce((sum, cat) => sum + cat.topics.length, 0)}
-                                    </span>
-                                    <span className="text-gray-500">topics</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
