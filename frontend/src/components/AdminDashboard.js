@@ -171,7 +171,7 @@ const AdminDashboard = () => {
                 <div className="mt-6">
                     <button
                         onClick={() => navigate('/admin/logs')}
-                        className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
+                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
                     >
                         View All Action Logs →
                     </button>

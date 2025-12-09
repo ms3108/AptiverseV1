@@ -100,7 +100,7 @@ const AdminLogs = () => {
                             <select
                                 value={filters.action_type}
                                 onChange={(e) => setFilters({ ...filters, action_type: e.target.value, skip: 0 })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
                                 <option value="">All Actions</option>
                                 {actionTypes.map(type => (
@@ -115,7 +115,7 @@ const AdminLogs = () => {
                             <select
                                 value={filters.limit}
                                 onChange={(e) => setFilters({ ...filters, limit: parseInt(e.target.value), skip: 0 })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
                                 <option value="25">25</option>
                                 <option value="50">50</option>

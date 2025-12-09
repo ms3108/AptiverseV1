@@ -65,7 +65,7 @@ function Settings() {
         return (
             <>
                 <Navigation />
-                <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #1E88E5 0%, #EC4899 100%)' }}>
+                <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #1E88E5 0%, #0D47A1 100%)' }}>
                     <div className="text-white text-xl">Loading settings...</div>
                 </div>
             </>
@@ -130,7 +130,7 @@ function Settings() {
                                             onChange={(e) => setDailyPracticeCount(parseInt(e.target.value))}
                                             className="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
                                             style={{
-                                                background: `linear-gradient(to right, #6366F1 0%, #6366F1 ${((dailyPracticeCount - 5) / 45) * 100}%, #E5E7EB ${((dailyPracticeCount - 5) / 45) * 100}%, #E5E7EB 100%)`
+                                                background: `linear-gradient(to right, #1E88E5 0%, #1E88E5 ${((dailyPracticeCount - 5) / 45) * 100}%, #E5E7EB ${((dailyPracticeCount - 5) / 45) * 100}%, #E5E7EB 100%)`
                                             }}
                                         />
                                         <div className="flex items-center gap-2">
@@ -152,8 +152,8 @@ function Settings() {
                         {/* Message Display */}
                         {message && (
                             <div className={`mt-6 p-3 rounded-lg text-sm ${message.includes('✅')
-                                    ? 'bg-green-50 text-green-700 border border-green-200'
-                                    : 'bg-red-50 text-red-700 border border-red-200'
+                                ? 'bg-green-50 text-green-700 border border-green-200'
+                                : 'bg-red-50 text-red-700 border border-red-200'
                                 }`}>
                                 {message}
                             </div>
@@ -166,13 +166,13 @@ function Settings() {
                                 disabled={saving}
                                 className="w-full py-3 rounded-lg text-white font-semibold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{
-                                    backgroundColor: saving ? '#9CA3AF' : '#6366F1'
+                                    backgroundColor: saving ? '#9CA3AF' : '#1E88E5'
                                 }}
                                 onMouseEnter={(e) => {
-                                    if (!saving) e.target.style.backgroundColor = '#4F46E5';
+                                    if (!saving) e.target.style.backgroundColor = '#1565C0';
                                 }}
                                 onMouseLeave={(e) => {
-                                    if (!saving) e.target.style.backgroundColor = '#6366F1';
+                                    if (!saving) e.target.style.backgroundColor = '#1E88E5';
                                 }}
                             >
                                 {saving ? 'Saving...' : 'Save Changes'}

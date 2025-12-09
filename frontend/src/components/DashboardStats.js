@@ -444,8 +444,8 @@ function ActivityHeatmap({ activityData = {} }) {
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#E2E8F0' }}></div>
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'rgba(30, 136, 229, 0.3)' }}></div>
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'rgba(30, 136, 229, 0.6)' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'rgba(236, 72, 153, 0.8)' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#EC4899' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'rgba(21, 101, 192, 0.8)' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#0D47A1' }}></div>
                 </div>
                 <span>More</span>
             </div>

@@ -227,7 +227,7 @@ function QuestionDetail() {
                                 {answerResult.is_correct ? 'Correct!' : 'Incorrect'}
                             </span>
                             {answerResult.xp_earned > 0 && (
-                                <span className="ml-4 text-sm font-semibold text-purple-700">
+                                <span className="ml-4 text-sm font-semibold text-blue-700">
                                     +{answerResult.xp_earned} XP
                                 </span>
                             )}
