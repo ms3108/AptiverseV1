@@ -121,8 +121,14 @@ function DashboardStats() {
                                 backgroundColor: 'rgba(255,255,255,0.2)',
                                 borderRadius: '6px'
                             }}
-                            variant="info"
-                        />
+                        >
+                            <ProgressBar
+                                now={Math.min(xpPercentage, 100)}
+                                style={{
+                                    backgroundColor: '#DBEAFE'
+                                }}
+                            />
+                        </ProgressBar>
                         <small className="d-block mt-2" style={{ color: 'rgba(255,255,255,0.8)' }}>
                             {stats.xp_progress} / {stats.xp_for_next_level - (stats.level * 100)} XP to Level {stats.level + 1}
                         </small>
