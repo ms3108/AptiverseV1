@@ -93,7 +93,7 @@ function Login() {
     return (
         <div className="min-vh-100 d-flex align-items-center justify-content-center py-5 position-relative overflow-hidden"
             style={{
-                background: 'linear-gradient(135deg, #93C5FD 0%, #BFDBFE 50%, #DBEAFE 100%)',
+                background: '#FFFFFF',
             }}>
             {/* Animated Background Elements */}
             <motion.div
@@ -165,7 +165,7 @@ function Login() {
                                     style={{
                                         width: '70px',
                                         height: '70px',
-                                        background: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%)',
+                                        background: '#2563EB',
                                         boxShadow: '0 10px 30px rgba(30, 136, 229, 0.4)'
                                     }}>
                                     <FaBullseye size={32} color="white" />
@@ -268,7 +268,7 @@ function Login() {
                                         disabled={loading}
                                         className="w-100 py-3 fw-semibold border-0"
                                         style={{
-                                            background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%)',
+                                            background: loading ? '#9CA3AF' : '#2563EB',
                                             borderRadius: '12px',
                                             boxShadow: loading ? 'none' : '0 10px 30px rgba(30, 136, 229, 0.4)',
                                             fontSize: '1rem'
@@ -287,7 +287,7 @@ function Login() {
                                 <div className="text-center mt-4">
                                     <p className="text-muted small mb-0">
                                         Don't have an account?{' '}
-                                        <Link to="/signup" className="fw-semibold text-decoration-none" style={{ color: '#60A5FA' }}>
+                                        <Link to="/signup" className="fw-semibold text-decoration-none" style={{ color: '#2563EB' }}>
                                             Create one now
                                         </Link>
                                     </p>

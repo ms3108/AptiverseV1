@@ -31,7 +31,7 @@ function DashboardStats() {
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center p-5">
-                <Spinner animation="border" style={{ color: '#93C5FD', width: '3rem', height: '3rem' }} />
+                <Spinner animation="border" style={{ color: '#2563EB', width: '3rem', height: '3rem' }} />
             </div>
         );
     }
@@ -84,8 +84,8 @@ function DashboardStats() {
             <motion.div variants={itemVariants}>
                 <Card className="border-0 text-white" style={{
                     borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #93C5FD 0%, #BFDBFE 100%)',
-                    boxShadow: '0 4px 20px rgba(147, 197, 253, 0.3)'
+                    background: '#2563EB',
+                    boxShadow: '0 4px 20px rgba(37, 99, 235, 0.3)'
                 }}>
                     <Card.Body className="p-4">
                         <Row className="align-items-center mb-4">
@@ -125,7 +125,7 @@ function DashboardStats() {
                             <ProgressBar
                                 now={Math.min(xpPercentage, 100)}
                                 style={{
-                                    backgroundColor: '#DBEAFE'
+                                    backgroundColor: '#2563EB'
                                 }}
                             />
                         </ProgressBar>
@@ -172,14 +172,14 @@ function DashboardStats() {
                                     <div className="d-flex align-items-center justify-content-center" style={{
                                         width: '40px',
                                         height: '40px',
-                                        backgroundColor: '#F0F9FF',
+                                        backgroundColor: '#EBF8FF',
                                         borderRadius: '10px'
                                     }}>
-                                        <FaBolt style={{ color: '#93C5FD' }} />
+                                        <FaBolt style={{ color: '#2563EB' }} />
                                     </div>
                                     <span className="text-muted small">Best Streak</span>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ color: '#60A5FA' }}>
+                                <h2 className="fw-bold mb-0" style={{ color: '#2563EB' }}>
                                     {stats.longest_streak}
                                 </h2>
                                 <small className="text-muted">personal best</small>
@@ -197,14 +197,14 @@ function DashboardStats() {
                                     <div className="d-flex align-items-center justify-content-center" style={{
                                         width: '40px',
                                         height: '40px',
-                                        backgroundColor: '#F0F9FF',
+                                        backgroundColor: '#EBF8FF',
                                         borderRadius: '10px'
                                     }}>
-                                        <FaCheckCircle style={{ color: '#93C5FD' }} />
+                                        <FaCheckCircle style={{ color: '#2563EB' }} />
                                     </div>
                                     <span className="text-muted small">Solved</span>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ color: '#60A5FA' }}>
+                                <h2 className="fw-bold mb-0" style={{ color: '#2563EB' }}>
                                     {stats.total_questions_solved}
                                 </h2>
                                 <small className="text-muted">questions</small>
@@ -267,7 +267,7 @@ function DashboardStats() {
                                 backgroundColor: '#EFF6FF',
                                 borderRadius: '10px'
                             }}>
-                                <FaChartBar style={{ color: '#93C5FD' }} />
+                                <FaChartBar style={{ color: '#2563EB' }} />
                             </div>
                             <h5 className="mb-0 fw-semibold" style={{ color: '#1F2937' }}>
                                 Activity
@@ -342,15 +342,15 @@ function ActivityHeatmap({ activityData = {} }) {
 
     // Get color intensity based on questions solved - blue palette
     const getColorStyle = (day) => {
-        if (!day) return { backgroundColor: '#F3F4F6' };
-        if (day.isFuture) return { backgroundColor: '#F3F4F6', opacity: 0.4 };
+        if (!day) return { backgroundColor: '#F8F9FA' };
+        if (day.isFuture) return { backgroundColor: '#F8F9FA', opacity: 0.4 };
 
         const { questions } = day;
-        if (questions === 0) return { backgroundColor: '#F3F4F6' };
-        if (questions <= 3) return { backgroundColor: '#DBEAFE' }; // Very light blue
-        if (questions <= 6) return { backgroundColor: '#BFDBFE' }; // Light blue
-        if (questions <= 9) return { backgroundColor: '#93C5FD' }; // Medium blue
-        return { backgroundColor: '#60A5FA' }; // Darker blue
+        if (questions === 0) return { backgroundColor: '#F8F9FA' };
+        if (questions <= 3) return { backgroundColor: '#E3F2FD' }; // Very light blue
+        if (questions <= 6) return { backgroundColor: '#BBDEFB' }; // Light blue
+        if (questions <= 9) return { backgroundColor: '#64B5F6' }; // Medium blue
+        return { backgroundColor: '#2563EB' }; // Primary blue
     };
 
     const dayLabels = {
@@ -430,7 +430,7 @@ function ActivityHeatmap({ activityData = {} }) {
                                 style={{
                                     borderRadius: '3px',
                                     ...getColorStyle(day),
-                                    boxShadow: day.questions > 0 ? '0 1px 3px rgba(147, 197, 253, 0.3)' : 'none'
+                                    boxShadow: day.questions > 0 ? '0 1px 3px rgba(37, 99, 235, 0.3)' : 'none'
                                 }}
                                 onMouseEnter={(e) => {
                                     if (!day.isFuture) {
@@ -469,11 +469,11 @@ function ActivityHeatmap({ activityData = {} }) {
             <div className="flex items-center justify-end gap-2 mt-4 text-xs" style={{ color: '#6B7280' }}>
                 <span>Less</span>
                 <div className="flex gap-1">
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#F3F4F6' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#DBEAFE' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#BFDBFE' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#93C5FD' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#60A5FA' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#F8F9FA' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#E3F2FD' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#BBDEFB' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#64B5F6' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#2563EB' }}></div>
                 </div>
                 <span>More</span>
             </div>
