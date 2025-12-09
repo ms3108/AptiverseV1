@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Spinner, Alert, Badge, ProgressBar } from 'react-bootstrap';
+import { motion } from 'framer-motion';
+import { FaFire, FaBolt, FaCheckCircle, FaTrophy, FaChartBar } from 'react-icons/fa';
 import API_URL from '../config/api';
 import axios from 'axios';
 
@@ -27,17 +30,17 @@ function DashboardStats() {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center p-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#1E88E5' }}></div>
+            <div className="d-flex justify-content-center align-items-center p-5">
+                <Spinner animation="border" style={{ color: '#3B82F6', width: '3rem', height: '3rem' }} />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="bg-red-50 border border-red-300 px-4 py-3 rounded-md" style={{ color: '#D32F2F' }}>
+            <Alert variant="danger" className="rounded-3">
                 {error}
-            </div>
+            </Alert>
         );
     }
 
@@ -45,205 +48,233 @@ function DashboardStats() {
 
     const xpPercentage = (stats.xp_progress / (stats.xp_for_next_level - (stats.level * 100))) * 100;
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+    };
+
     return (
-        <div className="space-y-6">
+        <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="d-flex flex-column gap-4"
+        >
             {/* User Header */}
-            <div className="relative overflow-hidden bg-white p-8" style={{
-                borderRadius: '16px',
-                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)'
-            }}>
-                <div className="relative z-10">
-                    <h2 className="text-2xl font-bold mb-1" style={{ color: '#1F2937' }}>
-                        Welcome back, {stats.username}!
-                    </h2>
-                    <p className="text-sm" style={{ color: '#6B7280' }}>Ready to level up your skills today?</p>
-                </div>
-            </div>
+            <motion.div variants={itemVariants}>
+                <Card className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+                    <Card.Body className="p-4">
+                        <h2 className="fw-bold mb-1" style={{ color: '#1F2937' }}>
+                            Welcome back, {stats.username}!
+                        </h2>
+                        <p className="text-muted mb-0">Ready to level up your skills today?</p>
+                    </Card.Body>
+                </Card>
+            </motion.div>
 
             {/* XP and Level Progress */}
-            <div className="relative overflow-hidden" style={{
-                borderRadius: '16px',
-                padding: '28px',
-                background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
-                boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3)'
-            }}>
-                <div className="relative z-10">
-                    <div className="flex items-start justify-between mb-6">
-                        <div className="flex items-center gap-4">
-                            {/* Level Badge */}
-                            <div className="relative flex items-center justify-center" style={{
-                                width: '64px',
-                                height: '64px',
-                                background: 'rgba(255, 255, 255, 0.2)',
-                                borderRadius: '14px',
-                                border: '2px solid rgba(255, 255, 255, 0.3)'
-                            }}>
-                                <span className="text-3xl font-black text-white">{stats.level}</span>
-                            </div>
-                            <div>
-                                <p className="text-xs font-medium mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>Current XP</p>
-                                <p className="text-4xl font-bold text-white">{stats.xp}</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-xs font-medium mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>Next Level</p>
-                            <p className="text-4xl font-bold" style={{ color: '#BFDBFE' }}>{stats.xp_for_next_level}</p>
-                        </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="relative w-full rounded-full h-3" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
-                        <div
-                            className="rounded-full h-3 transition-all duration-700"
-                            style={{
-                                width: `${Math.min(xpPercentage, 100)}%`,
-                                backgroundColor: '#BFDBFE'
-                            }}
-                        />
-                    </div>
-                    <p className="text-sm mt-2" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                        {stats.xp_progress} / {stats.xp_for_next_level - (stats.level * 100)} XP to Level {stats.level + 1}
-                    </p>
-                </div>
-            </div>
-
-            {/* Stats Grid - Blue palette */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Current Streak */}
-                <div className="bg-white p-6" style={{
+            <motion.div variants={itemVariants}>
+                <Card className="border-0 text-white" style={{
                     borderRadius: '16px',
-                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
-                    border: '1px solid #E5E7EB'
+                    background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+                    boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3)'
                 }}>
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center" style={{
-                            width: '40px',
-                            height: '40px',
-                            backgroundColor: '#EFF6FF',
-                            borderRadius: '10px'
-                        }}>
-                            <span className="text-xl">🔥</span>
-                        </div>
-                        <p className="text-sm font-medium" style={{ color: '#6B7280' }}>Current Streak</p>
-                    </div>
-                    <p className="text-3xl font-bold" style={{ color: '#1E40AF' }}>
-                        {stats.current_streak}
-                    </p>
-                    <p className="text-sm" style={{ color: '#6B7280' }}>days</p>
-                </div>
+                    <Card.Body className="p-4">
+                        <Row className="align-items-center mb-4">
+                            <Col xs="auto">
+                                <div className="d-flex align-items-center gap-3">
+                                    {/* Level Badge */}
+                                    <div className="d-flex align-items-center justify-content-center" style={{
+                                        width: '64px',
+                                        height: '64px',
+                                        background: 'rgba(255, 255, 255, 0.2)',
+                                        borderRadius: '14px',
+                                        border: '2px solid rgba(255, 255, 255, 0.3)'
+                                    }}>
+                                        <span className="display-6 fw-bold">{stats.level}</span>
+                                    </div>
+                                    <div>
+                                        <small style={{ color: 'rgba(255,255,255,0.7)' }}>Current XP</small>
+                                        <h2 className="mb-0 fw-bold">{stats.xp}</h2>
+                                    </div>
+                                </div>
+                            </Col>
+                            <Col className="text-end">
+                                <small style={{ color: 'rgba(255,255,255,0.7)' }}>Next Level</small>
+                                <h2 className="mb-0 fw-bold" style={{ color: '#BFDBFE' }}>{stats.xp_for_next_level}</h2>
+                            </Col>
+                        </Row>
+
+                        {/* Progress Bar */}
+                        <ProgressBar
+                            now={Math.min(xpPercentage, 100)}
+                            style={{
+                                height: '12px',
+                                backgroundColor: 'rgba(255,255,255,0.2)',
+                                borderRadius: '6px'
+                            }}
+                            variant="info"
+                        />
+                        <small className="d-block mt-2" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                            {stats.xp_progress} / {stats.xp_for_next_level - (stats.level * 100)} XP to Level {stats.level + 1}
+                        </small>
+                    </Card.Body>
+                </Card>
+            </motion.div>
+
+            {/* Stats Grid */}
+            <Row className="g-3">
+                {/* Current Streak */}
+                <Col md={4}>
+                    <motion.div variants={itemVariants}>
+                        <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px' }}>
+                            <Card.Body className="p-4">
+                                <div className="d-flex align-items-center gap-3 mb-3">
+                                    <div className="d-flex align-items-center justify-content-center" style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        backgroundColor: '#EFF6FF',
+                                        borderRadius: '10px'
+                                    }}>
+                                        <FaFire className="text-warning" />
+                                    </div>
+                                    <span className="text-muted small">Current Streak</span>
+                                </div>
+                                <h2 className="fw-bold mb-0" style={{ color: '#1E40AF' }}>
+                                    {stats.current_streak}
+                                </h2>
+                                <small className="text-muted">days</small>
+                            </Card.Body>
+                        </Card>
+                    </motion.div>
+                </Col>
 
                 {/* Longest Streak */}
-                <div className="bg-white p-6" style={{
-                    borderRadius: '16px',
-                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
-                    border: '1px solid #E5E7EB'
-                }}>
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center" style={{
-                            width: '40px',
-                            height: '40px',
-                            backgroundColor: '#EFF6FF',
-                            borderRadius: '10px'
-                        }}>
-                            <span className="text-xl">⚡</span>
-                        </div>
-                        <p className="text-sm font-medium" style={{ color: '#6B7280' }}>Best Streak</p>
-                    </div>
-                    <p className="text-3xl font-bold" style={{ color: '#1E40AF' }}>
-                        {stats.longest_streak}
-                    </p>
-                    <p className="text-sm" style={{ color: '#6B7280' }}>personal best</p>
-                </div>
+                <Col md={4}>
+                    <motion.div variants={itemVariants}>
+                        <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px' }}>
+                            <Card.Body className="p-4">
+                                <div className="d-flex align-items-center gap-3 mb-3">
+                                    <div className="d-flex align-items-center justify-content-center" style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        backgroundColor: '#EFF6FF',
+                                        borderRadius: '10px'
+                                    }}>
+                                        <FaBolt style={{ color: '#3B82F6' }} />
+                                    </div>
+                                    <span className="text-muted small">Best Streak</span>
+                                </div>
+                                <h2 className="fw-bold mb-0" style={{ color: '#1E40AF' }}>
+                                    {stats.longest_streak}
+                                </h2>
+                                <small className="text-muted">personal best</small>
+                            </Card.Body>
+                        </Card>
+                    </motion.div>
+                </Col>
 
                 {/* Total Questions */}
-                <div className="bg-white p-6" style={{
-                    borderRadius: '16px',
-                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
-                    border: '1px solid #E5E7EB'
-                }}>
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center justify-center" style={{
-                            width: '40px',
-                            height: '40px',
-                            backgroundColor: '#EFF6FF',
-                            borderRadius: '10px'
-                        }}>
-                            <span className="text-xl">✓</span>
-                        </div>
-                        <p className="text-sm font-medium" style={{ color: '#6B7280' }}>Solved</p>
-                    </div>
-                    <p className="text-3xl font-bold" style={{ color: '#1E40AF' }}>
-                        {stats.total_questions_solved}
-                    </p>
-                    <p className="text-sm" style={{ color: '#6B7280' }}>questions</p>
-                </div>
-            </div>
+                <Col md={4}>
+                    <motion.div variants={itemVariants}>
+                        <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px' }}>
+                            <Card.Body className="p-4">
+                                <div className="d-flex align-items-center gap-3 mb-3">
+                                    <div className="d-flex align-items-center justify-content-center" style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        backgroundColor: '#EFF6FF',
+                                        borderRadius: '10px'
+                                    }}>
+                                        <FaCheckCircle style={{ color: '#3B82F6' }} />
+                                    </div>
+                                    <span className="text-muted small">Solved</span>
+                                </div>
+                                <h2 className="fw-bold mb-0" style={{ color: '#1E40AF' }}>
+                                    {stats.total_questions_solved}
+                                </h2>
+                                <small className="text-muted">questions</small>
+                            </Card.Body>
+                        </Card>
+                    </motion.div>
+                </Col>
+            </Row>
 
             {/* Badges Section */}
             {stats.badges && stats.badges.length > 0 && (
-                <div className="bg-white p-6" style={{
-                    borderRadius: '16px',
-                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)'
-                }}>
-                    <div className="flex items-center gap-3 mb-5">
-                        <div className="flex items-center justify-center" style={{
-                            width: '40px',
-                            height: '40px',
-                            backgroundColor: '#EFF6FF',
-                            borderRadius: '10px'
-                        }}>
-                            <span className="text-xl">🏆</span>
-                        </div>
-                        <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>
-                            Achievements ({stats.badges.length})
-                        </h3>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {stats.badges.map((badge, index) => (
-                            <div
-                                key={index}
-                                className="p-4 text-center"
-                                style={{
-                                    backgroundColor: '#F9FAFB',
-                                    borderRadius: '12px',
-                                    border: '1px solid #E5E7EB'
-                                }}
-                                title={badge.description}
-                            >
-                                <div className="text-3xl mb-2">{badge.icon}</div>
-                                <p className="text-sm font-semibold" style={{ color: '#1F2937' }}>{badge.name}</p>
-                                <p className="text-xs mt-1" style={{ color: '#6B7280' }}>{badge.description}</p>
+                <motion.div variants={itemVariants}>
+                    <Card className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+                        <Card.Body className="p-4">
+                            <div className="d-flex align-items-center gap-3 mb-4">
+                                <div className="d-flex align-items-center justify-content-center" style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    backgroundColor: '#EFF6FF',
+                                    borderRadius: '10px'
+                                }}>
+                                    <FaTrophy style={{ color: '#F59E0B' }} />
+                                </div>
+                                <h5 className="mb-0 fw-semibold" style={{ color: '#1F2937' }}>
+                                    Achievements ({stats.badges.length})
+                                </h5>
                             </div>
-                        ))}
-                    </div>
-                </div>
+                            <Row className="g-3">
+                                {stats.badges.map((badge, index) => (
+                                    <Col xs={6} md={3} key={index}>
+                                        <motion.div
+                                            whileHover={{ scale: 1.05 }}
+                                            className="p-3 text-center rounded-3"
+                                            style={{
+                                                backgroundColor: '#F9FAFB',
+                                                border: '1px solid #E5E7EB'
+                                            }}
+                                            title={badge.description}
+                                        >
+                                            <div className="fs-1 mb-2">{badge.icon}</div>
+                                            <p className="small fw-semibold mb-1" style={{ color: '#1F2937' }}>{badge.name}</p>
+                                            <small className="text-muted">{badge.description}</small>
+                                        </motion.div>
+                                    </Col>
+                                ))}
+                            </Row>
+                        </Card.Body>
+                    </Card>
+                </motion.div>
             )}
 
             {/* Activity Heatmap */}
-            <div className="bg-white p-6" style={{
-                borderRadius: '16px',
-                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)'
-            }}>
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="flex items-center justify-center" style={{
-                        width: '40px',
-                        height: '40px',
-                        backgroundColor: '#EFF6FF',
-                        borderRadius: '10px'
-                    }}>
-                        <span className="text-xl">📊</span>
-                    </div>
-                    <h3 className="text-lg font-semibold" style={{ color: '#1F2937' }}>
-                        Activity
-                    </h3>
-                </div>
-                <p className="text-sm mb-4" style={{ color: '#6B7280', marginLeft: '52px' }}>
-                    Your practice activity over the past 6 months
-                </p>
-                <ActivityHeatmap activityData={stats.activity_data} />
-            </div>
-        </div>
-        </div >
+            <motion.div variants={itemVariants}>
+                <Card className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+                    <Card.Body className="p-4">
+                        <div className="d-flex align-items-center gap-3 mb-2">
+                            <div className="d-flex align-items-center justify-content-center" style={{
+                                width: '40px',
+                                height: '40px',
+                                backgroundColor: '#EFF6FF',
+                                borderRadius: '10px'
+                            }}>
+                                <FaChartBar style={{ color: '#3B82F6' }} />
+                            </div>
+                            <h5 className="mb-0 fw-semibold" style={{ color: '#1F2937' }}>
+                                Activity
+                            </h5>
+                        </div>
+                        <p className="text-muted small mb-4" style={{ marginLeft: '52px' }}>
+                            Your practice activity over the past 6 months
+                        </p>
+                        <ActivityHeatmap activityData={stats.activity_data} />
+                    </Card.Body>
+                </Card>
+            </motion.div>
+        </motion.div>
     );
 }
 
@@ -433,10 +464,10 @@ function ActivityHeatmap({ activityData = {} }) {
                 <span>Less</span>
                 <div className="flex gap-1">
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#F3F4F6' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#BBF7D0' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#4ADE80' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#16A34A' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#15803D' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#BFDBFE' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#60A5FA' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#3B82F6' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#1E40AF' }}></div>
                 </div>
                 <span>More</span>
             </div>

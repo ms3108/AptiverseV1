@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import DashboardStats from './DashboardStats';
 import NotificationsPanel from './NotificationsPanel';
+import { Container, Navbar, Nav, Button, Badge, Dropdown } from 'react-bootstrap';
+import { motion } from 'framer-motion';
+import { FaBell, FaSignOutAlt, FaBook, FaGamepad, FaBullseye, FaCog, FaUser } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 function Dashboard() {
     const { user, logout } = useAuth();
@@ -13,7 +17,6 @@ function Dashboard() {
 
     useEffect(() => {
         fetchNotificationCount();
-        // Refresh notification count every 30 seconds
         const interval = setInterval(fetchNotificationCount, 30000);
         return () => clearInterval(interval);
     }, []);
@@ -35,6 +38,7 @@ function Dashboard() {
     };
 
     const handleLogout = () => {
+        toast.success('Logged out successfully!');
         logout();
         navigate('/login');
     };
@@ -48,173 +52,189 @@ function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #F0F4FA 0%, #E8F0FE 100%)' }}>
-            <nav className="glass" style={{
-                borderBottom: '1px solid rgba(226, 232, 240, 0.8)',
-                position: 'sticky',
-                top: 0,
-                zIndex: 50
-            }}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center space-x-4">
-                            <h1 className="text-2xl font-extrabold tracking-tight cursor-pointer"
-                                onClick={() => navigate('/dashboard')}
-                                style={{
-                                    background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    backgroundClip: 'text',
-                                    letterSpacing: '-0.5px'
-                                }}>
-                                Aptiverse
-                            </h1>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                            <button
-                                onClick={handleStartPractice}
-                                className="px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-300"
-                                style={{
-                                    background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
-                                    boxShadow: '0 4px 14px rgba(30, 136, 229, 0.4)'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.transform = 'translateY(-2px)';
-                                    e.target.style.boxShadow = '0 6px 20px rgba(30, 136, 229, 0.5)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.transform = 'translateY(0)';
-                                    e.target.style.boxShadow = '0 4px 14px rgba(30, 136, 229, 0.4)';
-                                }}
-                            >
-                                🎯 Practice
-                            </button>
-                            <button
-                                onClick={handleQuestionBank}
-                                className="px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300"
-                                style={{
-                                    background: 'white',
-                                    color: '#1E88E5',
-                                    border: '2px solid #1E88E5'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.background = '#1E88E5';
-                                    e.target.style.color = 'white';
-                                    e.target.style.transform = 'translateY(-2px)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.background = 'white';
-                                    e.target.style.color = '#1E88E5';
-                                    e.target.style.transform = 'translateY(0)';
-                                }}
-                            >
-                                📚 Questions
-                            </button>
-                            <button
-                                onClick={() => navigate('/battle/history')}
-                                className="px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300"
-                                style={{
-                                    background: 'white',
-                                    color: '#0D47A1',
-                                    border: '2px solid #0D47A1'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.background = '#0D47A1';
-                                    e.target.style.color = 'white';
-                                    e.target.style.transform = 'translateY(-2px)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.background = 'white';
-                                    e.target.style.color = '#0D47A1';
-                                    e.target.style.transform = 'translateY(0)';
-                                }}
-                            >
-                                ⚔️ Battles
-                            </button>
+        <div className="min-vh-100" style={{ background: 'linear-gradient(135deg, #F0F4FA 0%, #E8F0FE 100%)' }}>
+            {/* Modern Navbar */}
+            <Navbar
+                expand="lg"
+                className="py-3 shadow-sm"
+                style={{
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    borderBottom: '1px solid rgba(226, 232, 240, 0.8)'
+                }}
+                sticky="top"
+            >
+                <Container>
+                    <Navbar.Brand
+                        onClick={() => navigate('/dashboard')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <motion.h1
+                            className="mb-0 fw-bold"
+                            style={{
+                                background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                fontSize: '1.75rem',
+                                letterSpacing: '-0.5px'
+                            }}
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ type: "spring", stiffness: 400 }}
+                        >
+                            Aptiverse
+                        </motion.h1>
+                    </Navbar.Brand>
+
+                    <Navbar.Toggle aria-controls="navbar-nav" />
+
+                    <Navbar.Collapse id="navbar-nav">
+                        <Nav className="ms-auto align-items-center gap-2">
+                            {/* Practice Button */}
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                <Button
+                                    onClick={handleStartPractice}
+                                    className="d-flex align-items-center gap-2 fw-semibold border-0"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
+                                        boxShadow: '0 4px 14px rgba(30, 136, 229, 0.35)',
+                                        borderRadius: '12px',
+                                        padding: '10px 20px'
+                                    }}
+                                >
+                                    <FaBullseye /> Practice
+                                </Button>
+                            </motion.div>
+
+                            {/* Questions Button */}
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                <Button
+                                    variant="outline-primary"
+                                    onClick={handleQuestionBank}
+                                    className="d-flex align-items-center gap-2 fw-semibold"
+                                    style={{
+                                        borderRadius: '12px',
+                                        borderWidth: '2px',
+                                        borderColor: '#1E88E5',
+                                        color: '#1E88E5',
+                                        padding: '10px 20px'
+                                    }}
+                                >
+                                    <FaBook /> Questions
+                                </Button>
+                            </motion.div>
+
+                            {/* Battles Button */}
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                <Button
+                                    variant="outline-primary"
+                                    onClick={() => navigate('/battle/history')}
+                                    className="d-flex align-items-center gap-2 fw-semibold"
+                                    style={{
+                                        borderRadius: '12px',
+                                        borderWidth: '2px',
+                                        borderColor: '#0D47A1',
+                                        color: '#0D47A1',
+                                        padding: '10px 20px'
+                                    }}
+                                >
+                                    <FaGamepad /> Battles
+                                </Button>
+                            </motion.div>
 
                             {/* Notification Bell */}
-                            <button
-                                onClick={() => setShowNotifications(!showNotifications)}
-                                className="relative p-2.5 rounded-xl transition-all duration-300"
-                                style={{
-                                    background: showNotifications ? 'rgba(30, 136, 229, 0.1)' : 'white',
-                                    border: '2px solid #E2E8F0'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.borderColor = '#1E88E5';
-                                    e.target.style.background = 'rgba(30, 136, 229, 0.05)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.borderColor = '#E2E8F0';
-                                    e.target.style.background = showNotifications ? 'rgba(30, 136, 229, 0.1)' : 'white';
-                                }}
+                            <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="position-relative mx-2"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-5 w-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="#1E88E5"
-                                    strokeWidth={2}
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                                    />
-                                </svg>
-                                {notificationCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white rounded-full animate-pulse" style={{
-                                        background: 'linear-gradient(135deg, #1E88E5, #1565C0)'
-                                    }}>
-                                        {notificationCount > 9 ? '9+' : notificationCount}
-                                    </span>
-                                )}
-                            </button>
-
-                            {/* User info & Logout */}
-                            <div className="flex items-center space-x-3 pl-2 border-l-2" style={{ borderColor: '#E2E8F0' }}>
-                                <div className="flex items-center px-3 py-1.5 rounded-lg" style={{ background: 'rgba(30, 136, 229, 0.08)' }}>
-                                    <span className="text-sm font-medium" style={{ color: '#64748B' }}>
-                                        👋 <span className="font-semibold" style={{ color: '#1E88E5' }}>{user?.username}</span>
-                                    </span>
-                                </div>
-                                <button
-                                    onClick={handleLogout}
-                                    className="px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-300"
+                                <Button
+                                    variant="light"
+                                    onClick={() => setShowNotifications(!showNotifications)}
+                                    className="rounded-circle p-2 position-relative"
                                     style={{
-                                        background: '#1565C0',
-                                        color: 'white'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.target.style.background = '#0D47A1';
-                                        e.target.style.transform = 'translateY(-1px)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.background = '#1565C0';
-                                        e.target.style.transform = 'translateY(0)';
+                                        width: '44px',
+                                        height: '44px',
+                                        background: showNotifications ? 'rgba(30, 136, 229, 0.1)' : 'white',
+                                        border: '2px solid #E2E8F0'
                                     }}
                                 >
-                                    Logout
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+                                    <FaBell size={18} color="#1E88E5" />
+                                    {notificationCount > 0 && (
+                                        <Badge
+                                            pill
+                                            className="position-absolute"
+                                            style={{
+                                                top: '-5px',
+                                                right: '-5px',
+                                                background: 'linear-gradient(135deg, #1E88E5, #1565C0)',
+                                                fontSize: '0.65rem',
+                                                animation: 'pulse 2s infinite'
+                                            }}
+                                        >
+                                            {notificationCount > 9 ? '9+' : notificationCount}
+                                        </Badge>
+                                    )}
+                                </Button>
+                            </motion.div>
 
-            <main className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
-                <div className="px-4 sm:px-0 animate-fadeIn">
+                            {/* User Dropdown */}
+                            <Dropdown align="end">
+                                <Dropdown.Toggle
+                                    variant="light"
+                                    className="d-flex align-items-center gap-2 border-0"
+                                    style={{
+                                        background: 'rgba(30, 136, 229, 0.08)',
+                                        borderRadius: '12px',
+                                        padding: '8px 16px'
+                                    }}
+                                >
+                                    <FaUser size={14} color="#1E88E5" />
+                                    <span className="fw-semibold" style={{ color: '#1E88E5' }}>
+                                        {user?.username}
+                                    </span>
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu
+                                    className="shadow-lg border-0"
+                                    style={{ borderRadius: '12px', padding: '8px' }}
+                                >
+                                    <Dropdown.Item
+                                        onClick={() => navigate('/settings')}
+                                        className="d-flex align-items-center gap-2 rounded-2 py-2"
+                                    >
+                                        <FaCog color="#64748B" /> Settings
+                                    </Dropdown.Item>
+                                    <Dropdown.Divider />
+                                    <Dropdown.Item
+                                        onClick={handleLogout}
+                                        className="d-flex align-items-center gap-2 rounded-2 py-2 text-danger"
+                                    >
+                                        <FaSignOutAlt /> Logout
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
+
+            {/* Main Content */}
+            <Container className="py-4">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                >
                     <DashboardStats />
-                </div>
-            </main>
+                </motion.div>
+            </Container>
 
             {/* Notifications Panel */}
             <NotificationsPanel
                 isOpen={showNotifications}
                 onClose={() => {
                     setShowNotifications(false);
-                    fetchNotificationCount(); // Refresh count when closing
+                    fetchNotificationCount();
                 }}
             />
         </div>

@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Navbar, Nav, Container, Button, Badge } from 'react-bootstrap';
+import { motion } from 'framer-motion';
+import { FaHome, FaBookOpen, FaChartPie, FaUsers, FaQuestionCircle, FaCrown, FaExclamationTriangle, FaSignOutAlt } from 'react-icons/fa';
+import { GiCrossedSwords } from 'react-icons/gi';
 import { useAuth } from '../context/AuthContext';
 import WarningsModal from './WarningsModal';
 import API_URL from '../config/api';
@@ -40,168 +44,178 @@ function Navigation() {
         navigate('/login');
     };
 
+    const NavButton = ({ onClick, variant = "outline", icon, children, style = {} }) => (
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+                onClick={onClick}
+                variant={variant === "outline" ? "outline-primary" : "primary"}
+                className="d-flex align-items-center gap-2 fw-semibold"
+                style={{
+                    borderRadius: '10px',
+                    border: variant === "outline" ? '2px solid #1E88E5' : 'none',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    ...style
+                }}
+            >
+                {icon}
+                {children}
+            </Button>
+        </motion.div>
+    );
+
     return (
-        <nav className="bg-white border-b" style={{ borderColor: '#E2E8F0', boxShadow: '0px 2px 8px rgba(30, 136, 229, 0.06)' }}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16">
-                    <div className="flex items-center space-x-4">
-                        <h1
-                            className="text-2xl font-bold tracking-tight cursor-pointer"
-                            onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')}
-                            style={{
-                                background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                backgroundClip: 'text',
-                                letterSpacing: '-0.5px'
-                            }}
-                        >
-                            Aptiverse
-                        </h1>
+        <Navbar bg="white" expand="lg" className="border-bottom shadow-sm py-2" style={{ borderColor: '#E2E8F0' }}>
+            <Container fluid className="px-4">
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <Navbar.Brand
+                        onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')}
+                        className="fw-bold fs-4"
+                        style={{
+                            cursor: 'pointer',
+                            background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            letterSpacing: '-0.5px'
+                        }}
+                    >
+                        Aptiverse
+                    </Navbar.Brand>
+                </motion.div>
+
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="me-auto d-flex flex-row flex-wrap gap-2 mt-2 mt-lg-0 ms-lg-3">
                         {!isAdmin && (
-                            <button
-                                onClick={() => navigate('/dashboard')}
-                                className="px-5 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
-                                style={{
-                                    border: '2px solid #1E88E5',
-                                    color: '#1E88E5',
-                                    borderRadius: '10px',
-                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                                }}
-                            >
-                                🏠 Dashboard
-                            </button>
+                            <NavButton onClick={() => navigate('/dashboard')} icon={<FaHome />}>
+                                Dashboard
+                            </NavButton>
                         )}
-                    </div>
-                    <div className="flex items-center space-x-4">
+                    </Nav>
+
+                    <Nav className="d-flex flex-row flex-wrap align-items-center gap-2">
                         {!isAdmin && (
                             <>
-                                <button
+                                <NavButton
                                     onClick={() => navigate('/practice')}
-                                    className="px-6 py-2 text-sm font-semibold hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2 text-white"
+                                    variant="solid"
+                                    icon={<FaChartPie />}
                                     style={{
                                         background: 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)',
-                                        borderRadius: '10px',
-                                        boxShadow: '0px 4px 10px rgba(30, 136, 229, 0.3)',
-                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                                        boxShadow: '0px 4px 10px rgba(30, 136, 229, 0.3)'
                                     }}
                                 >
-                                    Today's Practice Set
-                                </button>
-                                <button
+                                    Today's Practice
+                                </NavButton>
+                                <NavButton
                                     onClick={() => {
-                                        // Clear any existing query parameters and navigate to main category page
                                         navigate('/question-bank', { replace: true });
                                         window.location.href = '/question-bank';
                                     }}
-                                    className="px-6 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
-                                    style={{
-                                        border: '2px solid #1E88E5',
-                                        color: '#1E88E5',
-                                        borderRadius: '10px',
-                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                                    }}
+                                    icon={<FaBookOpen />}
                                 >
                                     Question Bank
-                                </button>
-                                <button
+                                </NavButton>
+                                <NavButton
                                     onClick={() => navigate('/battle/history')}
-                                    className="px-6 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
-                                    style={{
-                                        border: '2px solid #0D47A1',
-                                        color: '#0D47A1',
-                                        borderRadius: '10px',
-                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                                    }}
+                                    icon={<GiCrossedSwords />}
+                                    style={{ borderColor: '#0D47A1', color: '#0D47A1' }}
                                 >
-                                    ⚔️ Battles
-                                </button>
+                                    Battles
+                                </NavButton>
                             </>
                         )}
+
                         {isAdmin && (
                             <>
-                                <button
+                                <NavButton
                                     onClick={() => navigate('/admin')}
-                                    className="px-4 py-2 text-sm font-semibold text-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                    variant="solid"
+                                    icon={<FaCrown />}
                                     style={{
                                         background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
-                                        borderRadius: '10px',
-                                        boxShadow: '0px 4px 10px rgba(21, 101, 192, 0.3)',
-                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                                        boxShadow: '0px 4px 10px rgba(21, 101, 192, 0.3)'
                                     }}
                                 >
-                                    👑 Admin Dashboard
-                                </button>
-                                <button
-                                    onClick={() => navigate('/admin/users')}
-                                    className="px-4 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
-                                    style={{
-                                        border: '2px solid #1E88E5',
-                                        color: '#1E88E5',
-                                        borderRadius: '10px',
-                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                                    }}
-                                >
-                                    👥 Users
-                                </button>
-                                <button
+                                    Admin Dashboard
+                                </NavButton>
+                                <NavButton onClick={() => navigate('/admin/users')} icon={<FaUsers />}>
+                                    Users
+                                </NavButton>
+                                <NavButton
                                     onClick={() => navigate('/admin/questions')}
-                                    className="px-4 py-2 text-sm font-semibold bg-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
-                                    style={{
-                                        border: '2px solid #42A5F5',
-                                        color: '#42A5F5',
-                                        borderRadius: '10px',
-                                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                                    }}
+                                    icon={<FaQuestionCircle />}
+                                    style={{ borderColor: '#42A5F5', color: '#42A5F5' }}
                                 >
-                                    📝 Questions
-                                </button>
+                                    Questions
+                                </NavButton>
                             </>
                         )}
+
                         {!isAdmin && warningsCount > 0 && (
-                            <button
-                                onClick={() => setShowWarningsModal(true)}
-                                className="relative px-4 py-2 text-sm font-semibold hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
+                            <motion.div whileHover={{ scale: 1.05 }} className="position-relative">
+                                <Button
+                                    onClick={() => setShowWarningsModal(true)}
+                                    variant="outline-warning"
+                                    className="d-flex align-items-center gap-2 fw-semibold"
+                                    style={{
+                                        borderRadius: '10px',
+                                        border: '2px solid #F59E0B',
+                                        padding: '8px 16px',
+                                        fontSize: '14px'
+                                    }}
+                                >
+                                    <FaExclamationTriangle />
+                                    Warnings
+                                </Button>
+                                <Badge
+                                    bg="primary"
+                                    pill
+                                    className="position-absolute"
+                                    style={{ top: '-8px', right: '-8px', animation: 'pulse 2s infinite' }}
+                                >
+                                    {warningsCount}
+                                </Badge>
+                            </motion.div>
+                        )}
+
+                        <span className="text-muted small d-none d-lg-inline mx-2">
+                            Welcome, <span className="fw-semibold" style={{ color: '#1E88E5' }}>{user?.username}</span>!
+                        </span>
+
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                            <Button
+                                onClick={handleLogout}
+                                variant="primary"
+                                className="d-flex align-items-center gap-2 fw-semibold"
                                 style={{
-                                    border: '2px solid #1565C0',
-                                    color: '#1565C0',
+                                    backgroundColor: '#1565C0',
+                                    border: 'none',
                                     borderRadius: '10px',
-                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                                    padding: '8px 16px',
+                                    fontSize: '14px'
                                 }}
                             >
-                                ⚠️ Warnings
-                                {warningsCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
-                                        {warningsCount}
-                                    </span>
-                                )}
-                            </button>
-                        )}
-                        <span className="text-sm" style={{ color: '#64748B', letterSpacing: '0.3px' }}>
-                            Welcome, <span className="font-semibold" style={{ color: '#1E88E5' }}>{user?.username}</span>!
-                        </span>
-                        <button
-                            onClick={handleLogout}
-                            className="px-4 py-2 text-sm font-semibold text-white hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2"
-                            style={{
-                                backgroundColor: '#1565C0',
-                                borderRadius: '10px',
-                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                            }}
-                        >
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
+                                <FaSignOutAlt />
+                                Logout
+                            </Button>
+                        </motion.div>
+                    </Nav>
+                </Navbar.Collapse>
+            </Container>
             <WarningsModal
                 isOpen={showWarningsModal}
                 onClose={() => {
                     setShowWarningsModal(false);
-                    fetchWarningsCount(); // Refresh count after closing
+                    fetchWarningsCount();
                 }}
             />
-        </nav>
+        </Navbar>
     );
 }
 

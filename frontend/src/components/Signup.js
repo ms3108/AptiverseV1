@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Container, Row, Col, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
+import { motion } from 'framer-motion';
+import { FaEnvelope, FaLock, FaUser, FaUserPlus, FaArrowRight, FaExclamationCircle, FaCheckCircle } from 'react-icons/fa';
 import axios from 'axios';
 import API_URL from '../config/api';
 
@@ -49,7 +52,6 @@ function Signup() {
             ...formData,
             [e.target.name]: e.target.value
         });
-        // Clear error for this field
         if (errors[e.target.name]) {
             setErrors({
                 ...errors,
@@ -91,7 +93,7 @@ function Signup() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style={{
+        <div className="min-vh-100 d-flex align-items-center justify-content-center py-5" style={{
             background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1E88E5 100%)',
             position: 'relative',
             overflow: 'hidden'
@@ -118,199 +120,259 @@ function Signup() {
                 filter: 'blur(60px)'
             }}></div>
 
-            <div className="max-w-md w-full space-y-6 p-10 rounded-2xl animate-slideUp" style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                border: '1px solid rgba(255,255,255,0.3)'
-            }}>
-                <div>
-                    <div className="flex justify-center mb-4">
-                        <div style={{
-                            width: '60px',
-                            height: '60px',
-                            background: 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
-                            borderRadius: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 10px 30px rgba(13, 71, 161, 0.4)'
-                        }}>
-                            <span style={{ fontSize: '28px' }}>🚀</span>
-                        </div>
-                    </div>
-                    <h2 className="text-center text-3xl font-extrabold" style={{
-                        background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
-                    }}>
-                        Join Aptiverse
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-500">
-                        Start your learning journey today
-                    </p>
-                </div>
-                <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                                Email address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="input-modern"
-                                style={{ borderColor: errors.email ? '#ef4444' : '#E2E8F0' }}
-                                placeholder="you@example.com"
-                            />
-                            {errors.email && (
-                                <p className="mt-2 text-sm text-red-500 flex items-center">
-                                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                    </svg>
-                                    {errors.email}
-                                </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
-                                Username
-                            </label>
-                            <input
-                                id="username"
-                                name="username"
-                                type="text"
-                                autoComplete="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                className="input-modern"
-                                style={{ borderColor: errors.username ? '#ef4444' : '#E2E8F0' }}
-                                placeholder="Choose a username"
-                            />
-                            {errors.username && (
-                                <p className="mt-2 text-sm text-red-500 flex items-center">
-                                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                    </svg>
-                                    {errors.username}
-                                </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="new-password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="input-modern"
-                                style={{ borderColor: errors.password ? '#ef4444' : '#E2E8F0' }}
-                                placeholder="••••••••"
-                            />
-                            {errors.password && (
-                                <p className="mt-2 text-sm text-red-500 flex items-center">
-                                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                    </svg>
-                                    {errors.password}
-                                </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
-                                Confirm Password
-                            </label>
-                            <input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                autoComplete="new-password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                className="input-modern"
-                                style={{ borderColor: errors.confirmPassword ? '#ef4444' : '#E2E8F0' }}
-                                placeholder="••••••••"
-                            />
-                            {errors.confirmPassword && (
-                                <p className="mt-2 text-sm text-red-500 flex items-center">
-                                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                    </svg>
-                                    {errors.confirmPassword}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    {message && (
-                        <div className="rounded-xl p-4 flex items-center" style={{
-                            background: message.includes('successful') ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                            border: message.includes('successful') ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(239, 68, 68, 0.2)'
-                        }}>
-                            <svg className={`w-5 h-5 mr-3 ${message.includes('successful') ? 'text-green-500' : 'text-red-500'}`} fill="currentColor" viewBox="0 0 20 20">
-                                {message.includes('successful') ? (
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                ) : (
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                )}
-                            </svg>
-                            <p className={`text-sm font-medium ${message.includes('successful') ? 'text-green-600' : 'text-red-600'}`}>{message}</p>
-                        </div>
-                    )}
-
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-4 px-6 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            style={{
-                                background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
-                                boxShadow: loading ? 'none' : '0 10px 30px rgba(13, 71, 161, 0.4)'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!loading) {
-                                    e.target.style.transform = 'translateY(-2px)';
-                                    e.target.style.boxShadow = '0 15px 35px rgba(13, 71, 161, 0.5)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.transform = 'translateY(0)';
-                                e.target.style.boxShadow = '0 10px 30px rgba(13, 71, 161, 0.4)';
-                            }}
+            <Container>
+                <Row className="justify-content-center">
+                    <Col xs={12} sm={10} md={8} lg={5}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, ease: 'easeOut' }}
                         >
-                            {loading ? (
-                                <span className="flex items-center justify-center">
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Creating account...
-                                </span>
-                            ) : 'Create Account'}
-                        </button>
-                    </div>
+                            <Card className="border-0 shadow-lg" style={{
+                                background: 'rgba(255, 255, 255, 0.95)',
+                                backdropFilter: 'blur(20px)',
+                                borderRadius: '20px'
+                            }}>
+                                <Card.Body className="p-4 p-md-5">
+                                    {/* Logo/Icon */}
+                                    <motion.div
+                                        className="text-center mb-4"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                                    >
+                                        <div className="d-inline-flex align-items-center justify-content-center mb-3" style={{
+                                            width: '60px',
+                                            height: '60px',
+                                            background: 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
+                                            borderRadius: '16px',
+                                            boxShadow: '0 10px 30px rgba(13, 71, 161, 0.4)'
+                                        }}>
+                                            <FaUserPlus className="text-white fs-4" />
+                                        </div>
+                                        <h2 className="fw-bold mb-1" style={{
+                                            background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 100%)',
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent'
+                                        }}>
+                                            Join Aptiverse
+                                        </h2>
+                                        <p className="text-muted small">Start your learning journey today</p>
+                                    </motion.div>
 
-                    <div className="text-center pt-2">
-                        <p className="text-sm text-gray-500">
-                            Already have an account?{' '}
-                            <Link to="/login" className="font-semibold hover:underline" style={{ color: '#1565C0' }}>
-                                Sign in
-                            </Link>
-                        </p>
-                    </div>
-                </form>
-            </div>
+                                    <Form onSubmit={handleSubmit}>
+                                        {/* Email Field */}
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.3 }}
+                                        >
+                                            <Form.Group className="mb-3">
+                                                <Form.Label className="fw-semibold text-dark small">Email address</Form.Label>
+                                                <div className="position-relative">
+                                                    <div className="position-absolute top-50 translate-middle-y ms-3" style={{ color: '#6B7280' }}>
+                                                        <FaEnvelope />
+                                                    </div>
+                                                    <Form.Control
+                                                        type="email"
+                                                        name="email"
+                                                        value={formData.email}
+                                                        onChange={handleChange}
+                                                        placeholder="you@example.com"
+                                                        className="py-3 ps-5"
+                                                        isInvalid={!!errors.email}
+                                                        style={{
+                                                            borderRadius: '12px',
+                                                            border: errors.email ? '2px solid #dc3545' : '2px solid #E2E8F0',
+                                                            backgroundColor: '#F8FAFC'
+                                                        }}
+                                                    />
+                                                </div>
+                                                {errors.email && (
+                                                    <small className="text-danger d-flex align-items-center mt-1">
+                                                        <FaExclamationCircle className="me-1" /> {errors.email}
+                                                    </small>
+                                                )}
+                                            </Form.Group>
+                                        </motion.div>
+
+                                        {/* Username Field */}
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.35 }}
+                                        >
+                                            <Form.Group className="mb-3">
+                                                <Form.Label className="fw-semibold text-dark small">Username</Form.Label>
+                                                <div className="position-relative">
+                                                    <div className="position-absolute top-50 translate-middle-y ms-3" style={{ color: '#6B7280' }}>
+                                                        <FaUser />
+                                                    </div>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="username"
+                                                        value={formData.username}
+                                                        onChange={handleChange}
+                                                        placeholder="Choose a username"
+                                                        className="py-3 ps-5"
+                                                        isInvalid={!!errors.username}
+                                                        style={{
+                                                            borderRadius: '12px',
+                                                            border: errors.username ? '2px solid #dc3545' : '2px solid #E2E8F0',
+                                                            backgroundColor: '#F8FAFC'
+                                                        }}
+                                                    />
+                                                </div>
+                                                {errors.username && (
+                                                    <small className="text-danger d-flex align-items-center mt-1">
+                                                        <FaExclamationCircle className="me-1" /> {errors.username}
+                                                    </small>
+                                                )}
+                                            </Form.Group>
+                                        </motion.div>
+
+                                        {/* Password Field */}
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.4 }}
+                                        >
+                                            <Form.Group className="mb-3">
+                                                <Form.Label className="fw-semibold text-dark small">Password</Form.Label>
+                                                <div className="position-relative">
+                                                    <div className="position-absolute top-50 translate-middle-y ms-3" style={{ color: '#6B7280' }}>
+                                                        <FaLock />
+                                                    </div>
+                                                    <Form.Control
+                                                        type="password"
+                                                        name="password"
+                                                        value={formData.password}
+                                                        onChange={handleChange}
+                                                        placeholder="••••••••"
+                                                        className="py-3 ps-5"
+                                                        isInvalid={!!errors.password}
+                                                        style={{
+                                                            borderRadius: '12px',
+                                                            border: errors.password ? '2px solid #dc3545' : '2px solid #E2E8F0',
+                                                            backgroundColor: '#F8FAFC'
+                                                        }}
+                                                    />
+                                                </div>
+                                                {errors.password && (
+                                                    <small className="text-danger d-flex align-items-center mt-1">
+                                                        <FaExclamationCircle className="me-1" /> {errors.password}
+                                                    </small>
+                                                )}
+                                            </Form.Group>
+                                        </motion.div>
+
+                                        {/* Confirm Password Field */}
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.45 }}
+                                        >
+                                            <Form.Group className="mb-4">
+                                                <Form.Label className="fw-semibold text-dark small">Confirm Password</Form.Label>
+                                                <div className="position-relative">
+                                                    <div className="position-absolute top-50 translate-middle-y ms-3" style={{ color: '#6B7280' }}>
+                                                        <FaLock />
+                                                    </div>
+                                                    <Form.Control
+                                                        type="password"
+                                                        name="confirmPassword"
+                                                        value={formData.confirmPassword}
+                                                        onChange={handleChange}
+                                                        placeholder="••••••••"
+                                                        className="py-3 ps-5"
+                                                        isInvalid={!!errors.confirmPassword}
+                                                        style={{
+                                                            borderRadius: '12px',
+                                                            border: errors.confirmPassword ? '2px solid #dc3545' : '2px solid #E2E8F0',
+                                                            backgroundColor: '#F8FAFC'
+                                                        }}
+                                                    />
+                                                </div>
+                                                {errors.confirmPassword && (
+                                                    <small className="text-danger d-flex align-items-center mt-1">
+                                                        <FaExclamationCircle className="me-1" /> {errors.confirmPassword}
+                                                    </small>
+                                                )}
+                                            </Form.Group>
+                                        </motion.div>
+
+                                        {/* Message Alert */}
+                                        {message && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                            >
+                                                <Alert
+                                                    variant={message.includes('successful') ? 'success' : 'danger'}
+                                                    className="d-flex align-items-center rounded-3 mb-4"
+                                                >
+                                                    {message.includes('successful') ? (
+                                                        <FaCheckCircle className="me-2" />
+                                                    ) : (
+                                                        <FaExclamationCircle className="me-2" />
+                                                    )}
+                                                    {message}
+                                                </Alert>
+                                            </motion.div>
+                                        )}
+
+                                        {/* Submit Button */}
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.5 }}
+                                        >
+                                            <Button
+                                                type="submit"
+                                                disabled={loading}
+                                                className="w-100 py-3 fw-semibold border-0 d-flex align-items-center justify-content-center gap-2"
+                                                style={{
+                                                    background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
+                                                    borderRadius: '12px',
+                                                    boxShadow: loading ? 'none' : '0 10px 30px rgba(13, 71, 161, 0.4)',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                            >
+                                                {loading ? (
+                                                    <>
+                                                        <Spinner animation="border" size="sm" />
+                                                        Creating account...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Create Account
+                                                        <FaArrowRight />
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </motion.div>
+
+                                        {/* Sign In Link */}
+                                        <motion.div
+                                            className="text-center mt-4"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: 0.6 }}
+                                        >
+                                            <p className="text-muted small mb-0">
+                                                Already have an account?{' '}
+                                                <Link to="/login" className="fw-semibold text-decoration-none" style={{ color: '#1565C0' }}>
+                                                    Sign in
+                                                </Link>
+                                            </p>
+                                        </motion.div>
+                                    </Form>
+                                </Card.Body>
+                            </Card>
+                        </motion.div>
+                    </Col>
+                </Row>
+            </Container>
         </div>
     );
 }

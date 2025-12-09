@@ -3,6 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import API_URL from '../config/api';
+import { Container, Form, Button, Alert, Spinner, Card } from 'react-bootstrap';
+import { motion } from 'framer-motion';
+import { FaEnvelope, FaLock, FaBullseye, FaExclamationCircle } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -37,7 +41,6 @@ function Login() {
             ...formData,
             [e.target.name]: e.target.value
         });
-        // Clear error for this field
         if (errors[e.target.name]) {
             setErrors({
                 ...errors,
@@ -63,13 +66,12 @@ function Login() {
             });
 
             login(response.data.access_token);
+            toast.success('Welcome back!');
 
-            // Get user info to check if admin
             const userResponse = await axios.get(`${API_URL}/me`, {
                 headers: { Authorization: `Bearer ${response.data.access_token}` }
             });
 
-            // Redirect admin to admin panel, regular users to dashboard
             if (userResponse.data.is_admin) {
                 navigate('/admin');
             } else {
@@ -78,8 +80,10 @@ function Login() {
         } catch (error) {
             if (error.response?.data?.detail) {
                 setMessage(error.response.data.detail);
+                toast.error(error.response.data.detail);
             } else {
                 setMessage('Login failed. Please try again.');
+                toast.error('Login failed. Please try again.');
             }
         } finally {
             setLoading(false);
@@ -87,177 +91,212 @@ function Login() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style={{
-            background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 50%, #42A5F5 100%)',
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
-            {/* Background decorations */}
-            <div style={{
-                position: 'absolute',
-                top: '-10%',
-                right: '-5%',
-                width: '400px',
-                height: '400px',
-                background: 'rgba(255,255,255,0.1)',
-                borderRadius: '50%',
-                filter: 'blur(40px)'
-            }}></div>
-            <div style={{
-                position: 'absolute',
-                bottom: '-15%',
-                left: '-10%',
-                width: '500px',
-                height: '500px',
-                background: 'rgba(255,255,255,0.08)',
-                borderRadius: '50%',
-                filter: 'blur(60px)'
-            }}></div>
-
-            <div className="max-w-md w-full space-y-8 p-10 rounded-2xl animate-slideUp" style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                border: '1px solid rgba(255,255,255,0.3)'
+        <div className="min-vh-100 d-flex align-items-center justify-content-center py-5 position-relative overflow-hidden"
+            style={{
+                background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 50%, #42A5F5 100%)',
             }}>
-                <div>
-                    <div className="flex justify-center mb-4">
-                        <div style={{
-                            width: '60px',
-                            height: '60px',
-                            background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
-                            borderRadius: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 10px 30px rgba(30, 136, 229, 0.4)'
-                        }}>
-                            <span style={{ fontSize: '28px' }}>🎯</span>
-                        </div>
-                    </div>
-                    <h2 className="text-center text-3xl font-extrabold" style={{
-                        background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
+            {/* Animated Background Elements */}
+            <motion.div
+                className="position-absolute"
+                style={{
+                    top: '-10%',
+                    right: '-5%',
+                    width: '400px',
+                    height: '400px',
+                    background: 'rgba(255,255,255,0.1)',
+                    borderRadius: '50%',
+                    filter: 'blur(40px)'
+                }}
+                animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.1, 0.15, 0.1]
+                }}
+                transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                }}
+            />
+            <motion.div
+                className="position-absolute"
+                style={{
+                    bottom: '-15%',
+                    left: '-10%',
+                    width: '500px',
+                    height: '500px',
+                    background: 'rgba(255,255,255,0.08)',
+                    borderRadius: '50%',
+                    filter: 'blur(60px)'
+                }}
+                animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.08, 0.12, 0.08]
+                }}
+                transition={{
+                    duration: 10,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                }}
+            />
+
+            <Container>
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="d-flex justify-content-center"
+                >
+                    <Card className="border-0 shadow-lg" style={{
+                        maxWidth: '440px',
+                        width: '100%',
+                        borderRadius: '24px',
+                        background: 'rgba(255, 255, 255, 0.95)',
+                        backdropFilter: 'blur(20px)'
                     }}>
-                        Welcome Back
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-500">
-                        Sign in to continue your learning journey
-                    </p>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="space-y-5">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                                Email address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="input-modern"
-                                style={{
-                                    borderColor: errors.email ? '#ef4444' : '#E2E8F0'
-                                }}
-                                placeholder="you@example.com"
-                            />
-                            {errors.email && (
-                                <p className="mt-2 text-sm text-red-500 flex items-center">
-                                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                    </svg>
-                                    {errors.email}
-                                </p>
-                            )}
-                        </div>
+                        <Card.Body className="p-5">
+                            {/* Logo */}
+                            <motion.div
+                                className="text-center mb-4"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                            >
+                                <div className="d-inline-flex align-items-center justify-content-center rounded-4 mb-3"
+                                    style={{
+                                        width: '70px',
+                                        height: '70px',
+                                        background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
+                                        boxShadow: '0 10px 30px rgba(30, 136, 229, 0.4)'
+                                    }}>
+                                    <FaBullseye size={32} color="white" />
+                                </div>
+                                <h2 className="fw-bold mb-1" style={{
+                                    background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    fontSize: '1.75rem'
+                                }}>
+                                    Welcome Back
+                                </h2>
+                                <p className="text-muted small mb-0">Sign in to continue your learning journey</p>
+                            </motion.div>
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="input-modern"
-                                style={{
-                                    borderColor: errors.password ? '#ef4444' : '#E2E8F0'
-                                }}
-                                placeholder="••••••••"
-                            />
-                            {errors.password && (
-                                <p className="mt-2 text-sm text-red-500 flex items-center">
-                                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                    </svg>
-                                    {errors.password}
-                                </p>
-                            )}
-                        </div>
-                    </div>
+                            <Form onSubmit={handleSubmit}>
+                                {/* Email Input */}
+                                <Form.Group className="mb-4">
+                                    <Form.Label className="fw-semibold text-secondary small">Email address</Form.Label>
+                                    <div className="position-relative">
+                                        <div className="position-absolute d-flex align-items-center h-100 ps-3" style={{ color: '#94A3B8' }}>
+                                            <FaEnvelope />
+                                        </div>
+                                        <Form.Control
+                                            type="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            placeholder="you@example.com"
+                                            className="ps-5 py-3"
+                                            style={{
+                                                borderRadius: '12px',
+                                                border: errors.email ? '2px solid #EF4444' : '2px solid #E2E8F0',
+                                                fontSize: '0.95rem'
+                                            }}
+                                            isInvalid={!!errors.email}
+                                        />
+                                    </div>
+                                    {errors.email && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="d-flex align-items-center gap-1 mt-2 text-danger small"
+                                        >
+                                            <FaExclamationCircle size={12} /> {errors.email}
+                                        </motion.div>
+                                    )}
+                                </Form.Group>
 
-                    {message && (
-                        <div className="rounded-xl p-4 flex items-center" style={{
-                            background: 'rgba(239, 68, 68, 0.1)',
-                            border: '1px solid rgba(239, 68, 68, 0.2)'
-                        }}>
-                            <svg className="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                            </svg>
-                            <p className="text-sm text-red-600 font-medium">{message}</p>
-                        </div>
-                    )}
+                                {/* Password Input */}
+                                <Form.Group className="mb-4">
+                                    <Form.Label className="fw-semibold text-secondary small">Password</Form.Label>
+                                    <div className="position-relative">
+                                        <div className="position-absolute d-flex align-items-center h-100 ps-3" style={{ color: '#94A3B8' }}>
+                                            <FaLock />
+                                        </div>
+                                        <Form.Control
+                                            type="password"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            placeholder="••••••••"
+                                            className="ps-5 py-3"
+                                            style={{
+                                                borderRadius: '12px',
+                                                border: errors.password ? '2px solid #EF4444' : '2px solid #E2E8F0',
+                                                fontSize: '0.95rem'
+                                            }}
+                                            isInvalid={!!errors.password}
+                                        />
+                                    </div>
+                                    {errors.password && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="d-flex align-items-center gap-1 mt-2 text-danger small"
+                                        >
+                                            <FaExclamationCircle size={12} /> {errors.password}
+                                        </motion.div>
+                                    )}
+                                </Form.Group>
 
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-4 px-6 text-white font-semibold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            style={{
-                                background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
-                                boxShadow: loading ? 'none' : '0 10px 30px rgba(30, 136, 229, 0.4)',
-                                transform: 'translateY(0)'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!loading) {
-                                    e.target.style.transform = 'translateY(-2px)';
-                                    e.target.style.boxShadow = '0 15px 35px rgba(30, 136, 229, 0.5)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.transform = 'translateY(0)';
-                                e.target.style.boxShadow = '0 10px 30px rgba(30, 136, 229, 0.4)';
-                            }}
-                        >
-                            {loading ? (
-                                <span className="flex items-center justify-center">
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Signing in...
-                                </span>
-                            ) : 'Sign in'}
-                        </button>
-                    </div>
+                                {/* Error Message */}
+                                {message && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                    >
+                                        <Alert variant="danger" className="d-flex align-items-center gap-2 rounded-3 py-3">
+                                            <FaExclamationCircle />
+                                            {message}
+                                        </Alert>
+                                    </motion.div>
+                                )}
 
-                    <div className="text-center pt-4">
-                        <p className="text-sm text-gray-500">
-                            Don't have an account?{' '}
-                            <Link to="/signup" className="font-semibold hover:underline" style={{ color: '#1E88E5' }}>
-                                Create one now
-                            </Link>
-                        </p>
-                    </div>
-                </form>
-            </div>
+                                {/* Submit Button */}
+                                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                                    <Button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-100 py-3 fw-semibold border-0"
+                                        style={{
+                                            background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
+                                            borderRadius: '12px',
+                                            boxShadow: loading ? 'none' : '0 10px 30px rgba(30, 136, 229, 0.4)',
+                                            fontSize: '1rem'
+                                        }}
+                                    >
+                                        {loading ? (
+                                            <span className="d-flex align-items-center justify-content-center gap-2">
+                                                <Spinner animation="border" size="sm" />
+                                                Signing in...
+                                            </span>
+                                        ) : 'Sign in'}
+                                    </Button>
+                                </motion.div>
+
+                                {/* Sign Up Link */}
+                                <div className="text-center mt-4">
+                                    <p className="text-muted small mb-0">
+                                        Don't have an account?{' '}
+                                        <Link to="/signup" className="fw-semibold text-decoration-none" style={{ color: '#1E88E5' }}>
+                                            Create one now
+                                        </Link>
+                                    </p>
+                                </div>
+                            </Form>
+                        </Card.Body>
+                    </Card>
+                </motion.div>
+            </Container>
         </div>
     );
 }
