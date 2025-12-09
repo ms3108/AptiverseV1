@@ -181,14 +181,14 @@ const AdminQuestions = () => {
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-lg file:border-0
                   file:text-sm file:font-semibold
-                  file:bg-indigo-50 file:text-indigo-700
-                  hover:file:bg-indigo-100"
+                  file:bg-blue-50 file:text-blue-700
+                  hover:file:bg-blue-100"
                             />
                         </div>
                         <button
                             type="submit"
                             disabled={uploading || !uploadFile}
-                            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {uploading ? 'Uploading...' : 'Upload Questions'}
                         </button>
@@ -235,7 +235,7 @@ const AdminQuestions = () => {
                             {(searchQuery || selectedCategory || selectedDifficulty || selectedTopic) && (
                                 <button
                                     onClick={clearFilters}
-                                    className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                                 >
                                     Clear all filters
                                 </button>
@@ -251,7 +251,7 @@ const AdminQuestions = () => {
                                     placeholder="Search questions..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                                 <svg
                                     className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -267,7 +267,7 @@ const AdminQuestions = () => {
                             <select
                                 value={selectedCategory}
                                 onChange={(e) => setSelectedCategory(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                             >
                                 <option value="">All Categories</option>
                                 <option value="Quantitative">Quantitative</option>
@@ -279,7 +279,7 @@ const AdminQuestions = () => {
                             <select
                                 value={selectedDifficulty}
                                 onChange={(e) => setSelectedDifficulty(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                             >
                                 <option value="">All Difficulties</option>
                                 <option value="Easy">Easy</option>
@@ -291,7 +291,7 @@ const AdminQuestions = () => {
                             <select
                                 value={selectedTopic}
                                 onChange={(e) => setSelectedTopic(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                             >
                                 <option value="">All Topics</option>
                                 {topics.map((topic) => (
@@ -337,9 +337,9 @@ const AdminQuestions = () => {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${question.category === 'Quantitative' ? 'bg-blue-100 text-blue-800' :
-                                                            question.category === 'Logical' ? 'bg-purple-100 text-purple-800' :
-                                                                question.category === 'Linguistic' ? 'bg-green-100 text-green-800' :
-                                                                    'bg-gray-100 text-gray-800'
+                                                        question.category === 'Logical' ? 'bg-blue-200 text-blue-900' :
+                                                            question.category === 'Linguistic' ? 'bg-sky-100 text-sky-800' :
+                                                                'bg-slate-100 text-slate-800'
                                                         }`}>
                                                         {question.category || 'N/A'}
                                                     </span>
@@ -351,9 +351,9 @@ const AdminQuestions = () => {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${question.difficulty === 'easy' || question.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
-                                                        question.difficulty === 'medium' || question.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-red-100 text-red-800'
+                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${question.difficulty === 'easy' || question.difficulty === 'Easy' ? 'bg-sky-100 text-sky-700' :
+                                                        question.difficulty === 'medium' || question.difficulty === 'Medium' ? 'bg-blue-100 text-blue-700' :
+                                                            'bg-blue-600 text-white'
                                                         }`}>
                                                         {question.difficulty}
                                                     </span>
@@ -364,7 +364,7 @@ const AdminQuestions = () => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                     <button
                                                         onClick={() => handleDeleteQuestion(question.id)}
-                                                        className="text-red-600 hover:text-red-900"
+                                                        className="text-blue-600 hover:text-blue-800"
                                                     >
                                                         Delete
                                                     </button>
