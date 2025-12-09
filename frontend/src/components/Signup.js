@@ -94,7 +94,7 @@ function Signup() {
 
     return (
         <div className="min-vh-100 d-flex align-items-center justify-content-center py-5" style={{
-            background: '#FFFFFF',
+            background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)',
             position: 'relative',
             overflow: 'hidden'
         }}>
@@ -129,7 +129,7 @@ function Signup() {
                             transition={{ duration: 0.6, ease: 'easeOut' }}
                         >
                             <Card className="border-0 shadow-lg" style={{
-                                background: 'rgba(255, 255, 255, 0.95)',
+                                background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
                                 backdropFilter: 'blur(20px)',
                                 borderRadius: '20px'
                             }}>
@@ -144,7 +144,7 @@ function Signup() {
                                         <div className="d-inline-flex align-items-center justify-content-center mb-3" style={{
                                             width: '60px',
                                             height: '60px',
-                                            background: '#000000',
+                                            background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                             borderRadius: '16px',
                                             boxShadow: '0 10px 30px rgba(13, 71, 161, 0.4)'
                                         }}>
@@ -332,7 +332,7 @@ function Signup() {
                                                 disabled={loading}
                                                 className="w-100 py-3 fw-semibold border-0 d-flex align-items-center justify-content-center gap-2"
                                                 style={{
-                                                    background: loading ? '#9CA3AF' : '#000000',
+                                                    background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                                     borderRadius: '12px',
                                                     boxShadow: loading ? 'none' : '0 10px 30px rgba(13, 71, 161, 0.4)',
                                                     transition: 'all 0.3s ease'

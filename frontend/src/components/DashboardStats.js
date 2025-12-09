@@ -70,7 +70,7 @@ function DashboardStats() {
         >
             {/* User Header */}
             <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+                <Card className="border-0 shadow-sm" style={{ borderRadius: '16px', background: 'linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%)' }}>
                     <Card.Body className="p-4">
                         <h2 className="fw-bold mb-1" style={{ color: '#1F2937' }}>
                             Welcome back, {stats.username}!
@@ -84,7 +84,7 @@ function DashboardStats() {
             <motion.div variants={itemVariants}>
                 <Card className="border-0 text-white" style={{
                     borderRadius: '16px',
-                    background: '#000000',
+                    background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
                 }}>
                     <Card.Body className="p-4">
@@ -125,7 +125,7 @@ function DashboardStats() {
                             <ProgressBar
                                 now={Math.min(xpPercentage, 100)}
                                 style={{
-                                    backgroundColor: '#000000'
+                                    background: 'linear-gradient(90deg, #333333 0%, #000000 100%)'
                                 }}
                             />
                         </ProgressBar>
@@ -141,7 +141,7 @@ function DashboardStats() {
                 {/* Current Streak */}
                 <Col md={4}>
                     <motion.div variants={itemVariants}>
-                        <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px' }}>
+                        <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px', background: 'linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%)' }}>
                             <Card.Body className="p-4">
                                 <div className="d-flex align-items-center gap-3 mb-3">
                                     <div className="d-flex align-items-center justify-content-center" style={{
@@ -154,7 +154,7 @@ function DashboardStats() {
                                     </div>
                                     <span className="text-muted small">Current Streak</span>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ color: '#60A5FA' }}>
+                                <h2 className="fw-bold mb-0" style={{ color: '#000000' }}>
                                     {stats.current_streak}
                                 </h2>
                                 <small className="text-muted">days</small>
@@ -166,7 +166,7 @@ function DashboardStats() {
                 {/* Longest Streak */}
                 <Col md={4}>
                     <motion.div variants={itemVariants}>
-                        <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px' }}>
+                        <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px', background: 'linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%)' }}>
                             <Card.Body className="p-4">
                                 <div className="d-flex align-items-center gap-3 mb-3">
                                     <div className="d-flex align-items-center justify-content-center" style={{
@@ -191,7 +191,7 @@ function DashboardStats() {
                 {/* Total Questions */}
                 <Col md={4}>
                     <motion.div variants={itemVariants}>
-                        <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px' }}>
+                        <Card className="border-0 shadow-sm h-100" style={{ borderRadius: '16px', background: 'linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%)' }}>
                             <Card.Body className="p-4">
                                 <div className="d-flex align-items-center gap-3 mb-3">
                                     <div className="d-flex align-items-center justify-content-center" style={{
@@ -217,7 +217,7 @@ function DashboardStats() {
             {/* Badges Section */}
             {stats.badges && stats.badges.length > 0 && (
                 <motion.div variants={itemVariants}>
-                    <Card className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+                    <Card className="border-0 shadow-sm" style={{ borderRadius: '16px', background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)' }}>
                         <Card.Body className="p-4">
                             <div className="d-flex align-items-center gap-3 mb-4">
                                 <div className="d-flex align-items-center justify-content-center" style={{
@@ -258,7 +258,7 @@ function DashboardStats() {
 
             {/* Activity Heatmap */}
             <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+                <Card className="border-0 shadow-sm" style={{ borderRadius: '16px', background: 'linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%)' }}>
                     <Card.Body className="p-4">
                         <div className="d-flex align-items-center gap-3 mb-2">
                             <div className="d-flex align-items-center justify-content-center" style={{
@@ -340,17 +340,17 @@ function ActivityHeatmap({ activityData = {} }) {
 
     const weeks = generateHeatmapData();
 
-    // Get color intensity based on questions solved - grayscale palette
+    // Get color intensity based on questions solved - gradient grayscale palette
     const getColorStyle = (day) => {
-        if (!day) return { backgroundColor: '#F8F9FA' };
-        if (day.isFuture) return { backgroundColor: '#F8F9FA', opacity: 0.4 };
+        if (!day) return { background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)' };
+        if (day.isFuture) return { background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', opacity: 0.4 };
 
         const { questions } = day;
-        if (questions === 0) return { backgroundColor: '#F8F9FA' };
-        if (questions <= 3) return { backgroundColor: '#E9ECEF' }; // Very light gray
-        if (questions <= 6) return { backgroundColor: '#DEE2E6' }; // Light gray
-        if (questions <= 9) return { backgroundColor: '#6C757D' }; // Medium gray
-        return { backgroundColor: '#000000' }; // Black
+        if (questions === 0) return { background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)' };
+        if (questions <= 3) return { background: 'linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)' }; // Very light gray gradient
+        if (questions <= 6) return { background: 'linear-gradient(135deg, #dee2e6 0%, #adb5bd 100%)' }; // Light gray gradient
+        if (questions <= 9) return { background: 'linear-gradient(135deg, #6c757d 0%, #495057 100%)' }; // Medium gray gradient
+        return { background: 'linear-gradient(135deg, #333333 0%, #000000 100%)' }; // Dark gradient
     };
 
     const dayLabels = {
@@ -454,7 +454,7 @@ function ActivityHeatmap({ activityData = {} }) {
                                         <div style={{ color: '#94A3B8' }}>Upcoming</div>
                                     ) : (
                                         <>
-                                            <div style={{ color: '#60A5FA' }}>{day.questions} question{day.questions !== 1 ? 's' : ''}</div>
+                                            <div style={{ color: '#000000' }}>{day.questions} question{day.questions !== 1 ? 's' : ''}</div>
                                             <div style={{ color: '#F472B6' }}>{day.xp} XP</div>
                                         </>
                                     )}
@@ -469,11 +469,11 @@ function ActivityHeatmap({ activityData = {} }) {
             <div className="flex items-center justify-end gap-2 mt-4 text-xs" style={{ color: '#6B7280' }}>
                 <span>Less</span>
                 <div className="flex gap-1">
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#F8F9FA' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#E9ECEF' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#DEE2E6' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#6C757D' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#000000' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(135deg, #dee2e6 0%, #adb5bd 100%)' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(135deg, #6c757d 0%, #495057 100%)' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(135deg, #333333 0%, #000000 100%)' }}></div>
                 </div>
                 <span>More</span>
             </div>

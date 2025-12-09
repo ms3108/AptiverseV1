@@ -52,7 +52,7 @@ function Dashboard() {
     };
 
     return (
-        <div className="min-vh-100" style={{ background: '#FFFFFF' }}>
+        <div className="min-vh-100" style={{ background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)' }}>
             {/* Modern Navbar */}
             <Navbar
                 expand="lg"
@@ -95,7 +95,7 @@ function Dashboard() {
                                     onClick={handleStartPractice}
                                     className="d-flex align-items-center gap-2 fw-semibold border-0"
                                     style={{
-                                        background: '#2563EB',
+                                        background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                         boxShadow: '0 4px 14px rgba(30, 136, 229, 0.35)',
                                         borderRadius: '12px',
                                         padding: '10px 20px'
@@ -114,8 +114,8 @@ function Dashboard() {
                                     style={{
                                         borderRadius: '12px',
                                         borderWidth: '2px',
-                                        borderColor: '#2563EB',
-                                        color: '#2563EB',
+                                        borderColor: '#000000',
+                                        color: '#000000',
                                         padding: '10px 20px'
                                     }}
                                 >
@@ -132,8 +132,8 @@ function Dashboard() {
                                     style={{
                                         borderRadius: '12px',
                                         borderWidth: '2px',
-                                        borderColor: '#2563EB',
-                                        color: '#2563EB',
+                                        borderColor: '#000000',
+                                        color: '#000000',
                                         padding: '10px 20px'
                                     }}
                                 >
@@ -166,7 +166,7 @@ function Dashboard() {
                                             style={{
                                                 top: '-5px',
                                                 right: '-5px',
-                                                background: '#000000',
+                                                background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                                 fontSize: '0.65rem',
                                                 animation: 'pulse 2s infinite'
                                             }}
@@ -237,7 +237,7 @@ function Dashboard() {
                     fetchNotificationCount();
                 }}
             />
-        </div>
+        </div >
     );
 }
 

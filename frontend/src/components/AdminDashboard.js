@@ -39,9 +39,9 @@ const AdminDashboard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #EEF2FF 100%)' }}>
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #000000 0%, #333333 100%)' }}>
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-black mx-auto mb-4"></div>
                     <p className="text-gray-600 font-medium">Loading admin dashboard...</p>
                 </div>
             </div>
@@ -58,7 +58,7 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
             ),
-            color: '#1E40AF',
+            color: '#7cbae7ff',
             bgLight: '#DBEAFE',
         },
         {
@@ -82,8 +82,8 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             ),
-            color: '#60A5FA',
-            bgLight: '#EFF6FF',
+            color: '#666666',
+            bgLight: '#F8F9FA',
         },
         {
             label: 'Pending Reports',
@@ -94,7 +94,7 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
             ),
-            color: '#0369A1',
+            color: '#82c1e4c8',
             bgLight: '#E0F2FE',
         },
     ];
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
             ),
-            color: '#1E40AF',
+            color: '#81bad9ff',
             bgLight: '#DBEAFE',
         },
         {
@@ -133,20 +133,20 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
             ),
-            color: '#0369A1',
+            color: '#5faed2ff',
             bgLight: '#E0F2FE',
         },
     ];
 
     const getActionColor = (actionType) => {
-        if (actionType.includes('ban') || actionType.includes('delete')) return '#1E40AF';
-        if (actionType.includes('unban') || actionType.includes('create')) return '#3B82F6';
-        if (actionType.includes('edit') || actionType.includes('update')) return '#60A5FA';
-        return '#0369A1';
+        if (actionType.includes('ban') || actionType.includes('delete')) return '#000000';
+        if (actionType.includes('unban') || actionType.includes('create')) return '#333333';
+        if (actionType.includes('edit') || actionType.includes('update')) return '#666666';
+        return '#000000';
     };
 
     return (
-        <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 50%, #F8FAFC 100%)' }}>
+        <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #000000 0%, #333333 50%, #000000 100%)' }}>
             <Navigation />
 
             <div className="max-w-7xl mx-auto px-4 py-10">

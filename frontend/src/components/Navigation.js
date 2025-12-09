@@ -52,7 +52,7 @@ function Navigation() {
                 className="d-flex align-items-center gap-2 fw-semibold"
                 style={{
                     borderRadius: '10px',
-                    border: variant === "outline" ? '2px solid #1E88E5' : 'none',
+                    border: variant === "outline" ? '2px solid #000000' : 'none',
                     padding: '8px 16px',
                     fontSize: '14px',
                     ...style
@@ -65,7 +65,10 @@ function Navigation() {
     );
 
     return (
-        <Navbar bg="white" expand="lg" className="border-bottom shadow-sm py-2" style={{ borderColor: '#E2E8F0' }}>
+        <Navbar bg="" expand="lg" className="border-bottom shadow-sm py-2" style={{
+            borderColor: '#E2E8F0',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'
+        }}>
             <Container fluid className="px-4">
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -106,8 +109,8 @@ function Navigation() {
                                     variant="solid"
                                     icon={<FaChartPie />}
                                     style={{
-                                        background: '#2563EB',
-                                        boxShadow: '0px 4px 10px rgba(30, 136, 229, 0.3)'
+                                        background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)'
                                     }}
                                 >
                                     Today's Practice
@@ -124,7 +127,7 @@ function Navigation() {
                                 <NavButton
                                     onClick={() => navigate('/battle/history')}
                                     icon={<GiCrossedSwords />}
-                                    style={{ borderColor: '#0D47A1', color: '#0D47A1' }}
+                                    style={{ borderColor: '#000000', color: '#000000' }}
                                 >
                                     Battles
                                 </NavButton>
@@ -138,7 +141,7 @@ function Navigation() {
                                     variant="solid"
                                     icon={<FaCrown />}
                                     style={{
-                                        background: '#2563EB',
+                                        background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                         boxShadow: '0px 4px 10px rgba(21, 101, 192, 0.3)'
                                     }}
                                 >
@@ -150,7 +153,7 @@ function Navigation() {
                                 <NavButton
                                     onClick={() => navigate('/admin/questions')}
                                     icon={<FaQuestionCircle />}
-                                    style={{ borderColor: '#42A5F5', color: '#42A5F5' }}
+                                    style={{ borderColor: '#000000', color: '#000000' }}
                                 >
                                     Questions
                                 </NavButton>
@@ -174,10 +177,15 @@ function Navigation() {
                                     Warnings
                                 </Button>
                                 <Badge
-                                    bg="primary"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
+                                        color: 'white',
+                                        top: '-8px',
+                                        right: '-8px',
+                                        animation: 'pulse 2s infinite'
+                                    }}
                                     pill
                                     className="position-absolute"
-                                    style={{ top: '-8px', right: '-8px', animation: 'pulse 2s infinite' }}
                                 >
                                     {warningsCount}
                                 </Badge>
@@ -191,14 +199,14 @@ function Navigation() {
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             <Button
                                 onClick={handleLogout}
-                                variant="primary"
                                 className="d-flex align-items-center gap-2 fw-semibold"
                                 style={{
-                                    backgroundColor: '#000000',
+                                    background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                     border: 'none',
                                     borderRadius: '10px',
                                     padding: '8px 16px',
-                                    fontSize: '14px'
+                                    fontSize: '14px',
+                                    color: 'white'
                                 }}
                             >
                                 <FaSignOutAlt />

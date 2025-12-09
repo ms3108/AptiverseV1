@@ -93,7 +93,7 @@ function Login() {
     return (
         <div className="min-vh-100 d-flex align-items-center justify-content-center py-5 position-relative overflow-hidden"
             style={{
-                background: '#FFFFFF',
+                background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)',
             }}>
             {/* Animated Background Elements */}
             <motion.div
@@ -165,13 +165,13 @@ function Login() {
                                     style={{
                                         width: '70px',
                                         height: '70px',
-                                        background: '#000000',
+                                        background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                         boxShadow: '0 10px 30px rgba(30, 136, 229, 0.4)'
                                     }}>
                                     <FaBullseye size={32} color="white" />
                                 </div>
                                 <h2 className="fw-bold mb-1" style={{
-                                    background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
+                                    background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     fontSize: '1.75rem'
@@ -268,9 +268,9 @@ function Login() {
                                         disabled={loading}
                                         className="w-100 py-3 fw-semibold border-0"
                                         style={{
-                                            background: loading ? '#9CA3AF' : '#000000',
+                                            background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                             borderRadius: '12px',
-                                            boxShadow: loading ? 'none' : '0 10px 30px rgba(30, 136, 229, 0.4)',
+                                            boxShadow: loading ? 'none' : '0 10px 30px rgba(0, 0, 0, 0.4)',
                                             fontSize: '1rem'
                                         }}
                                     >
@@ -297,7 +297,7 @@ function Login() {
                     </Card>
                 </motion.div>
             </Container>
-        </div>
+        </div >
     );
 }
 
