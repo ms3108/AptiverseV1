@@ -77,7 +77,7 @@ function Navigation() {
                         className="fw-bold fs-4"
                         style={{
                             cursor: 'pointer',
-                            background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
+                            background: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             letterSpacing: '-0.5px'
@@ -106,7 +106,7 @@ function Navigation() {
                                     variant="solid"
                                     icon={<FaChartPie />}
                                     style={{
-                                        background: 'linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%)',
+                                        background: 'linear-gradient(135deg, #93C5FD 0%, #BFDBFE 100%)',
                                         boxShadow: '0px 4px 10px rgba(30, 136, 229, 0.3)'
                                     }}
                                 >
@@ -138,7 +138,7 @@ function Navigation() {
                                     variant="solid"
                                     icon={<FaCrown />}
                                     style={{
-                                        background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
+                                        background: 'linear-gradient(135deg, #60A5FA 0%, #93C5FD 100%)',
                                         boxShadow: '0px 4px 10px rgba(21, 101, 192, 0.3)'
                                     }}
                                 >
@@ -185,7 +185,7 @@ function Navigation() {
                         )}
 
                         <span className="text-muted small d-none d-lg-inline mx-2">
-                            Welcome, <span className="fw-semibold" style={{ color: '#1E88E5' }}>{user?.username}</span>!
+                            Welcome, <span className="fw-semibold" style={{ color: '#93C5FD' }}>{user?.username}</span>!
                         </span>
 
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -194,7 +194,7 @@ function Navigation() {
                                 variant="primary"
                                 className="d-flex align-items-center gap-2 fw-semibold"
                                 style={{
-                                    backgroundColor: '#1565C0',
+                                    backgroundColor: '#93C5FD',
                                     border: 'none',
                                     borderRadius: '10px',
                                     padding: '8px 16px',

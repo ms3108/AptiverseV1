@@ -31,7 +31,7 @@ function DashboardStats() {
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center p-5">
-                <Spinner animation="border" style={{ color: '#3B82F6', width: '3rem', height: '3rem' }} />
+                <Spinner animation="border" style={{ color: '#93C5FD', width: '3rem', height: '3rem' }} />
             </div>
         );
     }
@@ -84,8 +84,8 @@ function DashboardStats() {
             <motion.div variants={itemVariants}>
                 <Card className="border-0 text-white" style={{
                     borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
-                    boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3)'
+                    background: 'linear-gradient(135deg, #93C5FD 0%, #BFDBFE 100%)',
+                    boxShadow: '0 4px 20px rgba(147, 197, 253, 0.3)'
                 }}>
                     <Card.Body className="p-4">
                         <Row className="align-items-center mb-4">
@@ -148,7 +148,7 @@ function DashboardStats() {
                                     </div>
                                     <span className="text-muted small">Current Streak</span>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ color: '#1E40AF' }}>
+                                <h2 className="fw-bold mb-0" style={{ color: '#60A5FA' }}>
                                     {stats.current_streak}
                                 </h2>
                                 <small className="text-muted">days</small>
@@ -166,14 +166,14 @@ function DashboardStats() {
                                     <div className="d-flex align-items-center justify-content-center" style={{
                                         width: '40px',
                                         height: '40px',
-                                        backgroundColor: '#EFF6FF',
+                                        backgroundColor: '#F0F9FF',
                                         borderRadius: '10px'
                                     }}>
-                                        <FaBolt style={{ color: '#3B82F6' }} />
+                                        <FaBolt style={{ color: '#93C5FD' }} />
                                     </div>
                                     <span className="text-muted small">Best Streak</span>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ color: '#1E40AF' }}>
+                                <h2 className="fw-bold mb-0" style={{ color: '#60A5FA' }}>
                                     {stats.longest_streak}
                                 </h2>
                                 <small className="text-muted">personal best</small>
@@ -191,14 +191,14 @@ function DashboardStats() {
                                     <div className="d-flex align-items-center justify-content-center" style={{
                                         width: '40px',
                                         height: '40px',
-                                        backgroundColor: '#EFF6FF',
+                                        backgroundColor: '#F0F9FF',
                                         borderRadius: '10px'
                                     }}>
-                                        <FaCheckCircle style={{ color: '#3B82F6' }} />
+                                        <FaCheckCircle style={{ color: '#93C5FD' }} />
                                     </div>
                                     <span className="text-muted small">Solved</span>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ color: '#1E40AF' }}>
+                                <h2 className="fw-bold mb-0" style={{ color: '#60A5FA' }}>
                                     {stats.total_questions_solved}
                                 </h2>
                                 <small className="text-muted">questions</small>
@@ -261,7 +261,7 @@ function DashboardStats() {
                                 backgroundColor: '#EFF6FF',
                                 borderRadius: '10px'
                             }}>
-                                <FaChartBar style={{ color: '#3B82F6' }} />
+                                <FaChartBar style={{ color: '#93C5FD' }} />
                             </div>
                             <h5 className="mb-0 fw-semibold" style={{ color: '#1F2937' }}>
                                 Activity
@@ -341,10 +341,10 @@ function ActivityHeatmap({ activityData = {} }) {
 
         const { questions } = day;
         if (questions === 0) return { backgroundColor: '#F3F4F6' };
-        if (questions <= 3) return { backgroundColor: '#BFDBFE' }; // Light blue
-        if (questions <= 6) return { backgroundColor: '#60A5FA' }; // Medium blue
-        if (questions <= 9) return { backgroundColor: '#3B82F6' }; // Darker blue
-        return { backgroundColor: '#1E40AF' }; // Full dark blue
+        if (questions <= 3) return { backgroundColor: '#DBEAFE' }; // Very light blue
+        if (questions <= 6) return { backgroundColor: '#BFDBFE' }; // Light blue
+        if (questions <= 9) return { backgroundColor: '#93C5FD' }; // Medium blue
+        return { backgroundColor: '#60A5FA' }; // Darker blue
     };
 
     const dayLabels = {
@@ -424,7 +424,7 @@ function ActivityHeatmap({ activityData = {} }) {
                                 style={{
                                     borderRadius: '3px',
                                     ...getColorStyle(day),
-                                    boxShadow: day.questions > 0 ? '0 1px 3px rgba(59, 130, 246, 0.3)' : 'none'
+                                    boxShadow: day.questions > 0 ? '0 1px 3px rgba(147, 197, 253, 0.3)' : 'none'
                                 }}
                                 onMouseEnter={(e) => {
                                     if (!day.isFuture) {
@@ -464,10 +464,10 @@ function ActivityHeatmap({ activityData = {} }) {
                 <span>Less</span>
                 <div className="flex gap-1">
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#F3F4F6' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#DBEAFE' }}></div>
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#BFDBFE' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#93C5FD' }}></div>
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#60A5FA' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#3B82F6' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#1E40AF' }}></div>
                 </div>
                 <span>More</span>
             </div>

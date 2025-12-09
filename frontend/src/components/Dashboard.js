@@ -52,7 +52,7 @@ function Dashboard() {
     };
 
     return (
-        <div className="min-vh-100" style={{ background: 'linear-gradient(135deg, #F0F4FA 0%, #E8F0FE 100%)' }}>
+        <div className="min-vh-100" style={{ background: 'linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%)' }}>
             {/* Modern Navbar */}
             <Navbar
                 expand="lg"
@@ -72,7 +72,7 @@ function Dashboard() {
                         <motion.h1
                             className="mb-0 fw-bold"
                             style={{
-                                background: 'linear-gradient(135deg, #1565C0 0%, #1E88E5 100%)',
+                                background: 'linear-gradient(135deg, #60A5FA 0%, #93C5FD 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 fontSize: '1.75rem',
@@ -95,7 +95,7 @@ function Dashboard() {
                                     onClick={handleStartPractice}
                                     className="d-flex align-items-center gap-2 fw-semibold border-0"
                                     style={{
-                                        background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
+                                        background: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%)',
                                         boxShadow: '0 4px 14px rgba(30, 136, 229, 0.35)',
                                         borderRadius: '12px',
                                         padding: '10px 20px'
@@ -114,8 +114,8 @@ function Dashboard() {
                                     style={{
                                         borderRadius: '12px',
                                         borderWidth: '2px',
-                                        borderColor: '#1E88E5',
-                                        color: '#1E88E5',
+                                        borderColor: '#93C5FD',
+                                        color: '#60A5FA',
                                         padding: '10px 20px'
                                     }}
                                 >
@@ -132,8 +132,8 @@ function Dashboard() {
                                     style={{
                                         borderRadius: '12px',
                                         borderWidth: '2px',
-                                        borderColor: '#0D47A1',
-                                        color: '#0D47A1',
+                                        borderColor: '#60A5FA',
+                                        color: '#3B82F6',
                                         padding: '10px 20px'
                                     }}
                                 >
@@ -158,7 +158,7 @@ function Dashboard() {
                                         border: '2px solid #E2E8F0'
                                     }}
                                 >
-                                    <FaBell size={18} color="#1E88E5" />
+                                    <FaBell size={18} color="#93C5FD" />
                                     {notificationCount > 0 && (
                                         <Badge
                                             pill
@@ -166,7 +166,7 @@ function Dashboard() {
                                             style={{
                                                 top: '-5px',
                                                 right: '-5px',
-                                                background: 'linear-gradient(135deg, #1E88E5, #1565C0)',
+                                                background: 'linear-gradient(135deg, #93C5FD, #60A5FA)',
                                                 fontSize: '0.65rem',
                                                 animation: 'pulse 2s infinite'
                                             }}
@@ -188,8 +188,8 @@ function Dashboard() {
                                         padding: '8px 16px'
                                     }}
                                 >
-                                    <FaUser size={14} color="#1E88E5" />
-                                    <span className="fw-semibold" style={{ color: '#1E88E5' }}>
+                                    <FaUser size={14} color="#93C5FD" />
+                                    <span className="fw-semibold" style={{ color: '#60A5FA' }}>
                                         {user?.username}
                                     </span>
                                 </Dropdown.Toggle>
