@@ -39,142 +39,275 @@ const AdminDashboard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-xl">Loading admin dashboard...</div>
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #EEF2FF 100%)' }}>
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600 font-medium">Loading admin dashboard...</p>
+                </div>
             </div>
         );
     }
 
+    const statCards = [
+        {
+            label: 'Total Users',
+            value: stats?.users.total || 0,
+            subtitle: `${stats?.users.verified || 0} verified`,
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+            ),
+            color: '#3B82F6',
+            bgLight: '#EFF6FF',
+        },
+        {
+            label: 'Banned Users',
+            value: stats?.users.banned || 0,
+            subtitle: 'accounts restricted',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+            ),
+            color: '#EF4444',
+            bgLight: '#FEF2F2',
+        },
+        {
+            label: 'Total Questions',
+            value: stats?.questions.total || 0,
+            subtitle: 'in question bank',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            ),
+            color: '#10B981',
+            bgLight: '#ECFDF5',
+        },
+        {
+            label: 'Pending Reports',
+            value: stats?.reports.pending || 0,
+            subtitle: 'need review',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            ),
+            color: '#F59E0B',
+            bgLight: '#FFFBEB',
+        },
+    ];
+
+    const quickActions = [
+        {
+            title: 'Manage Users',
+            description: 'View, ban, or delete users',
+            path: '/admin/users',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            ),
+            color: '#3B82F6',
+            bgLight: '#EFF6FF',
+        },
+        {
+            title: 'Manage Questions',
+            description: 'Upload, edit, or delete questions',
+            path: '/admin/questions',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            ),
+            color: '#10B981',
+            bgLight: '#ECFDF5',
+        },
+        {
+            title: 'View Reports',
+            description: 'Handle community reports',
+            path: '/admin/reports',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+            ),
+            color: '#F59E0B',
+            bgLight: '#FFFBEB',
+        },
+    ];
+
+    const getActionColor = (actionType) => {
+        if (actionType.includes('ban') || actionType.includes('delete')) return '#EF4444';
+        if (actionType.includes('unban') || actionType.includes('create')) return '#10B981';
+        if (actionType.includes('edit') || actionType.includes('update')) return '#F59E0B';
+        return '#3B82F6';
+    };
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 50%, #F8FAFC 100%)' }}>
             <Navigation />
 
-            <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="max-w-7xl mx-auto px-4 py-10">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                    <p className="text-gray-600 mt-2">Manage users, questions, and community reports</p>
+                <div className="mb-10">
+                    <div className="flex items-center gap-4 mb-2">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-xl" style={{ background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)', boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)' }}>
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold" style={{ color: '#1F2937' }}>Admin Dashboard</h1>
+                            <p className="text-sm" style={{ color: '#6B7280' }}>Manage users, questions, and community reports</p>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="text-sm font-medium text-gray-500">Total Users</div>
-                        <div className="text-3xl font-bold text-gray-900 mt-2">{stats?.users.total || 0}</div>
-                        <div className="text-sm text-gray-600 mt-1">
-                            {stats?.users.verified || 0} verified
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+                    {statCards.map((stat, index) => (
+                        <div
+                            key={index}
+                            className="bg-white rounded-2xl p-6 transition-all duration-300"
+                            style={{ boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)' }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-4px)';
+                                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.1)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 2px 12px rgba(0, 0, 0, 0.06)';
+                            }}
+                        >
+                            <div className="flex items-start justify-between mb-4">
+                                <div
+                                    className="flex items-center justify-center w-12 h-12 rounded-xl"
+                                    style={{ backgroundColor: stat.bgLight, color: stat.color }}
+                                >
+                                    {stat.icon}
+                                </div>
+                            </div>
+                            <p className="text-sm font-medium mb-1" style={{ color: '#6B7280' }}>{stat.label}</p>
+                            <p className="text-3xl font-bold mb-1" style={{ color: stat.color }}>{stat.value}</p>
+                            <p className="text-xs" style={{ color: '#9CA3AF' }}>{stat.subtitle}</p>
                         </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="text-sm font-medium text-gray-500">Banned Users</div>
-                        <div className="text-3xl font-bold text-blue-800 mt-2">{stats?.users.banned || 0}</div>
-                    </div>
-
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="text-sm font-medium text-gray-500">Total Questions</div>
-                        <div className="text-3xl font-bold text-gray-900 mt-2">{stats?.questions.total || 0}</div>
-                    </div>
-
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="text-sm font-medium text-gray-500">Pending Reports</div>
-                        <div className="text-3xl font-bold text-blue-600 mt-2">{stats?.reports.pending || 0}</div>
-                    </div>
+                    ))}
                 </div>
 
                 {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <button
-                        onClick={() => navigate('/admin/users')}
-                        className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition text-left"
-                    >
-                        <div className="flex items-center">
-                            <div className="bg-blue-100 rounded-lg p-3">
-                                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                            </div>
-                            <div className="ml-4">
-                                <div className="text-lg font-semibold text-gray-900">Manage Users</div>
-                                <div className="text-sm text-gray-600">View, ban, or delete users</div>
-                            </div>
-                        </div>
-                    </button>
-
-                    <button
-                        onClick={() => navigate('/admin/questions')}
-                        className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition text-left"
-                    >
-                        <div className="flex items-center">
-                            <div className="bg-blue-100 rounded-lg p-3">
-                                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div className="ml-4">
-                                <div className="text-lg font-semibold text-gray-900">Manage Questions</div>
-                                <div className="text-sm text-gray-600">Upload, edit, or delete questions</div>
-                            </div>
-                        </div>
-                    </button>
-
-                    <button
-                        onClick={() => navigate('/admin/reports')}
-                        className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition text-left"
-                    >
-                        <div className="flex items-center">
-                            <div className="bg-sky-100 rounded-lg p-3">
-                                <svg className="w-6 h-6 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                            </div>
-                            <div className="ml-4">
-                                <div className="text-lg font-semibold text-gray-900">View Reports</div>
-                                <div className="text-sm text-gray-600">Handle community reports</div>
-                            </div>
-                        </div>
-                    </button>
+                <div className="mb-10">
+                    <h2 className="text-lg font-semibold mb-4" style={{ color: '#1F2937' }}>Quick Actions</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        {quickActions.map((action, index) => (
+                            <button
+                                key={index}
+                                onClick={() => navigate(action.path)}
+                                className="group bg-white rounded-2xl p-6 text-left transition-all duration-300 border-2 border-transparent"
+                                style={{ boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)' }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                    e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.1)';
+                                    e.currentTarget.style.borderColor = action.color;
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 2px 12px rgba(0, 0, 0, 0.06)';
+                                    e.currentTarget.style.borderColor = 'transparent';
+                                }}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div
+                                            className="flex items-center justify-center w-12 h-12 rounded-xl transition-transform group-hover:scale-110"
+                                            style={{ backgroundColor: action.bgLight, color: action.color }}
+                                        >
+                                            {action.icon}
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold" style={{ color: '#1F2937' }}>{action.title}</p>
+                                            <p className="text-sm" style={{ color: '#6B7280' }}>{action.description}</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        className="w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                        style={{ backgroundColor: action.bgLight, color: action.color }}
+                                    >
+                                        →
+                                    </div>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Recent Actions */}
-                <div className="bg-white rounded-lg shadow">
-                    <div className="px-6 py-4 border-b border-gray-200">
-                        <h2 className="text-lg font-semibold text-gray-900">Recent Admin Actions</h2>
+                <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)' }}>
+                    <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#EEF2FF' }}>
+                                <svg className="w-5 h-5" style={{ color: '#3B82F6' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h2 className="text-lg font-semibold" style={{ color: '#1F2937' }}>Recent Admin Actions</h2>
+                        </div>
+                        <button
+                            onClick={() => navigate('/admin/logs')}
+                            className="text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                            style={{ color: '#3B82F6', backgroundColor: '#EFF6FF' }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#DBEAFE'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#EFF6FF'}
+                        >
+                            View All Logs →
+                        </button>
                     </div>
                     <div className="p-6">
                         {stats?.recent_actions && stats.recent_actions.length > 0 ? (
                             <div className="space-y-3">
-                                {stats.recent_actions.map((action, index) => (
-                                    <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                            <div>
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    {action.action_type.replace(/_/g, ' ').toUpperCase()}
+                                {stats.recent_actions.map((action, index) => {
+                                    const actionColor = getActionColor(action.action_type);
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="flex items-center justify-between p-4 rounded-xl transition-colors"
+                                            style={{ backgroundColor: '#F9FAFB' }}
+                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
+                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9FAFB'}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div
+                                                    className="w-3 h-3 rounded-full"
+                                                    style={{ backgroundColor: actionColor }}
+                                                ></div>
+                                                <div>
+                                                    <p className="font-medium text-sm" style={{ color: '#1F2937' }}>
+                                                        {action.action_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                    </p>
+                                                    <p className="text-xs" style={{ color: '#6B7280' }}>by {action.admin_username}</p>
                                                 </div>
-                                                <div className="text-xs text-gray-500">by {action.admin_username}</div>
                                             </div>
+                                            <p className="text-xs font-medium" style={{ color: '#9CA3AF' }}>
+                                                {new Date(action.created_at).toLocaleString()}
+                                            </p>
                                         </div>
-                                        <div className="text-xs text-gray-500">
-                                            {new Date(action.created_at).toLocaleString()}
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         ) : (
-                            <div className="text-center text-gray-500 py-8">No recent actions</div>
+                            <div className="text-center py-12">
+                                <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
+                                    <svg className="w-8 h-8" style={{ color: '#9CA3AF' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </div>
+                                <p className="font-medium" style={{ color: '#6B7280' }}>No recent actions</p>
+                                <p className="text-sm" style={{ color: '#9CA3AF' }}>Admin activity will appear here</p>
+                            </div>
                         )}
                     </div>
-                </div>
-
-                {/* Action Logs Link */}
-                <div className="mt-6">
-                    <button
-                        onClick={() => navigate('/admin/logs')}
-                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-                    >
-                        View All Action Logs →
-                    </button>
                 </div>
             </div>
         </div>
