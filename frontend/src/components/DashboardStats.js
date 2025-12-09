@@ -294,7 +294,7 @@ function DashboardStats() {
                     </h3>
                 </div>
                 <p className="text-sm mb-6 ml-13" style={{ color: '#6B7280', marginLeft: '52px' }}>
-                    Your practice activity over the past 12 weeks
+                    Your practice activity over the past 6 months
                 </p>
                 <ActivityHeatmap activityData={stats.activity_data} />
             </div>
@@ -312,14 +312,11 @@ function ActivityHeatmap({ activityData = {} }) {
         return `${year}-${month}-${day}`;
     };
 
-    // Generate 12 weeks of data ending with the current week (Monday start)
+    // Generate 26 weeks (6 months) of data ending with the current week (Monday start)
     const generateHeatmapData = () => {
         const now = new Date();
         // Force to local timezone to avoid UTC date issues
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-        console.log('Heatmap Debug - Today (local):', formatLocalDate(today));
-        console.log('Heatmap Debug - Activity Data Keys:', Object.keys(activityData).slice(-10));
 
         const startOfWeek = new Date(today);
         const dayOfWeek = startOfWeek.getDay();
@@ -327,12 +324,9 @@ function ActivityHeatmap({ activityData = {} }) {
         startOfWeek.setDate(startOfWeek.getDate() + diffToMonday);
 
         const startDate = new Date(startOfWeek);
-        startDate.setDate(startDate.getDate() - (7 * 11)); // 11 weeks back so we have 12 including current week
+        startDate.setDate(startDate.getDate() - (7 * 25)); // 25 weeks back so we have 26 including current week
 
-        console.log('Heatmap Debug - Start of Current Week:', formatLocalDate(startOfWeek));
-        console.log('Heatmap Debug - Start Date (11 weeks back):', formatLocalDate(startDate));
-
-        const totalDays = 7 * 12;
+        const totalDays = 7 * 26;
         const weeks = [];
         let currentWeek = new Array(7).fill(null);
 
@@ -388,21 +382,23 @@ function ActivityHeatmap({ activityData = {} }) {
     };
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+    // Calculate cell size based on number of weeks to fill container
+    const cellSize = 'minmax(10px, 1fr)';
+
     return (
-        <div className="overflow-x-auto py-8 px-4">
-            <div className="inline-flex flex-col gap-1">
+        <div className="w-full py-4">
+            <div className="w-full">
                 {/* Month labels */}
-                <div className="flex gap-1 mb-2">
-                    <div className="w-12"></div>
+                <div className="flex mb-2" style={{ marginLeft: '48px' }}>
                     {weeks.map((week, weekIndex) => {
                         const firstDayEntry = week ? week.find(day => day) : null;
-                        if (!firstDayEntry) return <div key={weekIndex} style={{ width: '14px' }}></div>;
+                        if (!firstDayEntry) return <div key={weekIndex} className="flex-1" style={{ minWidth: '10px' }}></div>;
                         const firstDay = new Date(firstDayEntry.date);
                         const showMonth = weekIndex === 0 || firstDay.getDate() <= 7;
                         return (
-                            <div key={weekIndex} className="flex flex-col items-center" style={{ width: '14px' }}>
+                            <div key={weekIndex} className="flex-1 flex justify-center" style={{ minWidth: '10px' }}>
                                 {showMonth && (
-                                    <span className="text-xs font-medium mb-1" style={{ color: '#64748B' }}>
+                                    <span className="text-xs font-medium" style={{ color: '#64748B' }}>
                                         {months[firstDay.getMonth()]}
                                     </span>
                                 )}
@@ -413,13 +409,13 @@ function ActivityHeatmap({ activityData = {} }) {
 
                 {/* Heatmap grid - rows are days of week, columns are weeks */}
                 {[1, 2, 3, 4, 5, 6, 7].map((dayOfWeek) => (
-                    <div key={dayOfWeek} className="flex gap-1 items-center">
-                        <div className="w-12 text-xs font-medium" style={{ color: '#64748B' }}>
+                    <div key={dayOfWeek} className="flex gap-1 items-center mb-1">
+                        <div className="w-12 text-xs font-medium flex-shrink-0" style={{ color: '#64748B' }}>
                             {dayLabels[dayOfWeek]}
                         </div>
                         {weeks.map((week, weekIndex) => {
                             const day = week ? week[dayOfWeek - 1] : null;
-                            if (!day) return <div key={weekIndex} style={{ width: '14px', height: '14px' }}></div>;
+                            if (!day) return <div key={weekIndex} className="flex-1 aspect-square rounded-sm" style={{ minWidth: '10px', maxWidth: '18px', backgroundColor: '#F3F4F6' }}></div>;
 
                             // Position tooltip below for top rows (0, 1), above for bottom rows (2, 3, 4)
                             // Also handle left/right edges for better visibility
@@ -443,10 +439,10 @@ function ActivityHeatmap({ activityData = {} }) {
                             return (
                                 <div
                                     key={weekIndex}
-                                    className={`transition-all relative group ${day.isFuture ? 'cursor-default' : 'cursor-pointer'}`}
+                                    className={`flex-1 aspect-square transition-all relative group ${day.isFuture ? 'cursor-default' : 'cursor-pointer'}`}
                                     style={{
-                                        width: '14px',
-                                        height: '14px',
+                                        minWidth: '10px',
+                                        maxWidth: '18px',
                                         borderRadius: '3px',
                                         ...getColorStyle(day),
                                         transform: 'scale(1)',
@@ -454,7 +450,7 @@ function ActivityHeatmap({ activityData = {} }) {
                                     }}
                                     onMouseEnter={(e) => {
                                         if (!day.isFuture) {
-                                            e.currentTarget.style.transform = 'scale(1.4)';
+                                            e.currentTarget.style.transform = 'scale(1.3)';
                                             e.currentTarget.style.zIndex = '10';
                                         }
                                     }}
@@ -488,7 +484,7 @@ function ActivityHeatmap({ activityData = {} }) {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-2 mt-4 text-xs" style={{ color: '#64748B' }}>
+            <div className="flex items-center justify-end gap-2 mt-6 text-xs" style={{ color: '#64748B' }}>
                 <span>Less</span>
                 <div className="flex gap-1">
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#F3F4F6' }}></div>
