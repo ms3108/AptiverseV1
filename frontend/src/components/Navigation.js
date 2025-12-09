@@ -77,7 +77,7 @@ function Navigation() {
                         className="fw-bold fs-4"
                         style={{
                             cursor: 'pointer',
-                            background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+                            background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             letterSpacing: '-0.5px'
@@ -185,7 +185,7 @@ function Navigation() {
                         )}
 
                         <span className="text-muted small d-none d-lg-inline mx-2">
-                            Welcome, <span className="fw-semibold" style={{ color: '#2563EB' }}>{user?.username}</span>!
+                            Welcome, <span className="fw-semibold" style={{ color: '#000000' }}>{user?.username}</span>!
                         </span>
 
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -194,7 +194,7 @@ function Navigation() {
                                 variant="primary"
                                 className="d-flex align-items-center gap-2 fw-semibold"
                                 style={{
-                                    backgroundColor: '#2563EB',
+                                    backgroundColor: '#000000',
                                     border: 'none',
                                     borderRadius: '10px',
                                     padding: '8px 16px',

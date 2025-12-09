@@ -31,7 +31,7 @@ function DashboardStats() {
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center p-5">
-                <Spinner animation="border" style={{ color: '#2563EB', width: '3rem', height: '3rem' }} />
+                <Spinner animation="border" style={{ color: '#000000', width: '3rem', height: '3rem' }} />
             </div>
         );
     }
@@ -84,8 +84,8 @@ function DashboardStats() {
             <motion.div variants={itemVariants}>
                 <Card className="border-0 text-white" style={{
                     borderRadius: '16px',
-                    background: '#2563EB',
-                    boxShadow: '0 4px 20px rgba(37, 99, 235, 0.3)'
+                    background: '#000000',
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
                 }}>
                     <Card.Body className="p-4">
                         <Row className="align-items-center mb-4">
@@ -125,7 +125,7 @@ function DashboardStats() {
                             <ProgressBar
                                 now={Math.min(xpPercentage, 100)}
                                 style={{
-                                    backgroundColor: '#2563EB'
+                                    backgroundColor: '#000000'
                                 }}
                             />
                         </ProgressBar>
@@ -147,7 +147,7 @@ function DashboardStats() {
                                     <div className="d-flex align-items-center justify-content-center" style={{
                                         width: '40px',
                                         height: '40px',
-                                        backgroundColor: '#EFF6FF',
+                                        backgroundColor: '#F8F9FA',
                                         borderRadius: '10px'
                                     }}>
                                         <FaFire className="text-warning" />
@@ -172,10 +172,10 @@ function DashboardStats() {
                                     <div className="d-flex align-items-center justify-content-center" style={{
                                         width: '40px',
                                         height: '40px',
-                                        backgroundColor: '#EBF8FF',
+                                        backgroundColor: '#F8F9FA',
                                         borderRadius: '10px'
                                     }}>
-                                        <FaBolt style={{ color: '#2563EB' }} />
+                                        <FaBolt style={{ color: '#000000' }} />
                                     </div>
                                     <span className="text-muted small">Best Streak</span>
                                 </div>
@@ -197,10 +197,10 @@ function DashboardStats() {
                                     <div className="d-flex align-items-center justify-content-center" style={{
                                         width: '40px',
                                         height: '40px',
-                                        backgroundColor: '#EBF8FF',
+                                        backgroundColor: '#F8F9FA',
                                         borderRadius: '10px'
                                     }}>
-                                        <FaCheckCircle style={{ color: '#2563EB' }} />
+                                        <FaCheckCircle style={{ color: '#000000' }} />
                                     </div>
                                     <span className="text-muted small">Solved</span>
                                 </div>
@@ -223,7 +223,7 @@ function DashboardStats() {
                                 <div className="d-flex align-items-center justify-content-center" style={{
                                     width: '40px',
                                     height: '40px',
-                                    backgroundColor: '#EFF6FF',
+                                    backgroundColor: '#F8F9FA',
                                     borderRadius: '10px'
                                 }}>
                                     <FaTrophy style={{ color: '#F59E0B' }} />
@@ -264,10 +264,10 @@ function DashboardStats() {
                             <div className="d-flex align-items-center justify-content-center" style={{
                                 width: '40px',
                                 height: '40px',
-                                backgroundColor: '#EFF6FF',
+                                backgroundColor: '#F8F9FA',
                                 borderRadius: '10px'
                             }}>
-                                <FaChartBar style={{ color: '#2563EB' }} />
+                                <FaChartBar style={{ color: '#000000' }} />
                             </div>
                             <h5 className="mb-0 fw-semibold" style={{ color: '#1F2937' }}>
                                 Activity
@@ -340,17 +340,17 @@ function ActivityHeatmap({ activityData = {} }) {
 
     const weeks = generateHeatmapData();
 
-    // Get color intensity based on questions solved - blue palette
+    // Get color intensity based on questions solved - grayscale palette
     const getColorStyle = (day) => {
         if (!day) return { backgroundColor: '#F8F9FA' };
         if (day.isFuture) return { backgroundColor: '#F8F9FA', opacity: 0.4 };
 
         const { questions } = day;
         if (questions === 0) return { backgroundColor: '#F8F9FA' };
-        if (questions <= 3) return { backgroundColor: '#E3F2FD' }; // Very light blue
-        if (questions <= 6) return { backgroundColor: '#BBDEFB' }; // Light blue
-        if (questions <= 9) return { backgroundColor: '#64B5F6' }; // Medium blue
-        return { backgroundColor: '#2563EB' }; // Primary blue
+        if (questions <= 3) return { backgroundColor: '#E9ECEF' }; // Very light gray
+        if (questions <= 6) return { backgroundColor: '#DEE2E6' }; // Light gray
+        if (questions <= 9) return { backgroundColor: '#6C757D' }; // Medium gray
+        return { backgroundColor: '#000000' }; // Black
     };
 
     const dayLabels = {
@@ -430,7 +430,7 @@ function ActivityHeatmap({ activityData = {} }) {
                                 style={{
                                     borderRadius: '3px',
                                     ...getColorStyle(day),
-                                    boxShadow: day.questions > 0 ? '0 1px 3px rgba(37, 99, 235, 0.3)' : 'none'
+                                    boxShadow: day.questions > 0 ? '0 1px 3px rgba(0, 0, 0, 0.3)' : 'none'
                                 }}
                                 onMouseEnter={(e) => {
                                     if (!day.isFuture) {
@@ -470,10 +470,10 @@ function ActivityHeatmap({ activityData = {} }) {
                 <span>Less</span>
                 <div className="flex gap-1">
                     <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#F8F9FA' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#E3F2FD' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#BBDEFB' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#64B5F6' }}></div>
-                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#2563EB' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#E9ECEF' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#DEE2E6' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#6C757D' }}></div>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#000000' }}></div>
                 </div>
                 <span>More</span>
             </div>

@@ -144,14 +144,14 @@ function Signup() {
                                         <div className="d-inline-flex align-items-center justify-content-center mb-3" style={{
                                             width: '60px',
                                             height: '60px',
-                                            background: '#2563EB',
+                                            background: '#000000',
                                             borderRadius: '16px',
                                             boxShadow: '0 10px 30px rgba(13, 71, 161, 0.4)'
                                         }}>
                                             <FaUserPlus className="text-white fs-4" />
                                         </div>
                                         <h2 className="fw-bold mb-1" style={{
-                                            background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+                                            background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                             WebkitBackgroundClip: 'text',
                                             WebkitTextFillColor: 'transparent'
                                         }}>
@@ -332,7 +332,7 @@ function Signup() {
                                                 disabled={loading}
                                                 className="w-100 py-3 fw-semibold border-0 d-flex align-items-center justify-content-center gap-2"
                                                 style={{
-                                                    background: loading ? '#9CA3AF' : '#2563EB',
+                                                    background: loading ? '#9CA3AF' : '#000000',
                                                     borderRadius: '12px',
                                                     boxShadow: loading ? 'none' : '0 10px 30px rgba(13, 71, 161, 0.4)',
                                                     transition: 'all 0.3s ease'
@@ -361,7 +361,7 @@ function Signup() {
                                         >
                                             <p className="text-muted small mb-0">
                                                 Already have an account?{' '}
-                                                <Link to="/login" className="fw-semibold text-decoration-none" style={{ color: '#2563EB' }}>
+                                                <Link to="/login" className="fw-semibold text-decoration-none" style={{ color: '#000000' }}>
                                                     Sign in
                                                 </Link>
                                             </p>

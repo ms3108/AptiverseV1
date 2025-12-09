@@ -158,7 +158,7 @@ function Dashboard() {
                                         border: '2px solid #E2E8F0'
                                     }}
                                 >
-                                    <FaBell size={18} color="#2563EB" />
+                                    <FaBell size={18} color="#000000" />
                                     {notificationCount > 0 && (
                                         <Badge
                                             pill
@@ -166,7 +166,7 @@ function Dashboard() {
                                             style={{
                                                 top: '-5px',
                                                 right: '-5px',
-                                                background: '#2563EB',
+                                                background: '#000000',
                                                 fontSize: '0.65rem',
                                                 animation: 'pulse 2s infinite'
                                             }}
@@ -188,8 +188,8 @@ function Dashboard() {
                                         padding: '8px 16px'
                                     }}
                                 >
-                                    <FaUser size={14} color="#2563EB" />
-                                    <span className="fw-semibold" style={{ color: '#2563EB' }}>
+                                    <FaUser size={14} color="#000000" />
+                                    <span className="fw-semibold" style={{ color: '#000000' }}>
                                         {user?.username}
                                     </span>
                                 </Dropdown.Toggle>

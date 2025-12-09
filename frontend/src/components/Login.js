@@ -165,7 +165,7 @@ function Login() {
                                     style={{
                                         width: '70px',
                                         height: '70px',
-                                        background: '#2563EB',
+                                        background: '#000000',
                                         boxShadow: '0 10px 30px rgba(30, 136, 229, 0.4)'
                                     }}>
                                     <FaBullseye size={32} color="white" />
@@ -268,7 +268,7 @@ function Login() {
                                         disabled={loading}
                                         className="w-100 py-3 fw-semibold border-0"
                                         style={{
-                                            background: loading ? '#9CA3AF' : '#2563EB',
+                                            background: loading ? '#9CA3AF' : '#000000',
                                             borderRadius: '12px',
                                             boxShadow: loading ? 'none' : '0 10px 30px rgba(30, 136, 229, 0.4)',
                                             fontSize: '1rem'
@@ -287,7 +287,7 @@ function Login() {
                                 <div className="text-center mt-4">
                                     <p className="text-muted small mb-0">
                                         Don't have an account?{' '}
-                                        <Link to="/signup" className="fw-semibold text-decoration-none" style={{ color: '#2563EB' }}>
+                                        <Link to="/signup" className="fw-semibold text-decoration-none" style={{ color: '#000000' }}>
                                             Create one now
                                         </Link>
                                     </p>
