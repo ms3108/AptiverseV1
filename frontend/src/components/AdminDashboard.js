@@ -6,7 +6,7 @@ import API_URL from '../config/api';
 import Navigation from './Navigation';
 
 const AdminDashboard = () => {
-    const { token, logout } = useAuth();
+    const { token } = useAuth();
     const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -14,11 +14,6 @@ const AdminDashboard = () => {
     useEffect(() => {
         fetchStats();
     }, []);
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
 
     const fetchStats = async () => {
         try {
@@ -109,8 +104,6 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
             ),
-            color: '#81bad9ff',
-            bgLight: '#DBEAFE',
         },
         {
             title: 'Manage Questions',
@@ -121,8 +114,6 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
             ),
-            color: '#3B82F6',
-            bgLight: '#EFF6FF',
         },
         {
             title: 'View Reports',
@@ -133,8 +124,6 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
             ),
-            color: '#5faed2ff',
-            bgLight: '#E0F2FE',
         },
     ];
 
@@ -205,36 +194,20 @@ const AdminDashboard = () => {
                             <button
                                 key={index}
                                 onClick={() => navigate(action.path)}
-                                className="group bg-white rounded-2xl p-6 text-left transition-all duration-300 border-2 border-transparent"
+                                className="group bg-white rounded-2xl p-6 text-left transition-all duration-300 border-2 border-transparent hover:border-gray-300 hover:shadow-lg"
                                 style={{ boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)' }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-4px)';
-                                    e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.1)';
-                                    e.currentTarget.style.borderColor = action.color;
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 2px 12px rgba(0, 0, 0, 0.06)';
-                                    e.currentTarget.style.borderColor = 'transparent';
-                                }}
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div
-                                            className="flex items-center justify-center w-12 h-12 rounded-xl transition-transform group-hover:scale-110"
-                                            style={{ backgroundColor: action.bgLight, color: action.color }}
-                                        >
+                                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 text-gray-600 group-hover:bg-gray-200">
                                             {action.icon}
                                         </div>
                                         <div>
-                                            <p className="font-semibold" style={{ color: '#1F2937' }}>{action.title}</p>
-                                            <p className="text-sm" style={{ color: '#6B7280' }}>{action.description}</p>
+                                            <p className="font-semibold text-gray-900">{action.title}</p>
+                                            <p className="text-sm text-gray-600">{action.description}</p>
                                         </div>
                                     </div>
-                                    <div
-                                        className="w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style={{ backgroundColor: action.bgLight, color: action.color }}
-                                    >
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
                                         →
                                     </div>
                                 </div>
@@ -247,19 +220,16 @@ const AdminDashboard = () => {
                 <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)' }}>
                     <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#EEF2FF' }}>
-                                <svg className="w-5 h-5" style={{ color: '#3B82F6' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100">
+                                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h2 className="text-lg font-semibold" style={{ color: '#1F2937' }}>Recent Admin Actions</h2>
+                            <h2 className="text-lg font-semibold text-gray-900">Recent Admin Actions</h2>
                         </div>
                         <button
                             onClick={() => navigate('/admin/logs')}
-                            className="text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-                            style={{ color: '#3B82F6', backgroundColor: '#EFF6FF' }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#DBEAFE'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#EFF6FF'}
+                            className="text-sm font-medium px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
                         >
                             View All Logs →
                         </button>
@@ -270,26 +240,17 @@ const AdminDashboard = () => {
                                 {stats.recent_actions.map((action, index) => {
                                     const actionColor = getActionColor(action.action_type);
                                     return (
-                                        <div
-                                            key={index}
-                                            className="flex items-center justify-between p-4 rounded-xl transition-colors"
-                                            style={{ backgroundColor: '#F9FAFB' }}
-                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
-                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F9FAFB'}
-                                        >
+                                        <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
                                             <div className="flex items-center gap-4">
-                                                <div
-                                                    className="w-3 h-3 rounded-full"
-                                                    style={{ backgroundColor: actionColor }}
-                                                ></div>
+                                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: actionColor }}></div>
                                                 <div>
-                                                    <p className="font-medium text-sm" style={{ color: '#1F2937' }}>
+                                                    <p className="font-medium text-sm text-gray-900">
                                                         {action.action_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                                     </p>
-                                                    <p className="text-xs" style={{ color: '#6B7280' }}>by {action.admin_username}</p>
+                                                    <p className="text-xs text-gray-600">by {action.admin_username}</p>
                                                 </div>
                                             </div>
-                                            <p className="text-xs font-medium" style={{ color: '#9CA3AF' }}>
+                                            <p className="text-xs font-medium text-gray-500">
                                                 {new Date(action.created_at).toLocaleString()}
                                             </p>
                                         </div>
@@ -298,13 +259,13 @@ const AdminDashboard = () => {
                             </div>
                         ) : (
                             <div className="text-center py-12">
-                                <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
-                                    <svg className="w-8 h-8" style={{ color: '#9CA3AF' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-gray-100">
+                                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                     </svg>
                                 </div>
-                                <p className="font-medium" style={{ color: '#6B7280' }}>No recent actions</p>
-                                <p className="text-sm" style={{ color: '#9CA3AF' }}>Admin activity will appear here</p>
+                                <p className="font-medium text-gray-600">No recent actions</p>
+                                <p className="text-sm text-gray-500">Admin activity will appear here</p>
                             </div>
                         )}
                     </div>
