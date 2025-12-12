@@ -72,7 +72,8 @@ function Dashboard() {
                         <motion.h1
                             className="mb-0 fw-bold"
                             style={{
-                                background: '#2563EB',
+                                color: '#000000',
+                                background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 fontSize: '1.75rem',
@@ -96,7 +97,7 @@ function Dashboard() {
                                     className="d-flex align-items-center gap-2 fw-semibold border-0"
                                     style={{
                                         background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
-                                        boxShadow: '0 4px 14px rgba(30, 136, 229, 0.35)',
+                                        boxShadow: '0 4px 14px rgba(0, 0, 0, 0.35)',
                                         borderRadius: '12px',
                                         padding: '10px 20px'
                                     }}
@@ -108,13 +109,12 @@ function Dashboard() {
                             {/* Questions Button */}
                             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                 <Button
-                                    variant="outline-primary"
                                     onClick={handleQuestionBank}
                                     className="d-flex align-items-center gap-2 fw-semibold"
                                     style={{
                                         borderRadius: '12px',
-                                        borderWidth: '2px',
-                                        borderColor: '#000000',
+                                        border: '2px solid #000000',
+                                        backgroundColor: '#FFFFFF',
                                         color: '#000000',
                                         padding: '10px 20px'
                                     }}
@@ -126,13 +126,12 @@ function Dashboard() {
                             {/* Battles Button */}
                             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                 <Button
-                                    variant="outline-primary"
                                     onClick={() => navigate('/battle/history')}
                                     className="d-flex align-items-center gap-2 fw-semibold"
                                     style={{
                                         borderRadius: '12px',
-                                        borderWidth: '2px',
-                                        borderColor: '#000000',
+                                        border: '2px solid #000000',
+                                        backgroundColor: '#FFFFFF',
                                         color: '#000000',
                                         padding: '10px 20px'
                                     }}

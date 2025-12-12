@@ -31,7 +31,7 @@ function App() {
     return (
         <AuthProvider>
             <Router>
-                <div className="min-h-screen bg-gray-100">
+                <div className="min-h-screen bg-white">
                     <Suspense fallback={<LoadingScreen />}>
                         <Routes>
                             <Route path="/" element={<Navigate to="/login" />} />

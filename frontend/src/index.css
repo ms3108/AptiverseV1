@@ -5,23 +5,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-    --blue-primary: #1E88E5;
-    --blue-dark: #1565C0;
-    --blue-light: #42A5F5;
-    --blue-accent: #0D47A1;
-    --blue-sky: #64B5F6;
-    --blue-pale: #90CAF9;
-    --blue-glow: rgba(30, 136, 229, 0.4);
+    --black-primary: #000000;
+    --black-dark: #1A1A1A;
+    --black-light: #333333;
+    --black-accent: #555555;
+    --gray-sky: #6B7280;
+    --gray-pale: #9CA3AF;
+    --black-glow: rgba(0, 0, 0, 0.4);
     --bg-white: #FFFFFF;
-    --bg-main: #F0F4FA;
+    --bg-main: #F8F9FA;
     --bg-card: #FFFFFF;
     --text-primary: #1A202C;
     --text-secondary: #64748B;
     --border-light: #E2E8F0;
-    --shadow-soft: 0 4px 6px -1px rgba(30, 136, 229, 0.1), 0 2px 4px -1px rgba(30, 136, 229, 0.06);
-    --shadow-medium: 0 10px 15px -3px rgba(30, 136, 229, 0.1), 0 4px 6px -2px rgba(30, 136, 229, 0.05);
-    --shadow-hover: 0 20px 25px -5px rgba(30, 136, 229, 0.15), 0 10px 10px -5px rgba(30, 136, 229, 0.04);
-    --shadow-glow: 0 0 20px rgba(30, 136, 229, 0.3);
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-glow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
 * {
@@ -35,7 +35,7 @@ body {
         sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: linear-gradient(135deg, #F0F4FA 0%, #E8F0FE 100%);
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
     min-height: 100vh;
 }
 
@@ -47,6 +47,36 @@ code {
 /* Custom scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
+}
+
+/* Override Bootstrap button variants */
+.btn-outline-primary {
+    border-color: #000000 !important;
+    color: #000000 !important;
+    background-color: #FFFFFF !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #F8F9FA !important;
+    border-color: #000000 !important;
+    color: #000000 !important;
+}
+
+.btn-primary {
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-primary:hover {
+    background-color: #333333 !important;
+    border-color: #333333 !important;
+    color: #FFFFFF !important;
+}
+
+/* Force brand text to be black */
+.navbar-brand {
+    color: #000000 !important;
 }
 
 ::-webkit-scrollbar-track {

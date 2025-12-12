@@ -48,13 +48,20 @@ function Navigation() {
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
                 onClick={onClick}
-                variant={variant === "outline" ? "outline-primary" : "primary"}
+                variant=""
                 className="d-flex align-items-center gap-2 fw-semibold"
                 style={{
                     borderRadius: '10px',
+                    background: variant === "outline"
+                        ? '#ffffff'
+                        : 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                     border: variant === "outline" ? '2px solid #000000' : 'none',
+                    color: variant === "outline" ? '#000000' : '#ffffff',
                     padding: '8px 16px',
                     fontSize: '14px',
+                    boxShadow: variant === "outline"
+                        ? '0 2px 4px rgba(0, 0, 0, 0.1)'
+                        : '0 4px 8px rgba(0, 0, 0, 0.3)',
                     ...style
                 }}
             >
@@ -80,6 +87,7 @@ function Navigation() {
                         className="fw-bold fs-4"
                         style={{
                             cursor: 'pointer',
+                            color: '#000000',
                             background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
@@ -109,8 +117,8 @@ function Navigation() {
                                     variant="solid"
                                     icon={<FaChartPie />}
                                     style={{
-                                        background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
-                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)'
+                                        background: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.4)'
                                     }}
                                 >
                                     Today's Practice
@@ -127,7 +135,6 @@ function Navigation() {
                                 <NavButton
                                     onClick={() => navigate('/battle/history')}
                                     icon={<GiCrossedSwords />}
-                                    style={{ borderColor: '#000000', color: '#000000' }}
                                 >
                                     Battles
                                 </NavButton>
@@ -141,8 +148,8 @@ function Navigation() {
                                     variant="solid"
                                     icon={<FaCrown />}
                                     style={{
-                                        background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
-                                        boxShadow: '0px 4px 10px rgba(21, 101, 192, 0.3)'
+                                        background: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.4)'
                                     }}
                                 >
                                     Admin Dashboard
@@ -153,7 +160,6 @@ function Navigation() {
                                 <NavButton
                                     onClick={() => navigate('/admin/questions')}
                                     icon={<FaQuestionCircle />}
-                                    style={{ borderColor: '#000000', color: '#000000' }}
                                 >
                                     Questions
                                 </NavButton>
@@ -164,13 +170,18 @@ function Navigation() {
                             <motion.div whileHover={{ scale: 1.05 }} className="position-relative">
                                 <Button
                                     onClick={() => setShowWarningsModal(true)}
-                                    variant="outline-warning"
+                                    variant=""
                                     className="d-flex align-items-center gap-2 fw-semibold"
                                     style={{
                                         borderRadius: '10px',
-                                        border: '2px solid #F59E0B',
+                                        background: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
+                                        border: '2px solid transparent',
+                                        borderImage: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                        borderImageSlice: 1,
+                                        color: '#92400e',
                                         padding: '8px 16px',
-                                        fontSize: '14px'
+                                        fontSize: '14px',
+                                        boxShadow: '0 2px 4px rgba(245, 158, 11, 0.2)'
                                     }}
                                 >
                                     <FaExclamationTriangle />
@@ -201,12 +212,13 @@ function Navigation() {
                                 onClick={handleLogout}
                                 className="d-flex align-items-center gap-2 fw-semibold"
                                 style={{
-                                    background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
+                                    background: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
                                     border: 'none',
                                     borderRadius: '10px',
                                     padding: '8px 16px',
                                     fontSize: '14px',
-                                    color: 'white'
+                                    color: 'white',
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)'
                                 }}
                             >
                                 <FaSignOutAlt />

@@ -166,7 +166,7 @@ function Login() {
                                         width: '70px',
                                         height: '70px',
                                         background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
-                                        boxShadow: '0 10px 30px rgba(30, 136, 229, 0.4)'
+                                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)'
                                     }}>
                                     <FaBullseye size={32} color="white" />
                                 </div>

@@ -58,8 +58,8 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
             ),
-            color: '#7cbae7ff',
-            bgLight: '#DBEAFE',
+            color: '#000000',
+            bgLight: '#F8F9FA',
         },
         {
             label: 'Banned Users',
@@ -70,8 +70,8 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                 </svg>
             ),
-            color: '#3B82F6',
-            bgLight: '#EFF6FF',
+            color: '#333333',
+            bgLight: '#F8F9FA',
         },
         {
             label: 'Total Questions',
@@ -94,8 +94,8 @@ const AdminDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
             ),
-            color: '#82c1e4c8',
-            bgLight: '#E0F2FE',
+            color: '#555555',
+            bgLight: '#F8F9FA',
         },
     ];
 
@@ -172,7 +172,7 @@ const AdminDashboard = () => {
                         <div
                             key={index}
                             className="bg-white rounded-2xl p-6 transition-all duration-300"
-                            style={{ boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)' }}
+                            style={{ boxShadow: '0 2px 12px hsla(0, 0%, 0%, 0.06)' }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-4px)';
                                 e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.1)';

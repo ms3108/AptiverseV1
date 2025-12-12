@@ -179,7 +179,7 @@ function DashboardStats() {
                                     </div>
                                     <span className="text-muted small">Best Streak</span>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ color: '#2563EB' }}>
+                                <h2 className="fw-bold mb-0" style={{ color: '#000000' }}>
                                     {stats.longest_streak}
                                 </h2>
                                 <small className="text-muted">personal best</small>
@@ -204,7 +204,7 @@ function DashboardStats() {
                                     </div>
                                     <span className="text-muted small">Solved</span>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ color: '#2563EB' }}>
+                                <h2 className="fw-bold mb-0" style={{ color: '#000000' }}>
                                     {stats.total_questions_solved}
                                 </h2>
                                 <small className="text-muted">questions</small>
@@ -226,7 +226,7 @@ function DashboardStats() {
                                     backgroundColor: '#F8F9FA',
                                     borderRadius: '10px'
                                 }}>
-                                    <FaTrophy style={{ color: '#F59E0B' }} />
+                                    <FaTrophy style={{ color: '#000000' }} />
                                 </div>
                                 <h5 className="mb-0 fw-semibold" style={{ color: '#1F2937' }}>
                                     Achievements ({stats.badges.length})

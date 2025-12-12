@@ -125,21 +125,21 @@ function PracticeSet() {
                     {isCompletionMessage ? (
                         <div className="text-center">
                             <div className="text-6xl mb-4">🎉</div>
-                            <h2 className="text-2xl font-bold text-blue-800 mb-2">
+                            <h2 className="text-2xl font-bold text-black mb-2">
                                 Practice Complete!
                             </h2>
-                            <p className="text-blue-700 mb-6">
+                            <p className="text-black mb-6">
                                 {error}
                             </p>
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+                                className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold"
                             >
                                 Back to Dashboard
                             </button>
                         </div>
                     ) : (
-                        <div className="text-blue-800">
+                        <div className="text-black">
                             {error}
                         </div>
                     )}
@@ -159,7 +159,7 @@ function PracticeSet() {
                     <p className="text-xl text-gray-600 mb-6">
                         You answered {score.correct} out of {score.total} questions correctly
                     </p>
-                    <div className="bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-lg p-6 mb-6">
+                    <div className="bg-gradient-to-r from-gray-700 to-black text-white rounded-lg p-6 mb-6">
                         <p className="text-lg mb-2">Your Performance</p>
                         <p className="text-4xl font-bold">
                             {Math.round((score.correct / score.total) * 100)}%
@@ -174,7 +174,7 @@ function PracticeSet() {
                     </div>
                     <button
                         onClick={() => window.location.href = '/dashboard'}
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+                        className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition"
                     >
                         Back to Dashboard
                     </button>
@@ -186,7 +186,7 @@ function PracticeSet() {
     if (questions.length === 0) {
         return (
             <div className="max-w-2xl mx-auto mt-8">
-                <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
+                <div className="bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded">
                     No questions available for practice at the moment.
                 </div>
             </div>
@@ -211,7 +211,7 @@ function PracticeSet() {
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{
-                                    background: 'linear-gradient(135deg, #1E88E5 0%, #0D47A1 100%)'
+                                    background: 'linear-gradient(135deg, #000000 0%, #333333 100%)'
                                 }}>
                                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -230,12 +230,12 @@ function PracticeSet() {
                                 onClick={() => navigate('/settings')}
                                 className="px-4 py-2 text-sm font-semibold rounded-lg transition-all border-2 hover:shadow-md"
                                 style={{
-                                    borderColor: '#1E88E5',
-                                    color: '#1E88E5',
+                                    borderColor: '#000000',
+                                    color: '#000000',
                                     backgroundColor: 'white'
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = '#E3F2FD';
+                                    e.target.style.backgroundColor = '#F8F9FA';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.target.style.backgroundColor = 'white';
@@ -262,7 +262,7 @@ function PracticeSet() {
                             className="h-2 rounded-full transition-all duration-300"
                             style={{
                                 width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`,
-                                background: 'linear-gradient(135deg, #1E88E5 0%, #0D47A1 100%)'
+                                background: 'linear-gradient(135deg, #000000 0%, #333333 100%)'
                             }}
                         ></div>
                     </div>
@@ -272,7 +272,7 @@ function PracticeSet() {
                 <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
                     {/* Question Header */}
                     <div className="flex items-center justify-between mb-4">
-                        <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded">
+                        <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm font-semibold rounded">
                             {currentQuestion.topic}
                         </span>
                         <span className={`inline-block px-3 py-1 text-sm font-semibold rounded ${currentQuestion.difficulty === 'Easy' ? 'bg-blue-100 text-blue-700' :
@@ -313,10 +313,10 @@ function PracticeSet() {
                                     <span className="font-bold mr-3 text-lg">{option.label}.</span>
                                     <span className="text-gray-800">{option.text}</span>
                                     {isAnswered && option.label === answerResult?.correct_answer && (
-                                        <span className="ml-auto text-blue-600">✓</span>
+                                        <span className="ml-auto text-gray-600">✓</span>
                                     )}
                                     {isAnswered && option.label === selectedAnswer && option.label !== answerResult?.correct_answer && (
-                                        <span className="ml-auto text-blue-400">✗</span>
+                                        <span className="ml-auto text-gray-400">✗</span>
                                     )}
                                 </div>
                             </button>
@@ -325,7 +325,7 @@ function PracticeSet() {
 
                     {/* Explanation (shown after answering) */}
                     {isAnswered && answerResult && (
-                        <div className={`mt-6 p-4 rounded-lg ${answerResult.is_correct ? 'bg-blue-50 border border-blue-200' : 'bg-blue-100 border border-blue-300'
+                        <div className={`mt-6 p-4 rounded-lg ${answerResult.is_correct ? 'bg-gray-50 border border-gray-200' : 'bg-gray-100 border border-gray-300'
                             }`}>
                             <div className="flex items-center mb-2">
                                 <span className="text-2xl mr-2">
@@ -354,7 +354,7 @@ function PracticeSet() {
                                 onClick={handleSubmitAnswer}
                                 disabled={!selectedAnswer}
                                 className={`px-6 py-2 rounded-lg font-semibold transition ${selectedAnswer
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                    ? 'bg-black text-white hover:bg-gray-800'
                                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                             >
@@ -363,7 +363,7 @@ function PracticeSet() {
                         ) : (
                             <button
                                 onClick={handleNextQuestion}
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                                className="px-6 py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition"
                             >
                                 {currentQuestionIndex < questions.length - 1 ? 'Next Question →' : 'Finish Practice'}
                             </button>

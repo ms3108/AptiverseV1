@@ -166,13 +166,13 @@ function Settings() {
                                 disabled={saving}
                                 className="w-full py-3 rounded-lg text-white font-semibold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{
-                                    backgroundColor: saving ? '#9CA3AF' : '#1E88E5'
+                                    backgroundColor: saving ? '#9CA3AF' : '#000000'
                                 }}
                                 onMouseEnter={(e) => {
-                                    if (!saving) e.target.style.backgroundColor = '#1565C0';
+                                    if (!saving) e.target.style.backgroundColor = '#333333';
                                 }}
                                 onMouseLeave={(e) => {
-                                    if (!saving) e.target.style.backgroundColor = '#1E88E5';
+                                    if (!saving) e.target.style.backgroundColor = '#000000';
                                 }}
                             >
                                 {saving ? 'Saving...' : 'Save Changes'}

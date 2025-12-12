@@ -457,12 +457,12 @@ function QuestionBank() {
                             {category.topics.map((topic, index) => {
                                 // Alternate colors for visual interest
                                 const colors = [
-                                    { bg: '#EFF6FF', border: '#BFDBFE', accent: '#3B82F6' },
-                                    { bg: '#ECFDF5', border: '#A7F3D0', accent: '#10B981' },
-                                    { bg: '#F5F3FF', border: '#DDD6FE', accent: '#8B5CF6' },
-                                    { bg: '#FEF3C7', border: '#FDE68A', accent: '#F59E0B' },
-                                    { bg: '#FCE7F3', border: '#FBCFE8', accent: '#EC4899' },
-                                    { bg: '#CCFBF1', border: '#99F6E4', accent: '#14B8A6' },
+                                    { bg: '#F8F9FA', border: '#E5E7EB', accent: '#000000' },
+                                    { bg: '#F1F5F9', border: '#CBD5E1', accent: '#334155' },
+                                    { bg: '#F9FAFB', border: '#D1D5DB', accent: '#374151' },
+                                    { bg: '#F8FAFC', border: '#E2E8F0', accent: '#475569' },
+                                    { bg: '#FAFAFA', border: '#E4E4E7', accent: '#52525B' },
+                                    { bg: '#F4F4F5', border: '#D4D4D8', accent: '#3F3F46' },
                                 ];
                                 const color = colors[index % colors.length];
 
@@ -523,7 +523,7 @@ function QuestionBank() {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-sm text-gray-500">Ready to practice?</p>
-                                    <p className="font-semibold" style={{ color: style.gradient.includes('3B82F6') ? '#3B82F6' : style.gradient.includes('10B981') ? '#10B981' : '#8B5CF6' }}>Select a topic above</p>
+                                    <p className="font-semibold" style={{ color: style.gradient.includes('000000') ? '#000000' : style.gradient.includes('333333') ? '#333333' : '#555555' }}>Select a topic above</p>
                                 </div>
                             </div>
                         </div>
@@ -696,8 +696,8 @@ function QuestionBank() {
                                     >
                                         {/* Status indicator bar */}
                                         <div className="h-1" style={{
-                                            background: question.solved ? 'linear-gradient(90deg, #10B981, #34D399)' :
-                                                question.attempted ? 'linear-gradient(90deg, #F59E0B, #FBBF24)' :
+                                            background: question.solved ? 'linear-gradient(90deg, #000000, #333333)' :
+                                                question.attempted ? 'linear-gradient(90deg, #666666, #888888)' :
                                                     '#E5E7EB'
                                         }}></div>
 
@@ -730,19 +730,19 @@ function QuestionBank() {
                                                             💎 {question.xp_reward} XP
                                                         </span>
                                                         {question.solved && (
-                                                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#ECFDF5', color: '#059669' }}>
+                                                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#F3F4F6', color: '#000000' }}>
                                                                 ✓ Solved
                                                             </span>
                                                         )}
                                                         {!question.solved && question.attempted && (
-                                                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#FEF3C7', color: '#D97706' }}>
+                                                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#F9FAFB', color: '#666666' }}>
                                                                 In Progress
                                                             </span>
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="w-12 h-12 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: '#EEF2FF' }}>
-                                                    <span className="text-xl" style={{ color: '#4F46E5' }}>→</span>
+                                                <div className="w-12 h-12 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: '#F3F4F6' }}>
+                                                    <span className="text-xl" style={{ color: '#000000' }}>→</span>
                                                 </div>
                                             </div>
                                         </div>

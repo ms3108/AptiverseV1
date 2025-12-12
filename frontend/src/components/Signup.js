@@ -146,7 +146,7 @@ function Signup() {
                                             height: '60px',
                                             background: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                             borderRadius: '16px',
-                                            boxShadow: '0 10px 30px rgba(13, 71, 161, 0.4)'
+                                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)'
                                         }}>
                                             <FaUserPlus className="text-white fs-4" />
                                         </div>
@@ -334,7 +334,7 @@ function Signup() {
                                                 style={{
                                                     background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #000000 0%, #333333 100%)',
                                                     borderRadius: '12px',
-                                                    boxShadow: loading ? 'none' : '0 10px 30px rgba(13, 71, 161, 0.4)',
+                                                    boxShadow: loading ? 'none' : '0 10px 30px rgba(0, 0, 0, 0.4)',
                                                     transition: 'all 0.3s ease'
                                                 }}
                                             >

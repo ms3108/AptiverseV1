@@ -299,7 +299,8 @@ def get_daily_practice_set(
         func.date(models.ActivityLog.activity_date) == today
     ).first()
     
-    if today_activity and today_activity.questions_solved > 0:  # type: ignore
+    # Only consider it completed if they solved at least 8 questions (a reasonable practice set)
+    if today_activity and today_activity.questions_solved >= 8:  # type: ignore
         return {
             "already_completed": True,
             "message": "You've already completed your practice for today! Come back tomorrow for a new set.",
