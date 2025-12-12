@@ -267,9 +267,9 @@ function QuestionBank() {
     };
 
     const difficultyColorMap = useMemo(() => ({
-        Easy: 'text-blue-600 bg-blue-100',
-        Medium: 'text-blue-700 bg-blue-200',
-        Hard: 'text-blue-900 bg-blue-300'
+        Easy: 'text-gray-600 bg-gray-100',
+        Medium: 'text-gray-700 bg-gray-200',
+        Hard: 'text-black bg-gray-300'
     }), []);
 
     const getDifficultyColorClass = (difficulty) => difficultyColorMap[difficulty] || 'text-gray-600 bg-gray-100';
@@ -278,49 +278,49 @@ function QuestionBank() {
         return (
             <div className="flex justify-center items-center min-h-screen" style={{ background: '#FFFFFF' }}>
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-black mx-auto mb-4"></div>
                     <p className="text-gray-600 font-medium">Loading Question Bank...</p>
                 </div>
             </div>
         );
     }
 
-    // Category card styles - unified blue palette
+    // Category card styles - unified black/white palette
     const categoryStyles = {
         'Quants': {
-            gradient: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
-            bgLight: '#DBEAFE',
-            border: '#93C5FD',
+            gradient: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
+            bgLight: '#F8F9FA',
+            border: '#6C757D',
             icon: '🔢',
-            iconBg: 'rgba(30, 64, 175, 0.12)'
+            iconBg: 'rgba(0, 0, 0, 0.12)'
         },
         'Quantitative': {
-            gradient: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
-            bgLight: '#DBEAFE',
-            border: '#93C5FD',
+            gradient: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
+            bgLight: '#F8F9FA',
+            border: '#6C757D',
             icon: '🔢',
-            iconBg: 'rgba(30, 64, 175, 0.12)'
+            iconBg: 'rgba(0, 0, 0, 0.12)'
         },
         'Logical': {
-            gradient: 'linear-gradient(135deg, #0369A1 0%, #0284C7 100%)',
-            bgLight: '#E0F2FE',
-            border: '#7DD3FC',
+            gradient: 'linear-gradient(135deg, #333333 0%, #555555 100%)',
+            bgLight: '#F8F9FA',
+            border: '#6C757D',
             icon: '🧩',
-            iconBg: 'rgba(3, 105, 161, 0.12)'
+            iconBg: 'rgba(51, 51, 51, 0.12)'
         },
         'Language': {
-            gradient: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
-            bgLight: '#EFF6FF',
-            border: '#BFDBFE',
+            gradient: 'linear-gradient(135deg, #555555 0%, #777777 100%)',
+            bgLight: '#F8F9FA',
+            border: '#6C757D',
             icon: '📝',
-            iconBg: 'rgba(59, 130, 246, 0.12)'
+            iconBg: 'rgba(85, 85, 85, 0.12)'
         },
         'Linguistic': {
-            gradient: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
-            bgLight: '#EFF6FF',
-            border: '#BFDBFE',
+            gradient: 'linear-gradient(135deg, #555555 0%, #777777 100%)',
+            bgLight: '#F8F9FA',
+            border: '#6C757D',
             icon: '📝',
-            iconBg: 'rgba(59, 130, 246, 0.12)'
+            iconBg: 'rgba(85, 85, 85, 0.12)'
         }
     };
 
@@ -595,7 +595,7 @@ function QuestionBank() {
                                 <select
                                     value={filters.difficulty}
                                     onChange={(e) => setFilters({ ...filters, difficulty: e.target.value })}
-                                    className="border-2 border-gray-200 rounded-lg px-4 py-2 font-medium text-gray-700 focus:border-blue-400 focus:outline-none transition-colors bg-gray-50 hover:bg-white"
+                                    className="border-2 border-gray-200 rounded-lg px-4 py-2 font-medium text-gray-700 focus:border-black focus:outline-none transition-colors bg-gray-50 hover:bg-white"
                                 >
                                     <option value="">All Levels</option>
                                     <option value="Easy">🟢 Easy</option>
@@ -612,7 +612,7 @@ function QuestionBank() {
                                 <select
                                     value={filters.sortBy}
                                     onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
-                                    className="border-2 border-gray-200 rounded-lg px-4 py-2 font-medium text-gray-700 focus:border-blue-400 focus:outline-none transition-colors bg-gray-50 hover:bg-white"
+                                    className="border-2 border-gray-200 rounded-lg px-4 py-2 font-medium text-gray-700 focus:border-black focus:outline-none transition-colors bg-gray-50 hover:bg-white"
                                 >
                                     <option value="created_at">Date Added</option>
                                     <option value="difficulty">Difficulty</option>
@@ -626,7 +626,7 @@ function QuestionBank() {
                                 <select
                                     value={filters.sortOrder}
                                     onChange={(e) => setFilters({ ...filters, sortOrder: e.target.value })}
-                                    className="border-2 border-gray-200 rounded-lg px-4 py-2 font-medium text-gray-700 focus:border-blue-400 focus:outline-none transition-colors bg-gray-50 hover:bg-white"
+                                    className="border-2 border-gray-200 rounded-lg px-4 py-2 font-medium text-gray-700 focus:border-black focus:outline-none transition-colors bg-gray-50 hover:bg-white"
                                 >
                                     <option value="desc">Newest First</option>
                                     <option value="asc">Oldest First</option>
@@ -640,7 +640,7 @@ function QuestionBank() {
                         <>
                             <div className="flex items-center justify-center mb-6">
                                 <div className="text-center">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-3" style={{ borderColor: '#1E88E5' }}></div>
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-3" style={{ borderColor: '#000000' }}></div>
                                     <p className="text-gray-600 font-medium">Loading questions...</p>
                                 </div>
                             </div>
