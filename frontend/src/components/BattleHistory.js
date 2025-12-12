@@ -43,7 +43,7 @@ function BattleHistory() {
     };
 
     const getRankColor = (rank) => {
-        if (rank === 1) return '#1E88E5';
+        if (rank === 1) return '#000000';
         if (rank === 2) return '#64B5F6';
         if (rank === 3) return '#90CAF9';
         return '#64748B';
@@ -66,7 +66,7 @@ function BattleHistory() {
             <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8FAFF' }}>
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-16 w-16 border-b-4 mx-auto mb-4"
-                        style={{ borderColor: '#1E88E5' }}></div>
+                        style={{ borderColor: '#000000' }}></div>
                     <p className="text-lg font-medium" style={{ color: '#64748B' }}>Loading battle history...</p>
                 </div>
             </div>
@@ -109,7 +109,7 @@ function BattleHistory() {
                                     onClick={() => setFilter(f)}
                                     className="px-4 py-2 font-semibold rounded-lg transition"
                                     style={{
-                                        backgroundColor: filter === f ? '#1E88E5' : '#FFFFFF',
+                                        backgroundColor: filter === f ? '#000000' : '#FFFFFF',
                                         color: filter === f ? '#FFFFFF' : '#64748B',
                                         border: filter === f ? 'none' : '2px solid #E2E8F0'
                                     }}
@@ -133,7 +133,7 @@ function BattleHistory() {
                             <button
                                 onClick={() => navigate('/battle/create')}
                                 className="px-8 py-3 font-bold rounded-lg hover-scale"
-                                style={{ backgroundColor: '#1E88E5', color: '#FFFFFF' }}
+                                style={{ backgroundColor: '#000000', color: '#FFFFFF' }}
                             >
                                 Create Battle
                             </button>
@@ -172,7 +172,7 @@ function BattleHistory() {
                                                     </h3>
                                                     <div className="flex items-center gap-3 text-sm">
                                                         <span className="font-semibold" style={{ color: '#64748B' }}>
-                                                            Room: <span style={{ color: '#1E88E5' }}>{battle.room_code}</span>
+                                                            Room: <span style={{ color: '#000000' }}>{battle.room_code}</span>
                                                         </span>
                                                         <span>•</span>
                                                         <span style={{ color: '#64748B' }}>
@@ -219,7 +219,7 @@ function BattleHistory() {
                                                         <p className="text-xs font-semibold mb-1" style={{ color: '#64748B' }}>
                                                             SCORE
                                                         </p>
-                                                        <p className="text-2xl font-black" style={{ color: '#1E88E5' }}>
+                                                        <p className="text-2xl font-black" style={{ color: '#000000' }}>
                                                             {battle.score}
                                                         </p>
                                                     </div>
@@ -256,7 +256,7 @@ function BattleHistory() {
                                             <button
                                                 onClick={() => navigate(`/battle/${battle.room_code}`)}
                                                 className="flex-shrink-0 px-6 py-3 font-bold rounded-lg hover-scale"
-                                                style={{ backgroundColor: '#1E88E5', color: '#FFFFFF' }}
+                                                style={{ backgroundColor: '#000000', color: '#FFFFFF' }}
                                             >
                                                 Rejoin
                                             </button>
