@@ -382,7 +382,7 @@ async def upload_questions(
                 # Detect format and normalize data
                 if "question" in q_data and "options" in q_data:
                     # New simplified format
-                    required_fields = ["question", "options", "answer", "difficulty", "topic"]
+                    required_fields = ["question", "options", "answer", "difficulty", "category", "topic"]
                     if not all(field in q_data for field in required_fields):
                         results["errors"].append(f"Question {idx+1}: Missing required fields: {', '.join(required_fields)}")
                         continue
@@ -396,8 +396,8 @@ async def upload_questions(
                         "title": q_data["question"][:200],
                         "description": q_data["question"],
                         "difficulty": q_data["difficulty"].lower(),
-                        "category": q_data.get("topic", "general").capitalize(),
-                        "topic": q_data.get("topic", "general"),
+                        "category": q_data["category"],
+                        "topic": q_data["topic"],
                         "sub_topic": q_data.get("subtopic", ""),
                         "option_a": q_data["options"][0] if len(q_data["options"]) > 0 else "",
                         "option_b": q_data["options"][1] if len(q_data["options"]) > 1 else "",

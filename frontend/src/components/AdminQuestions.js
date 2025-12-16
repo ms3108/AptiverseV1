@@ -231,13 +231,14 @@ const AdminQuestions = () => {
     "options": ["100 km", "120 km", "110 km", "130 km"],
     "answer": "B",
     "difficulty": "Easy",
+    "category": "Quantitative",
     "topic": "Speed and Distance",
     "solution": "Distance = Speed × Time = 60 × 2 = 120 km"
   }
 ]`}
                         </pre>
                         <div className="mt-2 text-xs text-gray-600">
-                            <strong>Required fields:</strong> question, options (array), answer (A/B/C/D), difficulty (Easy/Medium/Hard), topic, solution
+                            <strong>Required fields:</strong> question, options (array), answer (A/B/C/D), difficulty (Easy/Medium/Hard), category, topic, solution
                         </div>
                     </div>
 
