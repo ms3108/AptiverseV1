@@ -375,10 +375,62 @@ async def upload_questions(
         
         for idx, q_data in enumerate(questions_data):
             try:
-                # Validate schema
-                required_fields = ["question", "options", "answer", "difficulty", "topic"]
-                if not all(field in q_data for field in required_fields):
-                    results["errors"].append(f"Question {idx+1}: Missing required fields")
+                # Support both old format and new simplified format
+                # New format: {"question", "options", "answer", "difficulty", "topic", "solution"}
+                # Old format: {"title", "description", "option_a", "option_b", etc.}
+                
+                # Detect format and normalize data
+                if "question" in q_data and "options" in q_data:
+                    # New simplified format
+                    required_fields = ["question", "options", "answer", "difficulty", "topic"]
+                    if not all(field in q_data for field in required_fields):
+                        results["errors"].append(f"Question {idx+1}: Missing required fields: {', '.join(required_fields)}")
+                        continue
+                    
+                    if not isinstance(q_data["options"], list) or len(q_data["options"]) < 4:
+                        results["errors"].append(f"Question {idx+1}: Options must be an array of at least 4 items")
+                        continue
+                    
+                    # Normalize to internal format
+                    normalized_data = {
+                        "title": q_data["question"][:200],
+                        "description": q_data["question"],
+                        "difficulty": q_data["difficulty"].lower(),
+                        "category": q_data.get("topic", "general").capitalize(),
+                        "topic": q_data.get("topic", "general"),
+                        "sub_topic": q_data.get("subtopic", ""),
+                        "option_a": q_data["options"][0] if len(q_data["options"]) > 0 else "",
+                        "option_b": q_data["options"][1] if len(q_data["options"]) > 1 else "",
+                        "option_c": q_data["options"][2] if len(q_data["options"]) > 2 else "",
+                        "option_d": q_data["options"][3] if len(q_data["options"]) > 3 else "",
+                        "correct_answer": q_data["answer"],
+                        "explanation": q_data.get("solution", ""),
+                        "question_text": q_data["question"]
+                    }
+                elif "title" in q_data and "description" in q_data:
+                    # Old format
+                    required_fields = ["title", "description", "difficulty", "topic", "option_a", "option_b", "option_c", "option_d", "correct_answer"]
+                    if not all(field in q_data for field in required_fields):
+                        results["errors"].append(f"Question {idx+1}: Missing required fields: {', '.join(required_fields)}")
+                        continue
+                    
+                    normalized_data = {
+                        "title": q_data["title"][:200],
+                        "description": q_data["description"],
+                        "difficulty": q_data["difficulty"].lower(),
+                        "category": q_data.get("topic", "general").capitalize(),
+                        "topic": q_data.get("topic", "general"),
+                        "sub_topic": q_data.get("sub_topic", ""),
+                        "option_a": q_data["option_a"],
+                        "option_b": q_data["option_b"],
+                        "option_c": q_data["option_c"],
+                        "option_d": q_data["option_d"],
+                        "correct_answer": q_data["correct_answer"],
+                        "explanation": q_data.get("explanation", ""),
+                        "question_text": q_data["description"]
+                    }
+                else:
+                    results["errors"].append(f"Question {idx+1}: Invalid format. Must have either 'question' or 'title' field")
                     continue
                 
                 # Check for duplicates in Vector DB
@@ -387,7 +439,7 @@ async def upload_questions(
                         "Question",
                         ["title", "description"]
                     ).with_near_text({
-                        "concepts": [q_data["question"]]
+                        "concepts": [normalized_data["question_text"]]
                     }).with_limit(1).with_additional(["certainty"]).do()
                     
                     if similar and "data" in similar and "Get" in similar["data"]:
@@ -401,19 +453,19 @@ async def upload_questions(
                 
                 # Create question
                 question = models.Question(
-                    title=q_data["question"][:200],
-                    description=q_data["question"],
-                    difficulty=q_data["difficulty"].lower(),
-                    category=q_data.get("topic", "general").capitalize(),
-                    topic=q_data.get("topic", "general"),
-                    sub_topic=q_data.get("subtopic", ""),
-                    option_a=q_data["options"][0] if len(q_data["options"]) > 0 else "",
-                    option_b=q_data["options"][1] if len(q_data["options"]) > 1 else "",
-                    option_c=q_data["options"][2] if len(q_data["options"]) > 2 else "",
-                    option_d=q_data["options"][3] if len(q_data["options"]) > 3 else "",
-                    correct_answer=q_data["answer"],
-                    explanation=q_data.get("solution", ""),
-                    points=10 if q_data["difficulty"].lower() == "easy" else 20 if q_data["difficulty"].lower() == "medium" else 30
+                    title=normalized_data["question_text"][:200],
+                    description=normalized_data["question_text"],
+                    difficulty=normalized_data["difficulty"],
+                    category=normalized_data["category"],
+                    topic=normalized_data["topic"],
+                    sub_topic=normalized_data["sub_topic"],
+                    option_a=normalized_data["option_a"],
+                    option_b=normalized_data["option_b"],
+                    option_c=normalized_data["option_c"],
+                    option_d=normalized_data["option_d"],
+                    correct_answer=normalized_data["correct_answer"],
+                    explanation=normalized_data["explanation"],
+                    points=10 if normalized_data["difficulty"] == "easy" else 20 if normalized_data["difficulty"] == "medium" else 30
                 )
                 
                 db.add(question)

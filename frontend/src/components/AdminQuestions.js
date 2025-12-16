@@ -13,6 +13,9 @@ const AdminQuestions = () => {
     const [uploadFile, setUploadFile] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [uploadResult, setUploadResult] = useState(null);
+    const [bulkText, setBulkText] = useState('');
+    const [textUploading, setTextUploading] = useState(false);
+    const [activeUploadTab, setActiveUploadTab] = useState('file'); // 'file' or 'text'
 
     // Search and filter state
     const [searchQuery, setSearchQuery] = useState('');
@@ -110,6 +113,60 @@ const AdminQuestions = () => {
         }
     };
 
+    const handleBulkTextUpload = async (e) => {
+        e.preventDefault();
+        if (!bulkText.trim()) {
+            alert('Please enter questions in JSON format');
+            return;
+        }
+
+        setTextUploading(true);
+        setUploadResult(null);
+
+        try {
+            // Parse the JSON text
+            const questionsData = JSON.parse(bulkText);
+
+            // Create a Blob and send it as if it were a file
+            const blob = new Blob([JSON.stringify(questionsData, null, 2)], { type: 'application/json' });
+            const formData = new FormData();
+            formData.append('file', blob, 'bulk_questions.json');
+
+            const response = await axios.post(`${API_URL}/admin/questions/upload`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            setUploadResult(response.data);
+            setBulkText('');
+            fetchQuestions();
+        } catch (jsonError) {
+            if (jsonError instanceof SyntaxError) {
+                setUploadResult({
+                    total: 0,
+                    added: 0,
+                    duplicates: 0,
+                    errors: ['Invalid JSON format. Please check your syntax.']
+                });
+            } else {
+                console.error('Upload failed:', jsonError);
+                if (jsonError.response && jsonError.response.data && jsonError.response.data.detail) {
+                    setUploadResult({
+                        total: 0,
+                        added: 0,
+                        duplicates: 0,
+                        errors: [jsonError.response.data.detail]
+                    });
+                } else {
+                    alert('Upload failed');
+                }
+            }
+        } finally {
+            setTextUploading(false);
+        }
+    };
+
     const handleDeleteQuestion = async (questionId) => {
         if (!window.confirm('Are you sure you want to delete this question?')) {
             return;
@@ -142,63 +199,109 @@ const AdminQuestions = () => {
                 <div className="bg-white rounded-lg shadow p-6 mb-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Upload Questions</h2>
 
+                    {/* Upload Tabs */}
+                    <div className="flex space-x-1 mb-4">
+                        <button
+                            onClick={() => setActiveUploadTab('file')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeUploadTab === 'file'
+                                ? 'bg-black text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                        >
+                            File Upload
+                        </button>
+                        <button
+                            onClick={() => setActiveUploadTab('text')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeUploadTab === 'text'
+                                ? 'bg-black text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                        >
+                            Paste Questions
+                        </button>
+                    </div>
+
                     {/* Format Example */}
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
                         <div className="text-sm font-medium text-gray-700 mb-2">JSON Format Example:</div>
                         <pre className="text-xs text-gray-600 overflow-x-auto">
                             {`[
   {
-    "title": "Speed and Distance",
-    "description": "If a train runs at 60 km/h for 2 hours, how far does it travel?",
+    "question": "If a train runs at 60 km/h for 2 hours, how far does it travel?",
+    "options": ["100 km", "120 km", "110 km", "130 km"],
+    "answer": "B",
     "difficulty": "Easy",
     "topic": "Speed and Distance",
-    "option_a": "100 km",
-    "option_b": "120 km",
-    "option_c": "110 km",
-    "option_d": "130 km",
-    "correct_answer": "B",
-    "explanation": "Distance = Speed × Time = 60 × 2 = 120 km",
-    "xp_reward": 10
+    "solution": "Distance = Speed × Time = 60 × 2 = 120 km"
   }
 ]`}
                         </pre>
                         <div className="mt-2 text-xs text-gray-600">
-                            <strong>Required fields:</strong> title, description, difficulty (Easy/Medium/Hard), topic, option_a, option_b, option_c, option_d, correct_answer (A/B/C/D), explanation, xp_reward (10/15/20)
+                            <strong>Required fields:</strong> question, options (array), answer (A/B/C/D), difficulty (Easy/Medium/Hard), topic, solution
                         </div>
                     </div>
 
-                    {/* Upload Form */}
-                    <form onSubmit={handleFileUpload} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Select JSON File
-                            </label>
-                            <input
-                                type="file"
-                                accept=".json"
-                                onChange={(e) => setUploadFile(e.target.files[0])}
-                                className="block w-full text-sm text-gray-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-lg file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={uploading || !uploadFile}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {uploading ? 'Uploading...' : 'Upload Questions'}
-                        </button>
-                    </form>
+                    {/* File Upload Tab */}
+                    {activeUploadTab === 'file' && (
+                        <form onSubmit={handleFileUpload} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Select JSON File
+                                </label>
+                                <input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={(e) => setUploadFile(e.target.files[0])}
+                                    className="block w-full text-sm text-gray-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-lg file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-gray-100 file:text-gray-700
+                      hover:file:bg-gray-200"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={uploading || !uploadFile}
+                                className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {uploading ? 'Uploading...' : 'Upload Questions'}
+                            </button>
+                        </form>
+                    )}
+
+                    {/* Text Upload Tab */}
+                    {activeUploadTab === 'text' && (
+                        <form onSubmit={handleBulkTextUpload} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Paste Questions (JSON Format)
+                                </label>
+                                <textarea
+                                    value={bulkText}
+                                    onChange={(e) => setBulkText(e.target.value)}
+                                    placeholder='Paste your questions in JSON format here...&#10;&#10;Example:&#10;[&#10;  {&#10;    "question": "What is 2 + 2?",&#10;    "options": ["3", "4", "5", "6"],&#10;    "answer": "B",&#10;    "difficulty": "Easy",&#10;    "topic": "Mathematics",&#10;    "solution": "Basic addition: 2 + 2 = 4"&#10;  }&#10;]'
+                                    className="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black resize-none font-mono text-sm"
+                                />
+                                <div className="mt-2 text-xs text-gray-500">
+                                    💡 Tip: You can paste multiple questions in an array format. The system will automatically check for duplicates using vector similarity.
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={textUploading || !bulkText.trim()}
+                                className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {textUploading ? 'Processing...' : 'Upload Questions'}
+                            </button>
+                        </form>
+                    )}
 
                     {/* Upload Result */}
                     {uploadResult && (
-                        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <div className="font-semibold text-blue-900 mb-2">Upload Results:</div>
-                            <div className="text-sm text-blue-800 space-y-1">
+                        <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                            <div className="font-semibold text-gray-900 mb-2">Upload Results:</div>
+                            <div className="text-sm text-gray-700 space-y-1">
                                 <div>✅ Total processed: {uploadResult.total}</div>
                                 <div>✅ Successfully added: {uploadResult.added}</div>
                                 <div>⚠️ Duplicates rejected: {uploadResult.duplicates}</div>
