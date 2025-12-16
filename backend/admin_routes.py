@@ -465,7 +465,7 @@ async def upload_questions(
                     option_d=normalized_data["option_d"],
                     correct_answer=normalized_data["correct_answer"],
                     explanation=normalized_data["explanation"],
-                    points=10 if normalized_data["difficulty"] == "easy" else 20 if normalized_data["difficulty"] == "medium" else 30
+                    xp_reward=10 if normalized_data["difficulty"] == "easy" else 20 if normalized_data["difficulty"] == "medium" else 30
                 )
                 
                 db.add(question)
