@@ -405,11 +405,12 @@ async def upload_questions(
                         "option_d": q_data["options"][3] if len(q_data["options"]) > 3 else "",
                         "correct_answer": q_data["answer"],
                         "explanation": q_data.get("solution", ""),
-                        "question_text": q_data["question"]
+                        "question_text": q_data["question"],
+                        "xp_reward": q_data.get("xp_reward", 10 if q_data["difficulty"].lower() == "easy" else 20 if q_data["difficulty"].lower() == "medium" else 30)
                     }
                 elif "title" in q_data and "description" in q_data:
-                    # Old format
-                    required_fields = ["title", "description", "difficulty", "topic", "option_a", "option_b", "option_c", "option_d", "correct_answer"]
+                    # Detailed format (recommended)
+                    required_fields = ["title", "description", "difficulty", "category", "topic", "option_a", "option_b", "option_c", "option_d", "correct_answer", "explanation"]
                     if not all(field in q_data for field in required_fields):
                         results["errors"].append(f"Question {idx+1}: Missing required fields: {', '.join(required_fields)}")
                         continue
@@ -418,16 +419,17 @@ async def upload_questions(
                         "title": q_data["title"][:200],
                         "description": q_data["description"],
                         "difficulty": q_data["difficulty"].lower(),
-                        "category": q_data.get("topic", "general").capitalize(),
-                        "topic": q_data.get("topic", "general"),
+                        "category": q_data["category"],
+                        "topic": q_data["topic"],
                         "sub_topic": q_data.get("sub_topic", ""),
                         "option_a": q_data["option_a"],
                         "option_b": q_data["option_b"],
                         "option_c": q_data["option_c"],
                         "option_d": q_data["option_d"],
                         "correct_answer": q_data["correct_answer"],
-                        "explanation": q_data.get("explanation", ""),
-                        "question_text": q_data["description"]
+                        "explanation": q_data["explanation"],
+                        "question_text": q_data["description"],
+                        "xp_reward": q_data.get("xp_reward", 10 if q_data["difficulty"].lower() == "easy" else 20 if q_data["difficulty"].lower() == "medium" else 30)
                     }
                 else:
                     results["errors"].append(f"Question {idx+1}: Invalid format. Must have either 'question' or 'title' field")
@@ -453,8 +455,8 @@ async def upload_questions(
                 
                 # Create question
                 question = models.Question(
-                    title=normalized_data["question_text"][:200],
-                    description=normalized_data["question_text"],
+                    title=normalized_data["title"],
+                    description=normalized_data["description"],
                     difficulty=normalized_data["difficulty"],
                     category=normalized_data["category"],
                     topic=normalized_data["topic"],
@@ -465,7 +467,7 @@ async def upload_questions(
                     option_d=normalized_data["option_d"],
                     correct_answer=normalized_data["correct_answer"],
                     explanation=normalized_data["explanation"],
-                    xp_reward=10 if normalized_data["difficulty"] == "easy" else 20 if normalized_data["difficulty"] == "medium" else 30
+                    xp_reward=normalized_data["xp_reward"]
                 )
                 
                 db.add(question)
