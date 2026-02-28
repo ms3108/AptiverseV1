@@ -15,27 +15,35 @@ export const AuthProvider = ({ children }) => {
         } else {
             setLoading(false);
         }
-    }, [token]);
+    }, []);
 
-    const fetchUser = async () => {
+    const fetchUser = async (tokenToUse = token) => {
         try {
             const response = await axios.get(`${API_URL}/me`, {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${tokenToUse}`
                 }
             });
             setUser(response.data);
+            return response.data;
         } catch (error) {
             console.error('Error fetching user:', error);
-            logout();
+            localStorage.removeItem('token');
+            setToken(null);
+            setUser(null);
+            throw error;
         } finally {
             setLoading(false);
         }
     };
 
-    const login = (newToken) => {
+    const login = async (newToken) => {
+        setLoading(true);
         localStorage.setItem('token', newToken);
         setToken(newToken);
+        // Immediately fetch user data with the new token
+        const userData = await fetchUser(newToken);
+        return userData;
     };
 
     const logout = () => {

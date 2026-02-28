@@ -65,17 +65,18 @@ function Login() {
                 password: formData.password
             });
 
-            login(response.data.access_token);
+            // Wait for login to complete and user data to be fetched
+            const userData = await login(response.data.access_token);
             toast.success('Welcome back!');
 
-            const userResponse = await axios.get(`${API_URL}/me`, {
-                headers: { Authorization: `Bearer ${response.data.access_token}` }
-            });
+            // Small delay to ensure React state is fully updated before navigation
+            await new Promise(resolve => setTimeout(resolve, 100));
 
-            if (userResponse.data.is_admin) {
-                navigate('/admin');
+            // Navigate based on user role (replace history to prevent back to login)
+            if (userData.is_admin) {
+                navigate('/admin', { replace: true });
             } else {
-                navigate('/dashboard');
+                navigate('/dashboard', { replace: true });
             }
         } catch (error) {
             if (error.response?.data?.detail) {

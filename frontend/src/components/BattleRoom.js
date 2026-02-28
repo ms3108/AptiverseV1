@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import Navigation from './Navigation';
+import { useSounds } from '../hooks/useSounds';
 
 function BattleRoom() {
     const { roomCode } = useParams();
@@ -26,6 +27,7 @@ function BattleRoom() {
     const ws = useRef(null);
     const timerRef = useRef(null);
     const questionStartTime = useRef(null);
+    const sounds = useSounds();
 
     useEffect(() => {
         fetchBattleInfo();
@@ -169,6 +171,8 @@ function BattleRoom() {
                     console.log('🎮 Current battle status:', battleStatus);
                     console.log('🎮 Changing status to in_progress');
                     setBattleStatus('in_progress');
+                    sounds.playBattleStart();
+                    sounds.startBackgroundMusic('battle');
                     console.log('🎮 Status change triggered');
                     break;
 
@@ -181,11 +185,17 @@ function BattleRoom() {
                     setAnswerResult(null);
                     setTimeLeft(timePerQuestion);
                     questionStartTime.current = Date.now();
+                    sounds.playClickSound();
                     startTimer();
                     break;
 
                 case 'answer_result':
                     setAnswerResult(data);
+                    if (data.is_correct) {
+                        sounds.playCorrectSound();
+                    } else {
+                        sounds.playWrongSound();
+                    }
                     if (timerRef.current) {
                         clearInterval(timerRef.current);
                     }
@@ -198,6 +208,8 @@ function BattleRoom() {
                 case 'battle_completed':
                     setBattleStatus('completed');
                     setLeaderboard(data.final_leaderboard);
+                    sounds.playCompleteSound();
+                    sounds.stopBackgroundMusic();
                     if (timerRef.current) {
                         clearInterval(timerRef.current);
                     }
@@ -236,6 +248,9 @@ function BattleRoom() {
                     }
                     return 0;
                 }
+                if (prev === 10) {
+                    sounds.playTimerWarning();
+                }
                 return prev - 1;
             });
         }, 1000);
@@ -247,6 +262,7 @@ function BattleRoom() {
         console.log('📡 WebSocket ready state:', ws.current?.readyState);
         console.log('📡 WebSocket OPEN constant:', WebSocket.OPEN);
 
+        sounds.playClickSound();
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             console.log('✅ Sending start_battle message...');
             ws.current.send(JSON.stringify({ type: 'start_battle' }));
@@ -300,6 +316,18 @@ function BattleRoom() {
                             <p className="text-lg font-medium" style={{ color: '#64748B' }}>
                                 Room Code: <span style={{ color: '#000000', fontWeight: 'bold' }}>{roomCode}</span>
                             </p>
+                            <button
+                                onClick={sounds.toggleMute}
+                                className="mt-4 px-4 py-2 rounded-lg font-semibold transition"
+                                style={{
+                                    background: sounds.isMuted ? '#EF4444' : '#10B981',
+                                    color: 'white',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {sounds.isMuted ? '🔇 Sound Off' : '🔊 Sound On'}
+                            </button>
                         </div>
 
                         {/* Battle Info */}

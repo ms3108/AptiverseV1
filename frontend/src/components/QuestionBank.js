@@ -567,6 +567,11 @@ function QuestionBank() {
                                             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold" style={{ backgroundColor: style.bgLight, color: style.gradient.includes('3B82F6') ? '#3B82F6' : style.gradient.includes('10B981') ? '#10B981' : '#8B5CF6' }}>
                                                 {questions.length} question{questions.length !== 1 ? 's' : ''}
                                             </span>
+                                            {questions.length > 100 && (
+                                                <span className="text-xs text-gray-500 bg-yellow-50 px-2 py-1 rounded-md">
+                                                    Large topic - may take a moment to display all questions
+                                                </span>
+                                            )}
                                         </span>
                                     )}
                                 </p>

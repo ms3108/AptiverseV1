@@ -93,7 +93,7 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        
+
         // Clear error for this field when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
@@ -122,11 +122,11 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Clear previous messages
         setSuccessMessage('');
         setGeneralError('');
-        
+
         if (!validateForm()) {
             return;
         }
@@ -135,7 +135,7 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
 
         try {
             const token = localStorage.getItem('token');
-            
+
             if (!token) {
                 setGeneralError('You must be logged in to create questions');
                 setIsSubmitting(false);
@@ -155,7 +155,7 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
 
             // Show success message
             setSuccessMessage(response.data.message || 'Question created successfully!');
-            
+
             // Clear form after successful submission
             setFormData({
                 title: '',
@@ -172,12 +172,12 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
                 explanation: '',
                 xp_reward: 10
             });
-            
+
             // Call onSuccess callback with the created question data
             if (onSuccess) {
                 onSuccess(response.data);
             }
-            
+
             // Auto-close after 2 seconds or let parent handle it
             setTimeout(() => {
                 setSuccessMessage('');
@@ -185,15 +185,15 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
                     onClose();
                 }
             }, 2000);
-            
+
         } catch (error) {
             console.error('Error creating question:', error);
-            
+
             if (error.response) {
                 // Server responded with error
                 const status = error.response.status;
                 const data = error.response.data;
-                
+
                 if (status === 401) {
                     setGeneralError('Your session has expired. Please log in again.');
                 } else if (status === 403) {
@@ -273,7 +273,7 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
 
         try {
             const token = localStorage.getItem('token');
-            
+
             if (!token) {
                 setGeneralError('You must be logged in to upload questions');
                 setIsSubmitting(false);
@@ -298,20 +298,20 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
 
             const stats = response.data.stats;
             setSuccessMessage(
-                `Upload successful! Added: ${stats.added}, Updated: ${stats.updated}, Deleted: ${stats.deleted}`
+                `Upload successful! Added: ${stats.added} out of ${stats.total_in_file} questions. ${stats.errors_count > 0 ? `${stats.errors_count} errors occurred.` : ''}`
             );
             setUploadProgress(null);
             setSelectedFile(null);
-            
+
             // Reset file input
             const fileInput = document.getElementById('bulk-upload-file');
             if (fileInput) fileInput.value = '';
-            
+
             // Call onSuccess callback
             if (onSuccess) {
                 onSuccess(response.data);
             }
-            
+
             // Auto-close after 3 seconds
             setTimeout(() => {
                 setSuccessMessage('');
@@ -319,15 +319,15 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
                     onClose();
                 }
             }, 3000);
-            
+
         } catch (error) {
             console.error('Error uploading questions:', error);
             setUploadProgress(null);
-            
+
             if (error.response) {
                 const status = error.response.status;
                 const data = error.response.data;
-                
+
                 if (status === 401) {
                     setGeneralError('Your session has expired. Please log in again.');
                 } else if (status === 403) {
@@ -354,7 +354,7 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
             <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-900">Add Questions</h2>
                 <p className="text-sm text-gray-600 mt-1">Create a single question or upload multiple questions from a JSON file</p>
-                
+
                 {/* Mode Tabs */}
                 <div className="flex gap-2 mt-4">
                     <button
@@ -364,11 +364,10 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
                             setGeneralError('');
                             setSuccessMessage('');
                         }}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            mode === 'single'
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${mode === 'single'
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
+                            }`}
                     >
                         Single Question
                     </button>
@@ -379,11 +378,10 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
                             setGeneralError('');
                             setSuccessMessage('');
                         }}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            mode === 'bulk'
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${mode === 'bulk'
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
+                            }`}
                     >
                         Bulk Upload
                     </button>
@@ -412,273 +410,264 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
                         </div>
                     )}
 
-                {/* Title */}
-                <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                        Title <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        disabled={isSubmitting}
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            errors.title ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="Enter question title"
-                    />
-                    {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
-                </div>
-
-                {/* Description */}
-                <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                        Description <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        disabled={isSubmitting}
-                        rows="4"
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            errors.description ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="Enter the question description"
-                    />
-                    {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
-                </div>
-
-                {/* Category, Topic, Sub-topic Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Category */}
+                    {/* Title */}
                     <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                            Category <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            id="category"
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            disabled={isSubmitting}
-                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                errors.category ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                        >
-                            <option value="">Select category</option>
-                            {categories.map(cat => (
-                                <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                        </select>
-                        {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category}</p>}
-                    </div>
-
-                    {/* Topic */}
-                    <div>
-                        <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-1">
-                            Topic <span className="text-red-500">*</span>
+                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                            Title <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
-                            id="topic"
-                            name="topic"
-                            value={formData.topic}
+                            id="title"
+                            name="title"
+                            value={formData.title}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             disabled={isSubmitting}
-                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                errors.topic ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                            placeholder="e.g., Profit and Loss"
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.title ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                            placeholder="Enter question title"
                         />
-                        {errors.topic && <p className="mt-1 text-sm text-red-600">{errors.topic}</p>}
+                        {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
                     </div>
 
-                    {/* Sub-topic */}
+                    {/* Description */}
                     <div>
-                        <label htmlFor="sub_topic" className="block text-sm font-medium text-gray-700 mb-1">
-                            Sub-topic
+                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                            Description <span className="text-red-500">*</span>
                         </label>
-                        <input
-                            type="text"
-                            id="sub_topic"
-                            name="sub_topic"
-                            value={formData.sub_topic}
+                        <textarea
+                            id="description"
+                            name="description"
+                            value={formData.description}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             disabled={isSubmitting}
-                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                errors.sub_topic ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                            placeholder="Optional"
+                            rows="4"
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.description ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                            placeholder="Enter the question description"
                         />
-                        {errors.sub_topic && <p className="mt-1 text-sm text-red-600">{errors.sub_topic}</p>}
+                        {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
                     </div>
-                </div>
 
-                {/* Difficulty */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Difficulty <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex gap-4">
-                        {difficulties.map(diff => (
-                            <label key={diff} className="flex items-center cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="difficulty"
-                                    value={diff}
-                                    checked={formData.difficulty === diff}
-                                    onChange={handleChange}
-                                    disabled={isSubmitting}
-                                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    diff === 'Easy' ? 'bg-green-100 text-green-800' :
-                                    diff === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                                    'bg-red-100 text-red-800'
-                                }`}>
-                                    {diff}
-                                </span>
+                    {/* Category, Topic, Sub-topic Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Category */}
+                        <div>
+                            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                                Category <span className="text-red-500">*</span>
                             </label>
-                        ))}
-                    </div>
-                    {errors.difficulty && <p className="mt-1 text-sm text-red-600">{errors.difficulty}</p>}
-                </div>
-
-                {/* Options */}
-                <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Answer Options</h3>
-                    
-                    {answerOptions.map(option => {
-                        const fieldName = `option_${option.toLowerCase()}`;
-                        return (
-                            <div key={option}>
-                                <label htmlFor={fieldName} className="block text-sm font-medium text-gray-700 mb-1">
-                                    Option {option} <span className="text-red-500">*</span>
-                                </label>
-                                <textarea
-                                    id={fieldName}
-                                    name={fieldName}
-                                    value={formData[fieldName]}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    disabled={isSubmitting}
-                                    rows="2"
-                                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                        errors[fieldName] ? 'border-red-500' : 'border-gray-300'
+                            <select
+                                id="category"
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                disabled={isSubmitting}
+                                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.category ? 'border-red-500' : 'border-gray-300'
                                     }`}
-                                    placeholder={`Enter option ${option}`}
-                                />
-                                {errors[fieldName] && <p className="mt-1 text-sm text-red-600">{errors[fieldName]}</p>}
-                            </div>
-                        );
-                    })}
-                </div>
+                            >
+                                <option value="">Select category</option>
+                                {categories.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                            {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category}</p>}
+                        </div>
 
-                {/* Correct Answer */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Correct Answer <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex gap-4">
-                        {answerOptions.map(option => (
-                            <label key={option} className="flex items-center cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="correct_answer"
-                                    value={option}
-                                    checked={formData.correct_answer === option}
-                                    onChange={handleChange}
-                                    disabled={isSubmitting}
-                                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                    {option}
-                                </span>
+                        {/* Topic */}
+                        <div>
+                            <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-1">
+                                Topic <span className="text-red-500">*</span>
                             </label>
-                        ))}
+                            <input
+                                type="text"
+                                id="topic"
+                                name="topic"
+                                value={formData.topic}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                disabled={isSubmitting}
+                                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.topic ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                placeholder="e.g., Profit and Loss"
+                            />
+                            {errors.topic && <p className="mt-1 text-sm text-red-600">{errors.topic}</p>}
+                        </div>
+
+                        {/* Sub-topic */}
+                        <div>
+                            <label htmlFor="sub_topic" className="block text-sm font-medium text-gray-700 mb-1">
+                                Sub-topic
+                            </label>
+                            <input
+                                type="text"
+                                id="sub_topic"
+                                name="sub_topic"
+                                value={formData.sub_topic}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                disabled={isSubmitting}
+                                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.sub_topic ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                placeholder="Optional"
+                            />
+                            {errors.sub_topic && <p className="mt-1 text-sm text-red-600">{errors.sub_topic}</p>}
+                        </div>
                     </div>
-                    {errors.correct_answer && <p className="mt-1 text-sm text-red-600">{errors.correct_answer}</p>}
-                </div>
 
-                {/* Explanation */}
-                <div>
-                    <label htmlFor="explanation" className="block text-sm font-medium text-gray-700 mb-1">
-                        Explanation <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                        id="explanation"
-                        name="explanation"
-                        value={formData.explanation}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        disabled={isSubmitting}
-                        rows="4"
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            errors.explanation ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="Explain why the correct answer is correct"
-                    />
-                    {errors.explanation && <p className="mt-1 text-sm text-red-600">{errors.explanation}</p>}
-                </div>
+                    {/* Difficulty */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Difficulty <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex gap-4">
+                            {difficulties.map(diff => (
+                                <label key={diff} className="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="difficulty"
+                                        value={diff}
+                                        checked={formData.difficulty === diff}
+                                        onChange={handleChange}
+                                        disabled={isSubmitting}
+                                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${diff === 'Easy' ? 'bg-green-100 text-green-800' :
+                                            diff === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                                                'bg-red-100 text-red-800'
+                                        }`}>
+                                        {diff}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                        {errors.difficulty && <p className="mt-1 text-sm text-red-600">{errors.difficulty}</p>}
+                    </div>
 
-                {/* XP Reward */}
-                <div>
-                    <label htmlFor="xp_reward" className="block text-sm font-medium text-gray-700 mb-1">
-                        XP Reward <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="number"
-                        id="xp_reward"
-                        name="xp_reward"
-                        value={formData.xp_reward}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        disabled={isSubmitting}
-                        min="5"
-                        max="100"
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            errors.xp_reward ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                    />
-                    <p className="mt-1 text-sm text-gray-500">XP reward must be between 5 and 100</p>
-                    {errors.xp_reward && <p className="mt-1 text-sm text-red-600">{errors.xp_reward}</p>}
-                </div>
+                    {/* Options */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Answer Options</h3>
 
-                {/* Form Actions */}
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        disabled={isSubmitting}
-                        className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                Creating...
-                            </>
-                        ) : (
-                            'Create Question'
-                        )}
-                    </button>
-                </div>
-            </form>
+                        {answerOptions.map(option => {
+                            const fieldName = `option_${option.toLowerCase()}`;
+                            return (
+                                <div key={option}>
+                                    <label htmlFor={fieldName} className="block text-sm font-medium text-gray-700 mb-1">
+                                        Option {option} <span className="text-red-500">*</span>
+                                    </label>
+                                    <textarea
+                                        id={fieldName}
+                                        name={fieldName}
+                                        value={formData[fieldName]}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        disabled={isSubmitting}
+                                        rows="2"
+                                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors[fieldName] ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                        placeholder={`Enter option ${option}`}
+                                    />
+                                    {errors[fieldName] && <p className="mt-1 text-sm text-red-600">{errors[fieldName]}</p>}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Correct Answer */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Correct Answer <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex gap-4">
+                            {answerOptions.map(option => (
+                                <label key={option} className="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="correct_answer"
+                                        value={option}
+                                        checked={formData.correct_answer === option}
+                                        onChange={handleChange}
+                                        disabled={isSubmitting}
+                                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                        {option}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                        {errors.correct_answer && <p className="mt-1 text-sm text-red-600">{errors.correct_answer}</p>}
+                    </div>
+
+                    {/* Explanation */}
+                    <div>
+                        <label htmlFor="explanation" className="block text-sm font-medium text-gray-700 mb-1">
+                            Explanation <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                            id="explanation"
+                            name="explanation"
+                            value={formData.explanation}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            disabled={isSubmitting}
+                            rows="4"
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.explanation ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                            placeholder="Explain why the correct answer is correct"
+                        />
+                        {errors.explanation && <p className="mt-1 text-sm text-red-600">{errors.explanation}</p>}
+                    </div>
+
+                    {/* XP Reward */}
+                    <div>
+                        <label htmlFor="xp_reward" className="block text-sm font-medium text-gray-700 mb-1">
+                            XP Reward <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            id="xp_reward"
+                            name="xp_reward"
+                            value={formData.xp_reward}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            disabled={isSubmitting}
+                            min="5"
+                            max="100"
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.xp_reward ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                        />
+                        <p className="mt-1 text-sm text-gray-500">XP reward must be between 5 and 100</p>
+                        {errors.xp_reward && <p className="mt-1 text-sm text-red-600">{errors.xp_reward}</p>}
+                    </div>
+
+                    {/* Form Actions */}
+                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            disabled={isSubmitting}
+                            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    Creating...
+                                </>
+                            ) : (
+                                'Create Question'
+                            )}
+                        </button>
+                    </div>
+                </form>
             ) : (
                 <div className="p-6 space-y-6">
                     {/* Success Message */}

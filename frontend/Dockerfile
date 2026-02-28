@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
@@ -11,8 +11,17 @@ RUN npm install
 # Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 3000
+# Build the app
+RUN npm run build
 
-# Start the development server
-CMD ["npm", "start"]
+# Production stage - serve with nginx
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Copy custom nginx config if needed
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

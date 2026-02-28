@@ -24,10 +24,20 @@ const AdminQuestions = () => {
     const [selectedTopic, setSelectedTopic] = useState('');
     const [topics, setTopics] = useState([]);
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const questionsPerPage = 50;
+
+    // Calculate pagination
+    const indexOfLastQuestion = currentPage * questionsPerPage;
+    const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
+    const currentQuestions = questions.slice(indexOfFirstQuestion, indexOfLastQuestion);
+    const totalPages = Math.ceil(questions.length / questionsPerPage);
+
     const fetchQuestions = useCallback(async () => {
         setLoading(true);
         try {
-            const params = { limit: 100 };
+            const params = { limit: 1000 };
             if (searchQuery) params.search = searchQuery;
             if (selectedCategory) params.category = selectedCategory;
             if (selectedDifficulty) params.difficulty = selectedDifficulty;
@@ -60,10 +70,16 @@ const AdminQuestions = () => {
     // Debounced search
     useEffect(() => {
         const timer = setTimeout(() => {
+            setCurrentPage(1); // Reset to first page when searching
             fetchQuestions();
         }, 300);
         return () => clearTimeout(timer);
     }, [searchQuery]);
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedCategory, selectedDifficulty, selectedTopic]);
 
     const clearFilters = () => {
         setSearchQuery('');
@@ -100,9 +116,11 @@ const AdminQuestions = () => {
             // Show backend error in the Errors section
             if (error.response && error.response.data && error.response.data.detail) {
                 setUploadResult({
-                    total: 0,
-                    added: 0,
-                    duplicates: 0,
+                    stats: {
+                        total_in_file: 0,
+                        added: 0,
+                        errors_count: 1
+                    },
                     errors: [error.response.data.detail]
                 });
             } else {
@@ -144,18 +162,22 @@ const AdminQuestions = () => {
         } catch (jsonError) {
             if (jsonError instanceof SyntaxError) {
                 setUploadResult({
-                    total: 0,
-                    added: 0,
-                    duplicates: 0,
+                    stats: {
+                        total_in_file: 0,
+                        added: 0,
+                        errors_count: 1
+                    },
                     errors: ['Invalid JSON format. Please check your syntax.']
                 });
             } else {
                 console.error('Upload failed:', jsonError);
                 if (jsonError.response && jsonError.response.data && jsonError.response.data.detail) {
                     setUploadResult({
-                        total: 0,
-                        added: 0,
-                        duplicates: 0,
+                        stats: {
+                            total_in_file: 0,
+                            added: 0,
+                            errors_count: 1
+                        },
                         errors: [jsonError.response.data.detail]
                     });
                 } else {
@@ -184,6 +206,34 @@ const AdminQuestions = () => {
         }
     };
 
+    const handleDeleteAllQuestions = async () => {
+        if (!window.confirm(`Are you sure you want to delete ALL ${total} questions? This action cannot be undone!`)) {
+            return;
+        }
+
+        // Double confirmation for safety
+        const confirmation = prompt(`To confirm deletion of ALL questions, please type "DELETE ALL" exactly:`);
+        if (confirmation !== "DELETE ALL") {
+            alert('Deletion cancelled - confirmation text did not match');
+            return;
+        }
+
+        try {
+            const response = await axios.delete(`${API_URL}/admin/questions/delete-all`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert(`Successfully deleted ${response.data.deleted_count} questions`);
+            fetchQuestions(); // Refresh the list
+        } catch (error) {
+            console.error('Delete all failed:', error);
+            const errorMessage = error.response?.data?.detail
+                || error.response?.data?.message
+                || error.message
+                || 'Unknown error occurred';
+            alert(`Failed to delete questions: ${errorMessage}`);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <Navigation />
@@ -191,8 +241,19 @@ const AdminQuestions = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-gray-900">Question Management</h1>
-                    <p className="text-gray-600 mt-2">Total Questions: {total}</p>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">Question Management</h1>
+                            <p className="text-gray-600 mt-2">Total Questions: {total}</p>
+                        </div>
+                        <button
+                            onClick={handleDeleteAllQuestions}
+                            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-lg"
+                            title={`Delete all ${total} questions`}
+                        >
+                            🗑️ Delete All Questions ({total})
+                        </button>
+                    </div>
                 </div>
 
                 {/* Upload Section */}
@@ -227,18 +288,23 @@ const AdminQuestions = () => {
                         <pre className="text-xs text-gray-600 overflow-x-auto">
                             {`[
   {
-    "question": "If a train runs at 60 km/h for 2 hours, how far does it travel?",
-    "options": ["100 km", "120 km", "110 km", "130 km"],
-    "answer": "B",
+    "title": "Train Speed Distance Problem",
+    "description": "If a train runs at 60 km/h for 2 hours, how far does it travel?",
     "difficulty": "Easy",
     "category": "Quantitative",
     "topic": "Speed and Distance",
-    "solution": "Distance = Speed × Time = 60 × 2 = 120 km"
+    "option_a": "100 km",
+    "option_b": "120 km",
+    "option_c": "110 km",
+    "option_d": "130 km",
+    "correct_answer": "B",
+    "explanation": "Distance = Speed × Time = 60 × 2 = 120 km",
+    "xp_reward": 10
   }
 ]`}
                         </pre>
                         <div className="mt-2 text-xs text-gray-600">
-                            <strong>Required fields:</strong> question, options (array), answer (A/B/C/D), difficulty (Easy/Medium/Hard), category, topic, solution
+                            <strong>Required fields:</strong> title, description, difficulty (Easy/Medium/Hard), category, topic, option_a, option_b, option_c, option_d, correct_answer (A/B/C/D), explanation, xp_reward
                         </div>
                     </div>
 
@@ -303,9 +369,11 @@ const AdminQuestions = () => {
                         <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                             <div className="font-semibold text-gray-900 mb-2">Upload Results:</div>
                             <div className="text-sm text-gray-700 space-y-1">
-                                <div>✅ Total processed: {uploadResult.total}</div>
-                                <div>✅ Successfully added: {uploadResult.added}</div>
-                                <div>⚠️ Duplicates rejected: {uploadResult.duplicates}</div>
+                                <div>✅ Total processed: {uploadResult.stats?.total_in_file || uploadResult.total || 0}</div>
+                                <div>✅ Successfully added: {uploadResult.stats?.added || uploadResult.added || 0}</div>
+                                {(uploadResult.stats?.errors_count > 0 || uploadResult.duplicates > 0) && (
+                                    <div>⚠️ Issues: {uploadResult.stats?.errors_count || uploadResult.duplicates || 0}</div>
+                                )}
                                 {uploadResult.errors && uploadResult.errors.length > 0 && (
                                     <div className="mt-2">
                                         <div className="font-medium text-red-600">Errors:</div>
@@ -332,6 +400,9 @@ const AdminQuestions = () => {
                                 All Questions
                                 <span className="text-sm font-normal text-gray-500 ml-2">
                                     ({total} {total === 1 ? 'result' : 'results'})
+                                    {totalPages > 1 && (
+                                        <> • Page {currentPage} of {totalPages}</>
+                                    )}
                                 </span>
                             </h2>
 
@@ -422,16 +493,16 @@ const AdminQuestions = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {questions.length === 0 ? (
+                                    {currentQuestions.length === 0 ? (
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                                            <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                                                 {searchQuery || selectedCategory || selectedDifficulty || selectedTopic
                                                     ? 'No questions match your filters'
                                                     : 'No questions found'}
                                             </td>
                                         </tr>
                                     ) : (
-                                        questions.map((question) => (
+                                        currentQuestions.map((question) => (
                                             <tr key={question.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                     #{question.id}
@@ -481,6 +552,97 @@ const AdminQuestions = () => {
                         </div>
                     )}
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex-1 flex justify-between sm:hidden">
+                                <button
+                                    onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                                    disabled={currentPage === 1}
+                                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-700">
+                                        Showing{' '}
+                                        <span className="font-medium">{indexOfFirstQuestion + 1}</span>
+                                        {' '}to{' '}
+                                        <span className="font-medium">
+                                            {Math.min(indexOfLastQuestion, questions.length)}
+                                        </span>
+                                        {' '}of{' '}
+                                        <span className="font-medium">{questions.length}</span>
+                                        {' '}results
+                                    </p>
+                                </div>
+                                <div>
+                                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                        <button
+                                            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                                            disabled={currentPage === 1}
+                                            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <span className="sr-only">Previous</span>
+                                            <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+
+                                        {/* Page Numbers */}
+                                        {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                                            let pageNumber;
+                                            if (totalPages <= 7) {
+                                                pageNumber = i + 1;
+                                            } else if (currentPage <= 4) {
+                                                pageNumber = i + 1;
+                                            } else if (currentPage >= totalPages - 3) {
+                                                pageNumber = totalPages - 6 + i;
+                                            } else {
+                                                pageNumber = currentPage - 3 + i;
+                                            }
+
+                                            return (
+                                                <button
+                                                    key={pageNumber}
+                                                    onClick={() => setCurrentPage(pageNumber)}
+                                                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === pageNumber
+                                                        ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                                        }`}
+                                                >
+                                                    {pageNumber}
+                                                </button>
+                                            );
+                                        })}
+
+                                        <button
+                                            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+                                            disabled={currentPage === totalPages}
+                                            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <span className="sr-only">Next</span>
+                                            <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

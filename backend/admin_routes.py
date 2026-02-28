@@ -514,7 +514,7 @@ async def upload_questions(
 @router.get("/questions")
 async def get_all_questions(
     skip: int = 0,
-    limit: int = 50,
+    limit: int = 1000,
     topic: Optional[str] = None,
     difficulty: Optional[str] = None,
     category: Optional[str] = None,

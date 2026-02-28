@@ -1,7 +1,7 @@
 // API Configuration
 import axios from 'axios';
 
-export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+export const API_URL = process.env.REACT_APP_API_URL || 'https://aptiverse-backend.fly.dev';
 
 // Configure axios defaults for better performance
 axios.defaults.timeout = 15000; // 15 second timeout

@@ -3,6 +3,7 @@ import API_URL from '../config/api';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navigation from './Navigation';
+import { useSounds } from '../hooks/useSounds';
 
 function PracticeSet() {
     const navigate = useNavigate();
@@ -17,9 +18,14 @@ function PracticeSet() {
     const [practiceComplete, setPracticeComplete] = useState(false);
     const [score, setScore] = useState({ correct: 0, total: 0 });
     const [userPreference, setUserPreference] = useState(10);
+    const sounds = useSounds();
 
     useEffect(() => {
         fetchPracticeSet();
+        sounds.startBackgroundMusic('practice');
+        return () => {
+            sounds.stopBackgroundMusic();
+        };
     }, []);
 
     const fetchPracticeSet = async () => {
@@ -49,6 +55,7 @@ function PracticeSet() {
     const handleAnswerSelect = (option) => {
         if (!isAnswered) {
             setSelectedAnswer(option);
+            sounds.playClickSound();
         }
     };
 
@@ -76,6 +83,13 @@ function PracticeSet() {
             setAnswerResult(response.data);
             setIsAnswered(true);
 
+            // Play sound effect
+            if (response.data.is_correct) {
+                sounds.playCorrectSound();
+            } else {
+                sounds.playWrongSound();
+            }
+
             // Update score
             if (response.data.is_correct) {
                 setScore(prev => ({ correct: prev.correct + 1, total: prev.total + 1 }));
@@ -96,6 +110,7 @@ function PracticeSet() {
     };
 
     const handleNextQuestion = () => {
+        sounds.playClickSound();
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
             setSelectedAnswer('');
@@ -104,6 +119,8 @@ function PracticeSet() {
             setStartTime(Date.now());
         } else {
             setPracticeComplete(true);
+            sounds.playCompleteSound();
+            sounds.stopBackgroundMusic();
         }
     };
 
@@ -226,154 +243,168 @@ function PracticeSet() {
                                     </p>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => navigate('/settings')}
-                                className="px-4 py-2 text-sm font-semibold rounded-lg transition-all border-2 hover:shadow-md"
-                                style={{
-                                    borderColor: '#000000',
-                                    color: '#000000',
-                                    backgroundColor: 'white'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = '#F8F9FA';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = 'white';
-                                }}
-                            >
-                                Adjust Questions
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={sounds.toggleMute}
+                                    className="px-4 py-2 rounded-lg font-semibold transition"
+                                    style={{
+                                        background: sounds.isMuted ? '#EF4444' : '#10B981',
+                                        color: 'white',
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    {sounds.isMuted ? '🔇' : '🔊'}
+                                </button>
+                                <button
+                                    onClick={() => navigate('/settings')}
+                                    className="px-4 py-2 text-sm font-semibold rounded-lg transition-all border-2 hover:shadow-md"
+                                    style={{
+                                        borderColor: '#000000',
+                                        color: '#000000',
+                                        backgroundColor: 'white'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.backgroundColor = '#F8F9FA';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.backgroundColor = 'white';
+                                    }}
+                                >
+                                    Adjust Questions
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Progress Bar */}
-                <div className="mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">
-                            Question {currentQuestionIndex + 1} of {questions.length}
-                        </span>
-                        <span className="text-sm font-medium text-gray-700">
-                            Score: {score.correct}/{score.total}
-                        </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                            className="h-2 rounded-full transition-all duration-300"
-                            style={{
-                                width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`,
-                                background: 'linear-gradient(135deg, #000000 0%, #333333 100%)'
-                            }}
-                        ></div>
-                    </div>
-                </div>
-
-                {/* Question Card */}
-                <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-                    {/* Question Header */}
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm font-semibold rounded">
-                            {currentQuestion.topic}
-                        </span>
-                        <span className={`inline-block px-3 py-1 text-sm font-semibold rounded ${currentQuestion.difficulty === 'Easy' ? 'bg-blue-100 text-blue-700' :
-                            currentQuestion.difficulty === 'Medium' ? 'bg-blue-200 text-blue-800' :
-                                'bg-blue-300 text-blue-900'
-                            }`}>
-                            {currentQuestion.difficulty}
-                        </span>
+                    {/* Progress Bar */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-gray-700">
+                                Question {currentQuestionIndex + 1} of {questions.length}
+                            </span>
+                            <span className="text-sm font-medium text-gray-700">
+                                Score: {score.correct}/{score.total}
+                            </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                                className="h-2 rounded-full transition-all duration-300"
+                                style={{
+                                    width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`,
+                                    background: 'linear-gradient(135deg, #000000 0%, #333333 100%)'
+                                }}
+                            ></div>
+                        </div>
                     </div>
 
-                    {/* Question Title and Description */}
-                    <h3 className="text-2xl font-bold text-gray-800 mb-3">
-                        {currentQuestion.title}
-                    </h3>
-                    <p className="text-gray-600 mb-6">
-                        {currentQuestion.description}
-                    </p>
+                    {/* Question Card */}
+                    <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
+                        {/* Question Header */}
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm font-semibold rounded">
+                                {currentQuestion.topic}
+                            </span>
+                            <span className={`inline-block px-3 py-1 text-sm font-semibold rounded ${currentQuestion.difficulty === 'Easy' ? 'bg-blue-100 text-blue-700' :
+                                currentQuestion.difficulty === 'Medium' ? 'bg-blue-200 text-blue-800' :
+                                    'bg-blue-300 text-blue-900'
+                                }`}>
+                                {currentQuestion.difficulty}
+                            </span>
+                        </div>
 
-                    {/* Answer Options */}
-                    <div className="space-y-3">
-                        {options.map((option) => (
-                            <button
-                                key={option.label}
-                                onClick={() => handleAnswerSelect(option.label)}
-                                disabled={isAnswered}
-                                className={`w-full text-left p-4 rounded-lg border-2 transition-all ${isAnswered
-                                    ? option.label === answerResult?.correct_answer
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : option.label === selectedAnswer
-                                            ? 'border-blue-300 bg-blue-100'
-                                            : 'border-gray-200 bg-gray-50'
-                                    : selectedAnswer === option.label
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
-                                    } ${isAnswered ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                            >
-                                <div className="flex items-center">
-                                    <span className="font-bold mr-3 text-lg">{option.label}.</span>
-                                    <span className="text-gray-800">{option.text}</span>
-                                    {isAnswered && option.label === answerResult?.correct_answer && (
-                                        <span className="ml-auto text-gray-600">✓</span>
-                                    )}
-                                    {isAnswered && option.label === selectedAnswer && option.label !== answerResult?.correct_answer && (
-                                        <span className="ml-auto text-gray-400">✗</span>
+                        {/* Question Title and Description */}
+                        <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                            {currentQuestion.title}
+                        </h3>
+                        <p className="text-gray-600 mb-6">
+                            {currentQuestion.description}
+                        </p>
+
+                        {/* Answer Options */}
+                        <div className="space-y-3">
+                            {options.map((option) => (
+                                <button
+                                    key={option.label}
+                                    onClick={() => handleAnswerSelect(option.label)}
+                                    disabled={isAnswered}
+                                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${isAnswered
+                                        ? option.label === answerResult?.correct_answer
+                                            ? 'border-blue-500 bg-blue-50'
+                                            : option.label === selectedAnswer
+                                                ? 'border-blue-300 bg-blue-100'
+                                                : 'border-gray-200 bg-gray-50'
+                                        : selectedAnswer === option.label
+                                            ? 'border-blue-500 bg-blue-50'
+                                            : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                                        } ${isAnswered ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                                >
+                                    <div className="flex items-center">
+                                        <span className="font-bold mr-3 text-lg">{option.label}.</span>
+                                        <span className="text-gray-800">{option.text}</span>
+                                        {isAnswered && option.label === answerResult?.correct_answer && (
+                                            <span className="ml-auto text-gray-600">✓</span>
+                                        )}
+                                        {isAnswered && option.label === selectedAnswer && option.label !== answerResult?.correct_answer && (
+                                            <span className="ml-auto text-gray-400">✗</span>
+                                        )}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Explanation (shown after answering) */}
+                        {isAnswered && answerResult && (
+                            <div className={`mt-6 p-4 rounded-lg ${answerResult.is_correct ? 'bg-gray-50 border border-gray-200' : 'bg-gray-100 border border-gray-300'
+                                }`}>
+                                <div className="flex items-center mb-2">
+                                    <span className="text-2xl mr-2">
+                                        {answerResult.is_correct ? '✅' : '❌'}
+                                    </span>
+                                    <span className={`font-bold ${answerResult.is_correct ? 'text-blue-800' : 'text-blue-700'
+                                        }`}>
+                                        {answerResult.is_correct ? 'Correct!' : 'Incorrect'}
+                                    </span>
+                                    {answerResult.xp_earned > 0 && (
+                                        <span className="ml-4 text-sm font-semibold text-blue-700">
+                                            +{answerResult.xp_earned} XP
+                                        </span>
                                     )}
                                 </div>
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Explanation (shown after answering) */}
-                    {isAnswered && answerResult && (
-                        <div className={`mt-6 p-4 rounded-lg ${answerResult.is_correct ? 'bg-gray-50 border border-gray-200' : 'bg-gray-100 border border-gray-300'
-                            }`}>
-                            <div className="flex items-center mb-2">
-                                <span className="text-2xl mr-2">
-                                    {answerResult.is_correct ? '✅' : '❌'}
-                                </span>
-                                <span className={`font-bold ${answerResult.is_correct ? 'text-blue-800' : 'text-blue-700'
-                                    }`}>
-                                    {answerResult.is_correct ? 'Correct!' : 'Incorrect'}
-                                </span>
-                                {answerResult.xp_earned > 0 && (
-                                    <span className="ml-4 text-sm font-semibold text-blue-700">
-                                        +{answerResult.xp_earned} XP
-                                    </span>
-                                )}
+                                <p className="text-gray-700 text-sm">
+                                    <strong>Explanation:</strong> {answerResult.explanation}
+                                </p>
                             </div>
-                            <p className="text-gray-700 text-sm">
-                                <strong>Explanation:</strong> {answerResult.explanation}
-                            </p>
-                        </div>
-                    )}
-
-                    {/* Action Buttons */}
-                    <div className="mt-6 flex justify-end space-x-3">
-                        {!isAnswered ? (
-                            <button
-                                onClick={handleSubmitAnswer}
-                                disabled={!selectedAnswer}
-                                className={`px-6 py-2 rounded-lg font-semibold transition ${selectedAnswer
-                                    ? 'bg-black text-white hover:bg-gray-800'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    }`}
-                            >
-                                Submit Answer
-                            </button>
-                        ) : (
-                            <button
-                                onClick={handleNextQuestion}
-                                className="px-6 py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition"
-                            >
-                                {currentQuestionIndex < questions.length - 1 ? 'Next Question →' : 'Finish Practice'}
-                            </button>
                         )}
-                    </div>
-                </div>
 
-                {/* XP Reward Info */}
-                <div className="text-center text-sm text-gray-500">
-                    💎 Earn {currentQuestion.xp_reward} XP for solving this question
+                        {/* Action Buttons */}
+                        <div className="mt-6 flex justify-end space-x-3">
+                            {!isAnswered ? (
+                                <button
+                                    onClick={handleSubmitAnswer}
+                                    disabled={!selectedAnswer}
+                                    className={`px-6 py-2 rounded-lg font-semibold transition ${selectedAnswer
+                                        ? 'bg-black text-white hover:bg-gray-800'
+                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        }`}
+                                >
+                                    Submit Answer
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleNextQuestion}
+                                    className="px-6 py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition"
+                                >
+                                    {currentQuestionIndex < questions.length - 1 ? 'Next Question →' : 'Finish Practice'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* XP Reward Info */}
+                    <div className="text-center text-sm text-gray-500">
+                        💎 Earn {currentQuestion.xp_reward} XP for solving this question
+                    </div>
                 </div>
             </div>
         </div>

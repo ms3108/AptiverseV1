@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status, WebSocket, WebSocke
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, Integer
 from datetime import datetime, timedelta
 from typing import Optional
 from functools import lru_cache
@@ -36,14 +36,18 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 # Cache is now imported from cache.py module
 
 # Include admin routes
-app.include_router(admin_routes.router)
+# IMPORTANT: admin_questions.router must be included FIRST so that 
+# /admin/questions/delete-all is matched before /admin/questions/{question_id}
 app.include_router(admin_questions.router)
+app.include_router(admin_routes.router)
 
 # CORS configuration - support multiple origins
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 allowed_origins = [
     "http://localhost:3000",  # Local development
-    "https://aptiverse-v1-hg3h.vercel.app",  # Vercel production
+    "https://aptiverse-v1-hg3h.vercel.app",  # Old Vercel production
+    "https://erse-v1-35au.vercel.app",  # Current Vercel production
+    "https://aptiverse-frontend.fly.dev",  # Frontend on Fly.io
     frontend_url,  # Production frontend (Vercel custom domain if set)
 ]
 
@@ -650,30 +654,36 @@ def get_questions_by_filters(
         else:
             questions = query.order_by(models.Question.created_at.desc()).all()
     
-    # Get user's attempt status for each question
-    question_attempts = {}
-    for q in questions:
-        # Check if solved (correct answer)
-        solved_attempt = db.query(models.QuestionAttempt).filter(
+    # Get question IDs for batch query
+    question_ids = [q.id for q in questions]
+    
+    # Batch query: Get all attempts for this user and these questions in ONE query
+    # This fixes the N+1 query problem that was causing timeouts with many questions
+    if question_ids:
+        user_attempts = db.query(
+            models.QuestionAttempt.question_id,
+            func.max(models.QuestionAttempt.is_correct.cast(Integer)).label('solved'),
+            func.count(models.QuestionAttempt.id).label('attempt_count')
+        ).filter(
             models.QuestionAttempt.user_id == current_user.id,
-            models.QuestionAttempt.question_id == q.id,
-            models.QuestionAttempt.is_correct == True
-        ).first()
+            models.QuestionAttempt.question_id.in_(question_ids)
+        ).group_by(models.QuestionAttempt.question_id).all()
         
-        # Check if attempted (any attempt)
-        any_attempt = db.query(models.QuestionAttempt).filter(
-            models.QuestionAttempt.user_id == current_user.id,
-            models.QuestionAttempt.question_id == q.id
-        ).first()
-        
-        question_attempts[q.id] = {
-            "solved": solved_attempt is not None,
-            "attempted": any_attempt is not None
+        # Build lookup dict
+        question_attempts = {
+            attempt.question_id: {
+                "solved": bool(attempt.solved),
+                "attempted": attempt.attempt_count > 0
+            }
+            for attempt in user_attempts
         }
+    else:
+        question_attempts = {}
     
     # Format response
     questions_data = []
     for q in questions:
+        attempt_info = question_attempts.get(q.id, {"solved": False, "attempted": False})
         questions_data.append({
             "id": q.id,
             "title": q.title,
@@ -682,8 +692,8 @@ def get_questions_by_filters(
             "category": q.category,
             "topic": q.topic,
             "xp_reward": q.xp_reward,
-            "solved": question_attempts[q.id]["solved"],
-            "attempted": question_attempts[q.id]["attempted"]
+            "solved": attempt_info["solved"],
+            "attempted": attempt_info["attempted"]
         })
     
     return {

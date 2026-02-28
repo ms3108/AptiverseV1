@@ -342,6 +342,50 @@ async def delete_question(
     return {"message": f"Question '{question.title}' deleted successfully"}
 
 
+@router.delete("/admin/questions/delete-all")
+async def delete_all_questions(
+    current_user: models.User = Depends(auth.get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Delete ALL questions from the database - USE WITH CAUTION"""
+    # Get total count first
+    total = db.query(models.Question).count()
+    
+    if total == 0:
+        return {
+            "message": "No questions to delete",
+            "deleted_count": 0
+        }
+    
+    # Delete all questions
+    deleted = db.query(models.Question).delete()
+    db.commit()
+    
+    # Log admin action
+    admin_log = models.AdminActionLog(
+        admin_id=current_user.id,
+        action_type="delete_all_questions",
+        target_type="question",
+        details={
+            "deleted_count": deleted,
+            "total_before": total
+        }
+    )
+    db.add(admin_log)
+    db.commit()
+    
+    # Clear cache
+    if "question_categories" in _cache:
+        del _cache["question_categories"]
+        del _cache_time["question_categories"]
+    
+    return {
+        "message": f"Successfully deleted all {deleted} questions",
+        "deleted_count": deleted,
+        "total_before": total
+    }
+
+
 @router.delete("/admin/questions/bulk-delete")
 async def bulk_delete_questions(
     question_ids: List[int],
