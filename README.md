@@ -1,262 +1,222 @@
-# Aptiverse - Full-Stack Authentication System
+# Aptiverse - AI-Powered Aptitude Practice & Battle Platform
 
-A complete full-stack application with JWT-based authentication, email verification, and modern UI.
+A comprehensive full-stack aptitude practice platform featuring AI-powered question recommendations, real-time multiplayer battles, and an extensive question bank with community discussions.
 
 ## Features
 
-- ✅ **Backend**: FastAPI (Python)
-- ✅ **Frontend**: React + TailwindCSS
-- ✅ **Database**: PostgreSQL
-- ✅ **Authentication**: JWT-based auth with email verification
-- ✅ **Email Service**: SendGrid integration
-- ✅ **Security**: Bcrypt password hashing
-- ✅ **Containerization**: Docker + Docker Compose
+### Core Features
+- **Daily Practice** - AI-curated personalized practice sets based on weak areas
+- **Question Bank** - Browse 1000+ aptitude questions across multiple categories
+- **Battle Mode** - Real-time multiplayer competitions with WebSocket support
+- **Discussions** - Community discussions with voting on each question
+- **Progress Tracking** - Detailed analytics, streaks, and performance metrics
+- **Badges & Achievements** - Gamification with unlockable badges
+
+### AI & ML Features
+- **Weak Area Detection** - Naive Bayes classifier identifies struggling topics
+- **Vector Similarity Search** - Weaviate-powered semantic question recommendations
+- **Adaptive Difficulty** - Hybrid difficulty system adjusts to user performance
+- **Personalized Practice** - Customizable settings for daily practice sessions
+
+### Admin Dashboard
+- **User Management** - Ban/unban, warnings, password resets
+- **Question Management** - Bulk upload, edit, delete questions
+- **Report Handling** - Community report moderation
+- **Analytics** - Platform-wide statistics and logs
+
+## Tech Stack
+
+### Backend
+- **FastAPI** - High-performance Python web framework
+- **SQLAlchemy** - SQL ORM with PostgreSQL/SQLite support
+- **WebSockets** - Real-time battle communication
+- **Weaviate** - Vector database for AI recommendations
+- **Scikit-learn** - ML for weak area prediction
+
+### Frontend
+- **React 18** - Modern UI library
+- **TailwindCSS** - Utility-first styling
+- **React Router** - Client-side routing
+- **WebSocket API** - Real-time updates
+- **Context API** - State management
+
+### Infrastructure
+- **Docker** - Containerization
+- **Fly.io** - Backend deployment
+- **Vercel** - Frontend deployment
+- **PostgreSQL** - Production database
 
 ## Project Structure
 
 ```
 Aptiverse V1/
 ├── backend/
-│   ├── main.py              # FastAPI application
-│   ├── models.py            # Database models
+│   ├── main.py              # FastAPI app & routes
+│   ├── models.py            # SQLAlchemy models
 │   ├── schemas.py           # Pydantic schemas
-│   ├── auth.py              # Authentication logic
-│   ├── database.py          # Database configuration
-│   ├── requirements.txt     # Python dependencies
-│   ├── Dockerfile           # Backend Docker configuration
-│   └── .env.example         # Environment variables template
+│   ├── auth.py              # JWT authentication
+│   ├── admin_routes.py      # Admin API endpoints
+│   ├── admin_questions.py   # Question management
+│   ├── battle_manager.py    # Battle room logic
+│   ├── ml_service.py        # ML recommendation engine
+│   ├── vector_service.py    # Weaviate integration
+│   ├── hybrid_difficulty.py # Adaptive difficulty
+│   ├── cache.py             # Response caching
+│   └── database.py          # DB configuration
 ├── frontend/
 │   ├── src/
-│   │   ├── components/      # React components
-│   │   ├── context/         # Auth context
-│   │   ├── App.js           # Main app component
-│   │   └── index.js         # Entry point
-│   ├── public/
-│   ├── package.json         # Node dependencies
-│   ├── Dockerfile           # Frontend Docker configuration
-│   └── tailwind.config.js   # TailwindCSS configuration
-├── docker-compose.yml       # Docker Compose configuration
-├── .env.example             # Root environment variables
-└── README.md
+│   │   ├── components/
+│   │   │   ├── Dashboard.js
+│   │   │   ├── PracticeSet.js
+│   │   │   ├── QuestionBank.js
+│   │   │   ├── BattleRoom.js
+│   │   │   ├── AdminDashboard.js
+│   │   │   └── ...
+│   │   ├── context/
+│   │   │   └── AuthContext.js
+│   │   └── config/
+│   │       └── api.js
+│   └── public/
+├── docker-compose.yml
+└── Documentation files (*.md)
 ```
 
-## API Endpoints
+## Quick Start
 
-- **POST** `/register` - Register a new user
-- **GET** `/verify-email?token=<token>` - Verify email address
-- **POST** `/login` - Login with credentials
-- **GET** `/me` - Get current user info (protected)
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- Docker (optional)
 
-## Prerequisites
-
-- Docker and Docker Compose installed
-- Gmail account (for email verification) - Optional, see setup options below
-
-## Setup Instructions
-
-### 1. Clone and Navigate
-
-```bash
-cd "c:\Users\misna\PycharmProjects\Aptiverse V1"
-```
-
-### 2. Configure Email (Choose One Option)
-
-#### **Option A: Gmail SMTP (Recommended for Development)**
-
-1. Enable 2-Step Verification: https://myaccount.google.com/security
-2. Generate App Password: https://myaccount.google.com/apppasswords
-3. See detailed guide: [GMAIL_SETUP.md](GMAIL_SETUP.md)
-
-#### **Option B: Skip Email Verification (Fastest)**
-
-Users will be auto-verified on signup. Just set `SKIP_EMAIL_VERIFICATION=true` in `.env`
-
-#### **Option C: Console Mode (No Configuration)**
-
-Don't configure Gmail. Verification links will print to console logs.
-
-### 3. Set Environment Variables
-
-Create a `.env` file in the root directory:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and add your configuration:
-
-**For Gmail SMTP:**
-```env
-GMAIL_USER=your-email@gmail.com
-GMAIL_APP_PASSWORD=your-16-char-app-password
-SKIP_EMAIL_VERIFICATION=false
-```
-
-**For Quick Testing (No Email):**
-```env
-SKIP_EMAIL_VERIFICATION=true
-```
-
-### 4. Launch the Application
-
-```bash
-docker-compose up --build
-```
-
-This will start:
-- **PostgreSQL**: localhost:5432
-- **Backend API**: http://localhost:8000
-- **Frontend**: http://localhost:3000
-
-### 5. Access the Application
-
-- **Frontend**: Open http://localhost:3000 in your browser
-- **API Docs**: http://localhost:8000/docs (Swagger UI)
-- **API Alternative Docs**: http://localhost:8000/redoc
-
-## Usage Flow
-
-### 1. Register a New User
-
-1. Go to http://localhost:3000/signup
-2. Fill in email, username, and password (min 8 characters)
-3. Click "Sign up"
-4. Check your email for verification link
-
-### 2. Verify Email
-
-1. Click the verification link in your email
-2. You'll be redirected to the verification page
-3. After successful verification, you can log in
-
-### 3. Login
-
-1. Go to http://localhost:3000/login
-2. Enter your email and password
-3. Click "Sign in"
-4. You'll be redirected to your dashboard
-
-### 4. Access Protected Routes
-
-Once logged in, you can access:
-- Dashboard at `/dashboard`
-- Your profile information via the `/me` endpoint
-
-## Development
-
-### Running Without Docker
+### Local Development
 
 #### Backend
-
 ```bash
 cd backend
 python -m venv venv
-venv\Scripts\activate  # On Windows
+venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
 #### Frontend
-
 ```bash
 cd frontend
 npm install
 npm start
 ```
 
-Make sure PostgreSQL is running and update the `DATABASE_URL` in `backend/database.py`.
+### Docker
+```bash
+docker-compose up --build
+```
 
-## Database Schema
+Access:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
 
-### Users Table
+## API Endpoints
 
-| Column              | Type      | Description                |
-|---------------------|-----------|----------------------------|
-| id                  | Integer   | Primary key                |
-| email               | String    | User email (unique)        |
-| username            | String    | Username (unique)          |
-| hashed_password     | String    | Bcrypt hashed password     |
-| is_verified         | Boolean   | Email verification status  |
-| verification_token  | String    | Email verification token   |
-| created_at          | DateTime  | Account creation timestamp |
-| updated_at          | DateTime  | Last update timestamp      |
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/register` | Register new user |
+| POST | `/login` | Login & get JWT |
+| GET | `/verify-email` | Verify email token |
+| GET | `/me` | Get current user |
 
-## Security Features
+### Practice & Questions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/daily-practice` | Get personalized practice set |
+| POST | `/submit-answer` | Submit answer & get feedback |
+| GET | `/weak-areas` | Get ML-detected weak topics |
+| GET | `/question-bank/categories` | List all categories |
+| GET | `/question-bank/questions` | Browse questions |
+| GET | `/question-bank/question/{id}` | Get question details |
 
-- ✅ Passwords hashed with bcrypt
-- ✅ JWT tokens for authentication
-- ✅ Email verification required before login
-- ✅ CORS configuration for API security
-- ✅ Protected routes requiring authentication
-- ✅ Secure token-based email verification
+### Discussions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/discussions/{question_id}` | Get discussions |
+| POST | `/discussions` | Create discussion |
+| POST | `/discussions/{id}/vote` | Vote on discussion |
+| POST | `/discussions/{id}/report` | Report discussion |
 
-## Tech Stack Details
+### Battles
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/battles/create` | Create battle room |
+| POST | `/battles/{code}/join` | Join battle |
+| POST | `/battles/{code}/start` | Start battle |
+| GET | `/battles/history` | Get battle history |
+| WS | `/ws/battle/{code}` | Battle WebSocket |
 
-### Backend
-- **FastAPI**: Modern, fast web framework
-- **SQLAlchemy**: SQL toolkit and ORM
-- **PostgreSQL**: Relational database
-- **Pydantic**: Data validation
-- **Python-JOSE**: JWT token handling
-- **Passlib + Bcrypt**: Password hashing
-- **SendGrid**: Email delivery service
+### Admin (requires admin role)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/admin/users` | List all users |
+| POST | `/admin/users/{id}/ban` | Ban user |
+| POST | `/admin/questions/upload` | Bulk upload questions |
+| GET | `/admin/reports` | View community reports |
+| GET | `/admin/stats` | Platform statistics |
 
-### Frontend
-- **React 18**: UI library
-- **React Router**: Navigation
-- **TailwindCSS**: Utility-first CSS
-- **Axios**: HTTP client
-- **Context API**: State management
+## Database Models
 
-### DevOps
-- **Docker**: Containerization
-- **Docker Compose**: Multi-container orchestration
-- **PostgreSQL**: Database container
-
-## Troubleshooting
-
-### Email not sending?
-- **Gmail:** Make sure you're using an App Password (not regular password)
-- **Gmail:** Check 2-Step Verification is enabled
-- See detailed troubleshooting: [GMAIL_SETUP.md](GMAIL_SETUP.md)
-- Look at backend logs: `docker-compose logs backend`
-- **Quick fix:** Set `SKIP_EMAIL_VERIFICATION=true` in `.env`
-
-### Database connection errors?
-- Ensure PostgreSQL container is healthy: `docker-compose ps`
-- Check database credentials in docker-compose.yml
-
-### Frontend not loading?
-- Check if backend is running: `curl http://localhost:8000`
-- Verify CORS settings in backend/main.py
-- Check browser console for errors
-
-### Port already in use?
-- Change ports in docker-compose.yml if needed
-- Stop conflicting services
+- **User** - Account info, XP, streaks, role
+- **Question** - Multi-category aptitude questions
+- **QuestionAttempt** - User answer history
+- **BattleRoom** - Multiplayer battle sessions
+- **BattleParticipant** - Battle player scores
+- **Discussion** - Question discussions
+- **DiscussionVote** - Upvote/downvote tracking
+- **Badge** / **UserBadge** - Achievement system
+- **AdminActionLog** - Admin audit trail
+- **ReportedPost** - Community reports
+- **UserWarning** - User warnings
 
 ## Environment Variables
 
-### Backend (.env)
-- `DATABASE_URL`: PostgreSQL connection string
-- `SECRET_KEY`: JWT secret key (change in production!)
-- `GMAIL_USER`: Your Gmail address
-- `GMAIL_APP_PASSWORD`: Gmail App Password (16 characters)
-- `SKIP_EMAIL_VERIFICATION`: Set to `true` to auto-verify users (development only)
+```env
+# Database
+DATABASE_URL=postgresql://user:pass@host:5432/aptiverse
+
+# Auth
+SECRET_KEY=your-secret-key
+
+# Email (optional)
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=your-app-password
+SKIP_EMAIL_VERIFICATION=false
+
+# Frontend
+FRONTEND_URL=http://localhost:3000
+
+# Weaviate (optional, for AI features)
+WEAVIATE_URL=your-weaviate-url
+WEAVIATE_API_KEY=your-api-key
+```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [BATTLE_ARCHITECTURE.md](BATTLE_ARCHITECTURE.md) | Battle system design |
+| [BATTLE_ROOM_GUIDE.md](BATTLE_ROOM_GUIDE.md) | Battle feature usage |
+| [AI_RECOMMENDATION_SYSTEM.md](AI_RECOMMENDATION_SYSTEM.md) | ML recommendation details |
+| [ADMIN_SYSTEM_GUIDE.md](ADMIN_SYSTEM_GUIDE.md) | Admin panel guide |
+| [QUESTION_UPLOAD_FORMAT.md](QUESTION_UPLOAD_FORMAT.md) | Bulk upload format |
+| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Production deployment |
+| [GMAIL_SETUP.md](GMAIL_SETUP.md) | Email configuration |
 
 ## Production Deployment
 
-**Before deploying to production:**
+The app is configured for deployment on:
+- **Backend**: Fly.io (`fly.backend.toml`)
+- **Frontend**: Vercel (`vercel.json`) or Fly.io (`frontend/fly.toml`)
 
-1. Change `SECRET_KEY` to a strong, random value
-2. Use environment-specific `.env` files
-3. Enable HTTPS/SSL
-4. Update CORS origins to your production domain
-5. Use managed PostgreSQL service
-6. Set up proper logging and monitoring
-7. Configure rate limiting
-8. Enable database backups
+See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for detailed instructions.
 
 ## License
 
@@ -266,10 +226,6 @@ MIT License
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Support
-
-For issues and questions, please create an issue in the repository.
-
 ---
 
-**Built with ❤️ using FastAPI, React, and Docker**
+**Built with FastAPI, React, and AI-powered recommendations**
