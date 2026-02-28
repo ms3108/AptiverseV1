@@ -11,6 +11,7 @@ A comprehensive full-stack aptitude practice platform featuring AI-powered quest
 - **Discussions** - Community discussions with voting on each question
 - **Progress Tracking** - Detailed analytics, streaks, and performance metrics
 - **Badges & Achievements** - Gamification with unlockable badges
+- **Event-driven rewards engine** - Kafka-powered real-time gamification system
 
 ### AI & ML Features
 - **Weak Area Detection** - Naive Bayes classifier identifies struggling topics
@@ -32,6 +33,7 @@ A comprehensive full-stack aptitude practice platform featuring AI-powered quest
 - **WebSockets** - Real-time battle communication
 - **Weaviate** - Vector database for AI recommendations
 - **Scikit-learn** - ML for weak area prediction
+- **Kafka** - Event streaming for gamification engine
 
 ### Frontend
 - **React 18** - Modern UI library
@@ -45,6 +47,7 @@ A comprehensive full-stack aptitude practice platform featuring AI-powered quest
 - **Fly.io** - Backend deployment
 - **Vercel** - Frontend deployment
 - **PostgreSQL** - Production database
+- **Redis** - Caching and session storage
 
 ## Project Structure
 
@@ -209,6 +212,7 @@ WEAVIATE_API_KEY=your-api-key
 | [QUESTION_UPLOAD_FORMAT.md](QUESTION_UPLOAD_FORMAT.md) | Bulk upload format |
 | [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Production deployment |
 | [GMAIL_SETUP.md](GMAIL_SETUP.md) | Email configuration |
+| [MODULE_4_EVENT_DRIVEN_GAMIFICATION.md](MODULE_4_EVENT_DRIVEN_GAMIFICATION.md) | Event-driven gamification engine |
 
 ## Production Deployment
 
