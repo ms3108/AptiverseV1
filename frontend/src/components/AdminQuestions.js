@@ -333,7 +333,7 @@ const AdminQuestions = () => {
                         <button
                             onClick={() => setActiveUploadTab('generate')}
                             className={`px-4 py-2 rounded-lg text-sm font-medium ${activeUploadTab === 'generate'
-                                ? 'bg-black text-white'
+                                ? 'bg-purple-600 text-white'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
