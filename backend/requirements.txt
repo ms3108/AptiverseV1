@@ -20,5 +20,12 @@ numpy==1.26.3
 # Caching (Redis)
 redis==5.0.1
 
+# Task queue (Celery + Beat scheduler)
+celery[redis]==5.3.6
+flower==2.0.1
+
 # Additional utilities
 python-dateutil==2.8.2
+
+# Event streaming (Kafka)
+kafka-python==2.0.2

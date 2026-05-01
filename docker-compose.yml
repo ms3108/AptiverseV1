@@ -1,8 +1,25 @@
 version: '3.8'
 
 services:
+  # -------------------------------------------------------------------------
+  # Redis — broker for Celery + ephemeral state for battles & ML caches
+  # -------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------------------------
+  # Backend — FastAPI
+  # -------------------------------------------------------------------------
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
@@ -11,10 +28,60 @@ services:
       - DATABASE_URL=sqlite:///./aptiverse.db
       - SECRET_KEY=your-secret-key-for-local-dev
       - SKIP_EMAIL_VERIFICATION=true
+      - REDIS_URL=redis://redis:6379/0
+      - FRONTEND_URL=http://localhost:3000
     volumes:
       - ./backend:/app
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-    
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # -------------------------------------------------------------------------
+  # Celery Worker — processes async tasks (XP/badges/reminders)
+  # -------------------------------------------------------------------------
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=sqlite:///./aptiverse.db
+      - SECRET_KEY=your-secret-key-for-local-dev
+      - REDIS_URL=redis://redis:6379/0
+      - GMAIL_USER=${GMAIL_USER:-}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD:-}
+      - FRONTEND_URL=http://localhost:3000
+    volumes:
+      - ./backend:/app
+    command: celery -A celery_app worker --loglevel=info --concurrency=2
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # -------------------------------------------------------------------------
+  # Celery Beat — schedules periodic tasks
+  # -------------------------------------------------------------------------
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=sqlite:///./aptiverse.db
+      - SECRET_KEY=your-secret-key-for-local-dev
+      - REDIS_URL=redis://redis:6379/0
+      - GMAIL_USER=${GMAIL_USER:-}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD:-}
+      - FRONTEND_URL=http://localhost:3000
+    volumes:
+      - ./backend:/app
+    command: celery -A celery_app beat --loglevel=info
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # -------------------------------------------------------------------------
+  # Frontend — React
+  # -------------------------------------------------------------------------
   frontend:
     build:
       context: ./frontend

@@ -19,6 +19,7 @@ import asyncio
 import random
 import admin_routes
 import admin_questions
+import knowledge_hub
 
 # Create database tables - wrap in try-except to allow app to start even if DB connection fails temporarily
 try:
@@ -40,14 +41,16 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 # /admin/questions/delete-all is matched before /admin/questions/{question_id}
 app.include_router(admin_questions.router)
 app.include_router(admin_routes.router)
+app.include_router(knowledge_hub.router)
 
 # CORS configuration - support multiple origins
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 allowed_origins = [
     "http://localhost:3000",  # Local development
     "https://aptiverse-v1-hg3h.vercel.app",  # Old Vercel production
-    "https://erse-v1-35au.vercel.app",  # Current Vercel production
+    "https://erse-v1-35au.vercel.app",  # Old Vercel production
     "https://aptiverse-frontend.fly.dev",  # Frontend on Fly.io
+    "https://aptiverse.vercel.app",  # Current Vercel production
     frontend_url,  # Production frontend (Vercel custom domain if set)
 ]
 
@@ -398,6 +401,43 @@ def update_user_preferences(
     }
 
 
+@app.get("/personalization/mastery")
+def get_mastery(
+    current_user: models.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Get BKT mastery probabilities per topic for the current user.
+    Returns topics ordered from weakest to strongest.
+    """
+    mastery_rows = db.query(models.UserTopicMastery).filter(
+        models.UserTopicMastery.user_id == current_user.id
+    ).order_by(models.UserTopicMastery.p_mastery.asc()).all()
+
+    mastery_data = [
+        {
+            "topic": row.topic,
+            "p_mastery": round(row.p_mastery, 4),
+            "mastery_pct": round(row.p_mastery * 100, 1),
+            "level": (
+                "mastered" if row.p_mastery >= 0.80
+                else "proficient" if row.p_mastery >= 0.60
+                else "developing" if row.p_mastery >= 0.40
+                else "weak"
+            ),
+            "last_updated": row.updated_at.isoformat() if row.updated_at else None,
+        }
+        for row in mastery_rows
+    ]
+
+    return {
+        "total_topics": len(mastery_data),
+        "mastery": mastery_data,
+        "weak_topics": [m["topic"] for m in mastery_data if m["p_mastery"] < 0.60],
+        "note": "Probabilities computed via Bayesian Knowledge Tracing (BKT).",
+    }
+
+
 @app.post("/submit-answer")
 def submit_answer(
     answer_data: schemas.AnswerSubmission,
@@ -407,21 +447,22 @@ def submit_answer(
     """Submit an answer to a question, log the attempt, and update user stats"""
     from datetime import datetime
     import ml_service
-    
+    from kafka_producer import get_producer
+
     # Get the question
     question = db.query(models.Question).filter(models.Question.id == answer_data.question_id).first()
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
-    
+
     # Check if answer is correct
     is_correct = answer_data.user_answer.upper() == question.correct_answer.upper()
-    
+
     # Get attempt count for this question by this user
     previous_attempts = db.query(models.QuestionAttempt).filter(
         models.QuestionAttempt.user_id == current_user.id,
         models.QuestionAttempt.question_id == answer_data.question_id
     ).count()
-    
+
     # Create question attempt record
     attempt = models.QuestionAttempt(
         user_id=current_user.id,
@@ -432,36 +473,64 @@ def submit_answer(
         attempt_count=previous_attempts + 1
     )
     db.add(attempt)
-    
+
     # Calculate XP earned (full XP only on first correct attempt)
     xp_earned = 0
     if is_correct and previous_attempts == 0:
         xp_earned = question.xp_reward
-    
-    # Update user stats
+
+    # Update BKT mastery for this topic (Gap 4)
+    try:
+        ml_service.update_mastery_after_attempt(
+            db, current_user.id, question.topic, is_correct,
+            int(answer_data.time_taken_seconds)
+        )
+    except Exception as _bkt_err:
+        print(f"⚠️ BKT update failed (non-fatal): {_bkt_err}")
+
+    # Dispatch async XP/badge processing via Kafka (Gap 5)
+    # Falls back to Celery, then to synchronous if both unavailable
+    _kafka_dispatched = False
+    _celery_dispatched = False
+
     if is_correct:
+        try:
+            producer = get_producer()
+            _kafka_dispatched = producer.publish_attempt_submitted(
+                current_user.id, answer_data.question_id, is_correct, xp_earned, question.topic,
+                int(answer_data.time_taken_seconds)
+            )
+            if _kafka_dispatched:
+                print(f"✓ Published attempt-submitted event to Kafka (user: {current_user.id})")
+        except Exception as _kafka_err:
+            print(f"⚠️ Kafka dispatch failed: {_kafka_err}")
+
+        # Fallback to Celery if Kafka unavailable
+        if not _kafka_dispatched:
+            try:
+                from celery_tasks import process_attempt_submitted
+                process_attempt_submitted.delay(current_user.id, answer_data.question_id, is_correct, xp_earned)
+                _celery_dispatched = True
+            except Exception as _cel_err:
+                print(f"⚠️ Celery dispatch failed, falling back to sync: {_cel_err}")
+
+    # Synchronous fallback (when both Kafka and Celery are not running)
+    if is_correct and not _kafka_dispatched and not _celery_dispatched:
         ml_service.update_user_stats_after_practice(db, current_user.id, 1, xp_earned)  # type: ignore
-        
-        # Check and award badges
         newly_earned_badges = ml_service.check_and_award_badges(db, current_user.id)  # type: ignore
-        
-        # Get badge details for newly earned badges
-        new_badges_data = []
-        for badge in newly_earned_badges:
-            new_badges_data.append({
-                "name": badge.name,
-                "description": badge.description,
-                "icon": badge.icon
-            })
+        new_badges_data = [{"name": b.name, "description": b.description, "icon": b.icon} for b in newly_earned_badges]
+    elif is_correct and (_kafka_dispatched or _celery_dispatched):
+        # Synchronously update stats so the response shows correct XP (async updates badges)
+        ml_service.update_user_stats_after_practice(db, current_user.id, 1, xp_earned)  # type: ignore
+        new_badges_data = []  # badges will be computed async
     else:
-        newly_earned_badges = []
         new_badges_data = []
-    
+
     db.commit()
-    
+
     # Refresh user to get updated stats
     db.refresh(current_user)
-    
+
     return {
         "is_correct": is_correct,
         "correct_answer": question.correct_answer,
@@ -1498,7 +1567,7 @@ async def battle_websocket(
                         # Battle completed
                         battle.status = "completed"  # type: ignore
                         battle.completed_at = datetime.now()  # type: ignore
-                        
+
                         # Update ranks
                         final_leaderboard = manager.get_sorted_leaderboard(room_code)
                         for entry in final_leaderboard:
@@ -1508,9 +1577,27 @@ async def battle_websocket(
                             ).first()
                             if p:
                                 p.rank = entry["rank"]
-                        
+
                         db.commit()
-                        
+
+                        # Publish battle-completed event to Kafka (Gap 5)
+                        try:
+                            from kafka_producer import get_producer
+                            producer = get_producer()
+                            battle_results = [
+                                {
+                                    "user_id": entry["user_id"],
+                                    "score": entry["score"],
+                                    "correct_answers": entry.get("correct_answers", 0),
+                                    "rank": entry["rank"]
+                                }
+                                for entry in final_leaderboard
+                            ]
+                            producer.publish_battle_completed(room_code, battle_results)
+                            print(f"✓ Published battle-completed event to Kafka (room: {room_code})")
+                        except Exception as e:
+                            print(f"⚠️ Kafka dispatch failed for battle completion: {e}")
+
                         # Broadcast final results
                         await manager.broadcast_to_room(room_code, {
                             "type": "battle_completed",
