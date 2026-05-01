@@ -341,7 +341,7 @@ const AdminQuestions = () => {
                         </button>
                     </div>
 
-                    {/* Format Example */}
+                    {/* Format Example - Upload Methods */}
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
                         <div className="text-sm font-medium text-gray-700 mb-2">JSON Format Example:</div>
                         <pre className="text-xs text-gray-600 overflow-x-auto">
