@@ -109,58 +109,76 @@ export const useSounds = () => {
 
     const stopBackgroundMusic = useCallback(() => {
         if (bgMusicRef.current) {
-            try {
-                const { oscillator1, oscillator2 } = bgMusicRef.current;
-                oscillator1.stop();
-                oscillator2.stop();
-            } catch (error) {
-                console.log('Error stopping music:', error);
-            }
+            try { bgMusicRef.current.stop(); } catch (e) {}
             bgMusicRef.current = null;
         }
     }, []);
 
     const startBackgroundMusic = useCallback((type = 'battle') => {
-        if (soundEnabledRef.current) {
-            try {
-                // Stop any existing background music first
-                if (bgMusicRef.current) {
-                    try {
-                        bgMusicRef.current.oscillator1.stop();
-                        bgMusicRef.current.oscillator2.stop();
-                    } catch (e) { }
-                    bgMusicRef.current = null;
-                }
+        if (!soundEnabledRef.current) return;
+        if (bgMusicRef.current) {
+            try { bgMusicRef.current.stop(); } catch (e) {}
+            bgMusicRef.current = null;
+        }
+        try {
+            const audioContext = getAudioContext();
+            let stopped = false;
 
-                const audioContext = getAudioContext();
-                const oscillator1 = audioContext.createOscillator();
-                const oscillator2 = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
+            const tracks = {
+                // Calm pentatonic loop for practice
+                practice: {
+                    melody: [392.00, 440.00, 493.88, 440.00, 392.00, 349.23, 392.00, 329.63],
+                    bass:   [130.81, 146.83, 130.81, 110.00],
+                    tempo: 0.45,
+                    melodyGain: 0.05,
+                    bassGain: 0.04,
+                    melodyWave: 'sine',
+                    bassWave: 'triangle',
+                },
+                // Epic boss battle music replacing default battle music
+                battle: {
+                    melody: [293.66, 311.13, 349.23, 311.13, 293.66, 261.63, 246.94, 261.63], // D4, D#4, F4, D#4, D4, C4, B3, C4
+                    bass:   [146.83, 130.81, 123.47, 110.00], // D3, C3, B2, A2
+                    tempo: 0.18,
+                    melodyGain: 0.07,
+                    bassGain: 0.06,
+                    melodyWave: 'sawtooth',
+                    bassWave: 'sawtooth',
+                },
+            };
 
-                oscillator1.type = 'sine';
-                oscillator2.type = 'sine';
+            const t = tracks[type] || tracks.battle;
+            const loopLen = t.melody.length * t.tempo;
 
-                if (type === 'battle') {
-                    oscillator1.frequency.value = 130.81; // C3
-                    oscillator2.frequency.value = 164.81; // E3
-                } else {
-                    oscillator1.frequency.value = 110; // A2
-                    oscillator2.frequency.value = 146.83; // D3
-                }
+            const scheduleNote = (freq, start, dur, gain, wave) => {
+                const osc = audioContext.createOscillator();
+                const g = audioContext.createGain();
+                osc.type = wave;
+                osc.frequency.value = freq;
+                osc.connect(g);
+                g.connect(audioContext.destination);
+                g.gain.setValueAtTime(gain, start);
+                g.gain.exponentialRampToValueAtTime(0.001, start + dur * 0.85);
+                osc.start(start);
+                osc.stop(start + dur);
+            };
 
-                gainNode.gain.value = 0.03; // Very subtle
+            const scheduleLoop = (startTime) => {
+                if (stopped) return;
+                t.melody.forEach((freq, i) =>
+                    scheduleNote(freq, startTime + i * t.tempo, t.tempo * 0.8, t.melodyGain, t.melodyWave)
+                );
+                const bassStep = loopLen / t.bass.length;
+                t.bass.forEach((freq, i) =>
+                    scheduleNote(freq, startTime + i * bassStep, bassStep * 0.7, t.bassGain, t.bassWave)
+                );
+                setTimeout(() => scheduleLoop(startTime + loopLen), (loopLen - 0.3) * 1000);
+            };
 
-                oscillator1.connect(gainNode);
-                oscillator2.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-
-                bgMusicRef.current = { oscillator1, oscillator2, audioContext };
-
-                oscillator1.start();
-                oscillator2.start();
-            } catch (error) {
-                console.log('Background music not available:', error);
-            }
+            scheduleLoop(audioContext.currentTime + 0.1);
+            bgMusicRef.current = { stop: () => { stopped = true; } };
+        } catch (error) {
+            console.log('Background music not available:', error);
         }
     }, []);
 
