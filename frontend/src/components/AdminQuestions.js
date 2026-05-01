@@ -15,7 +15,14 @@ const AdminQuestions = () => {
     const [uploadResult, setUploadResult] = useState(null);
     const [bulkText, setBulkText] = useState('');
     const [textUploading, setTextUploading] = useState(false);
-    const [activeUploadTab, setActiveUploadTab] = useState('file'); // 'file' or 'text'
+    const [activeUploadTab, setActiveUploadTab] = useState('file'); // 'file', 'text', or 'generate'
+
+    // Question generation state
+    const [genTopic, setGenTopic] = useState('');
+    const [genDifficulty, setGenDifficulty] = useState('Easy');
+    const [genCount, setGenCount] = useState(1);
+    const [generating, setGenerating] = useState(false);
+    const [generateResult, setGenerateResult] = useState(null);
 
     // Search and filter state
     const [searchQuery, setSearchQuery] = useState('');
@@ -128,6 +135,49 @@ const AdminQuestions = () => {
             }
         } finally {
             setUploading(false);
+        }
+    };
+
+    const handleGenerateQuestions = async (e) => {
+        e.preventDefault();
+        if (!genTopic.trim()) {
+            alert('Please enter a topic');
+            return;
+        }
+
+        setGenerating(true);
+        setGenerateResult(null);
+
+        try {
+            const response = await axios.post(
+                `${API_URL}/admin/questions/generate`,
+                null,
+                {
+                    params: {
+                        topic: genTopic,
+                        difficulty: genDifficulty,
+                        count: genCount
+                    },
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            setGenerateResult(response.data);
+            setGenTopic('');
+            fetchQuestions();
+        } catch (error) {
+            console.error('Generation failed:', error);
+            if (error.response && error.response.data && error.response.data.detail) {
+                setGenerateResult({
+                    error: error.response.data.detail
+                });
+            } else {
+                setGenerateResult({
+                    error: 'Failed to generate questions'
+                });
+            }
+        } finally {
+            setGenerating(false);
         }
     };
 
@@ -280,6 +330,15 @@ const AdminQuestions = () => {
                         >
                             Paste Questions
                         </button>
+                        <button
+                            onClick={() => setActiveUploadTab('generate')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium ${activeUploadTab === 'generate'
+                                ? 'bg-black text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                        >
+                            Generate with AI
+                        </button>
                     </div>
 
                     {/* Format Example */}
@@ -364,6 +423,72 @@ const AdminQuestions = () => {
                         </form>
                     )}
 
+                    {/* Generate with AI Tab */}
+                    {activeUploadTab === 'generate' && (
+                        <form onSubmit={handleGenerateQuestions} className="space-y-4">
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                <p className="text-sm text-blue-800">
+                                    ✨ Generate questions using Google Gemini AI. Specify a topic and difficulty level, and the system will automatically check for duplicates before saving.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Topic *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={genTopic}
+                                        onChange={(e) => setGenTopic(e.target.value)}
+                                        placeholder="e.g., Profit and Loss, Time and Work"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
+                                        disabled={generating}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Difficulty
+                                    </label>
+                                    <select
+                                        value={genDifficulty}
+                                        onChange={(e) => setGenDifficulty(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black bg-white"
+                                        disabled={generating}
+                                    >
+                                        <option value="Easy">Easy</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Hard">Hard</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Count (1-5)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="5"
+                                        value={genCount}
+                                        onChange={(e) => setGenCount(Math.max(1, Math.min(5, parseInt(e.target.value) || 1)))}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
+                                        disabled={generating}
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={generating || !genTopic.trim()}
+                                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all"
+                            >
+                                {generating ? 'Generating... 🤖' : 'Generate with Gemini AI 🚀'}
+                            </button>
+                        </form>
+                    )}
+
                     {/* Upload Result */}
                     {uploadResult && (
                         <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
@@ -388,6 +513,60 @@ const AdminQuestions = () => {
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    )}
+
+                    {/* Generate Result */}
+                    {generateResult && (
+                        <div className={`mt-4 p-4 rounded-lg border ${generateResult.error ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
+                            {generateResult.error ? (
+                                <div className="text-red-800">
+                                    <div className="font-semibold">Error:</div>
+                                    <div className="text-sm mt-1">{generateResult.error}</div>
+                                </div>
+                            ) : (
+                                <div className="text-green-800">
+                                    <div className="font-semibold mb-3">Generation Results:</div>
+                                    <div className="grid grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <div className="text-sm opacity-75">Generated</div>
+                                            <div className="text-2xl font-bold">{generateResult.generated || 0}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-sm opacity-75">Added to DB</div>
+                                            <div className="text-2xl font-bold">{generateResult.added || 0}</div>
+                                        </div>
+                                    </div>
+
+                                    {generateResult.duplicate_summary && generateResult.duplicate_summary.length > 0 && (
+                                        <div className="mt-4 pt-4 border-t border-green-300">
+                                            <div className="font-medium text-sm mb-2">⚠️ Duplicates Found:</div>
+                                            <div className="text-xs space-y-1">
+                                                {generateResult.duplicate_summary.map((dup, idx) => (
+                                                    <div key={idx} className="flex justify-between items-center bg-white/50 p-2 rounded">
+                                                        <span>{dup.title}</span>
+                                                        <span className="text-gray-600">{(dup.similarity * 100).toFixed(0)}% match</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {generateResult.questions && generateResult.questions.length > 0 && (
+                                        <div className="mt-4 pt-4 border-t border-green-300">
+                                            <div className="font-medium text-sm mb-2">✨ New Questions Created:</div>
+                                            <div className="text-xs space-y-2 max-h-48 overflow-y-auto">
+                                                {generateResult.questions.map((q, idx) => (
+                                                    <div key={idx} className="bg-white/50 p-2 rounded">
+                                                        <div className="font-medium">{q.title}</div>
+                                                        <div className="text-gray-700">{q.difficulty} • {q.topic}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
