@@ -319,7 +319,7 @@ const AdminQuestions = () => {
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
-                            File Upload
+                            📁 File Upload
                         </button>
                         <button
                             onClick={() => setActiveUploadTab('text')}
@@ -337,7 +337,7 @@ const AdminQuestions = () => {
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
-                            Generate with AI
+                            ✨ Generate with AI
                         </button>
                     </div>
 
