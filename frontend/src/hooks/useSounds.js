@@ -135,15 +135,15 @@ export const useSounds = () => {
                     melodyWave: 'sine',
                     bassWave: 'triangle',
                 },
-                // Epic boss battle music replacing default battle music
+                // High-energy electronic/arcade loop for battle
                 battle: {
-                    melody: [293.66, 311.13, 349.23, 311.13, 293.66, 261.63, 246.94, 261.63], // D4, D#4, F4, D#4, D4, C4, B3, C4
-                    bass:   [146.83, 130.81, 123.47, 110.00], // D3, C3, B2, A2
-                    tempo: 0.18,
-                    melodyGain: 0.07,
-                    bassGain: 0.06,
-                    melodyWave: 'sawtooth',
-                    bassWave: 'sawtooth',
+                    melody: [440.00, 440.00, 523.25, 587.33, 659.25, 587.33, 523.25, 493.88], // A4 A4 C5 D5 E5 D5 C5 B4
+                    bass:   [110.00, 110.00, 110.00, 110.00], // A2 A2 A2 A2 (Driving pedal tone)
+                    tempo: 0.15, // Fast tempo
+                    melodyGain: 0.06,
+                    bassGain: 0.07,
+                    melodyWave: 'square', // Chiptune feel
+                    bassWave: 'sawtooth', // Aggressive bass
                 },
             };
 

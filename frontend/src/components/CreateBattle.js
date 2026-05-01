@@ -236,5 +236,3 @@ function CreateBattle() {
 }
 
 export default CreateBattle;
-
-
