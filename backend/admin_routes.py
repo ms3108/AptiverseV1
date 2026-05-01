@@ -2,7 +2,7 @@
 Admin Routes for Aptiverse
 Handles all admin functionality including user management, question management, and community moderation
 """
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 from typing import List, Optional
@@ -15,7 +15,8 @@ from database import get_db
 from auth import get_current_admin, get_password_hash, verify_password
 import models
 import schemas
-from ml_service import get_weaviate_client
+from vector_service import check_duplicate, index_question
+from question_generator import get_question_generator
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -371,8 +372,6 @@ async def upload_questions(
             "errors": []
         }
         
-        weaviate_client = get_weaviate_client()
-        
         for idx, q_data in enumerate(questions_data):
             try:
                 # Support both old format and new simplified format
@@ -435,23 +434,19 @@ async def upload_questions(
                     results["errors"].append(f"Question {idx+1}: Invalid format. Must have either 'question' or 'title' field")
                     continue
                 
-                # Check for duplicates in Vector DB
-                if weaviate_client:
-                    similar = weaviate_client.query.get(
-                        "Question",
-                        ["title", "description"]
-                    ).with_near_text({
-                        "concepts": [normalized_data["question_text"]]
-                    }).with_limit(1).with_additional(["certainty"]).do()
-                    
-                    if similar and "data" in similar and "Get" in similar["data"]:
-                        questions = similar["data"]["Get"]["Question"]
-                        if questions and questions[0].get("_additional", {}).get("certainty", 0) > 0.95:
-                            results["duplicates"] += 1
-                            results["errors"].append(
-                                f"Question {idx+1}: Duplicate detected (similarity > 95%)"
-                            )
-                            continue
+                # Check for duplicates via ChromaDB
+                dup = check_duplicate(
+                    title=normalized_data["title"],
+                    description=normalized_data["description"],
+                    threshold=0.92,
+                )
+                if dup:
+                    results["duplicates"] += 1
+                    results["errors"].append(
+                        f"Question {idx+1}: Duplicate detected "
+                        f"(similarity {dup['similarity']:.0%}) — '{dup['title']}'"
+                    )
+                    continue
                 
                 # Create question
                 question = models.Question(
@@ -473,19 +468,8 @@ async def upload_questions(
                 db.add(question)
                 db.flush()
                 
-                # Add to Vector DB
-                if weaviate_client:
-                    weaviate_client.data_object.create(
-                        class_name="Question",
-                        data_object={
-                            "question_id": question.id,
-                            "title": question.title,
-                            "description": question.description,
-                            "difficulty": question.difficulty,
-                            "topic": question.topic,
-                            "sub_topic": question.sub_topic or ""
-                        }
-                    )
+                # Index into ChromaDB for future duplicate detection
+                index_question(question)
                 
                 results["added"] += 1
                 
@@ -509,6 +493,111 @@ async def upload_questions(
         raise HTTPException(status_code=400, detail="Invalid JSON format")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
+
+
+@router.post("/questions/generate")
+async def generate_questions(
+    topic: str = Query(..., min_length=2, max_length=100),
+    difficulty: str = Query(..., regex="^(Easy|Medium|Hard)$"),
+    count: int = Query(1, ge=1, le=5),
+    db: Session = Depends(get_db),
+    current_admin: models.User = Depends(get_current_admin)
+):
+    """
+    Generate questions using Gemini AI with automatic duplicate detection.
+
+    Generates MCQ questions for a given topic and difficulty level,
+    checks for duplicates using vector similarity, and saves to database.
+    """
+    try:
+        generator = get_question_generator()
+        generated = generator.generate_single(topic=topic, difficulty=difficulty, count=count)
+
+        if not generated:
+            raise HTTPException(status_code=500, detail="Failed to generate questions from Gemini")
+
+        duplicates = []
+        added_questions = []
+
+        for gen_q in generated:
+            # Check for duplicate/similar questions
+            dup = check_duplicate(
+                title=gen_q.get("title", ""),
+                description=gen_q.get("description", ""),
+                threshold=0.92
+            )
+
+            if dup:
+                duplicates.append({
+                    "title": gen_q.get("title"),
+                    "similar_to": dup.get("title"),
+                    "similarity": dup.get("similarity", 0)
+                })
+                continue
+
+            # Create question model
+            new_question = models.Question(
+                title=gen_q.get("title", ""),
+                description=gen_q.get("description", ""),
+                difficulty=difficulty,
+                category=gen_q.get("category", "Quants"),
+                topic=topic,
+                sub_topic="",
+                option_a=gen_q.get("option_a", ""),
+                option_b=gen_q.get("option_b", ""),
+                option_c=gen_q.get("option_c", ""),
+                option_d=gen_q.get("option_d", ""),
+                correct_answer=gen_q.get("correct_answer", "A").upper(),
+                explanation=gen_q.get("explanation", ""),
+                xp_reward=int(gen_q.get("xp_reward", 10))
+            )
+
+            db.add(new_question)
+            db.flush()  # Get the ID
+
+            # Index to ChromaDB for semantic search
+            try:
+                index_question(new_question)
+            except Exception as idx_err:
+                print(f"Warning: Failed to index question {new_question.id}: {idx_err}")
+
+            added_questions.append({
+                "id": new_question.id,
+                "title": new_question.title,
+                "difficulty": new_question.difficulty,
+                "topic": new_question.topic
+            })
+
+        db.commit()
+
+        # Log admin action
+        log_admin_action(
+            db=db,
+            admin_id=current_admin.id,
+            action_type="generated_questions",
+            target_type="questions",
+            details={
+                "topic": topic,
+                "difficulty": difficulty,
+                "requested_count": count,
+                "added": len(added_questions),
+                "duplicates": len(duplicates)
+            }
+        )
+
+        return {
+            "generated": len(generated),
+            "added": len(added_questions),
+            "duplicates": len(duplicates),
+            "questions": added_questions,
+            "duplicate_summary": duplicates
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating questions: {str(e)}")
+
 
 
 @router.get("/questions")
