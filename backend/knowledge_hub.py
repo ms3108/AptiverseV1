@@ -5,28 +5,30 @@ Knowledge Hub Module - Semantic search and content management
 Placeholder for Knowledge Hub implementation.
 Will integrate with Weaviate for vector search and PostgreSQL for full-text search.
 """
+from fastapi import APIRouter
+
+router = APIRouter(prefix="/knowledge", tags=["knowledge_hub"])
 
 
-def get_knowledge_content(search_query: str, user_id: int = None):
+@router.get("/search")
+def search_knowledge(q: str, skip: int = 0, limit: int = 10):
     """Search knowledge base using hybrid approach (lexical + semantic)."""
     # TODO: Implement hybrid search
-    # Phase 1: Lexical search (Postgres full-text)
-    # Phase 2: Semantic search (Weaviate embeddings)
-    # Phase 3: Merge and rank results
-    return []
+    return {"results": [], "total": 0}
 
 
-def create_knowledge_content(user_id: int, title: str, body: str):
+@router.post("/create")
+def create_knowledge_content(title: str, body: str):
     """Create user-generated knowledge article."""
     # TODO: Create content, generate embeddings, index to Weaviate
-    pass
+    return {"id": None, "status": "placeholder"}
 
 
-def vote_knowledge_content(content_id: int, user_id: int, vote_type: int):
+@router.post("/vote")
+def vote_knowledge_content(content_id: int, vote_type: int):
     """Vote on knowledge content (upvote/downvote)."""
     # TODO: Update votes, track reputation
-    pass
+    return {"status": "placeholder"}
 
 
-# Placeholder initialization
 print("✓ Knowledge Hub module loaded (stub implementation)")
