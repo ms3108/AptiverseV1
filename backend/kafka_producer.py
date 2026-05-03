@@ -6,11 +6,25 @@ import json
 import os
 import logging
 from typing import Optional, Dict, Any, List
-from kafka import KafkaProducer
-from kafka.errors import KafkaError
-from kafka_events import (
-    KAFKA_TOPICS, AttemptSubmitted, BattleCompleted, DiscussionVoted
-)
+try:
+    from kafka import KafkaProducer
+    from kafka.errors import KafkaError
+    _KAFKA_AVAILABLE = True
+except ImportError:
+    KafkaProducer = None  # type: ignore
+    KafkaError = Exception  # type: ignore
+    _KAFKA_AVAILABLE = False
+    logger.warning("kafka-python not installed — Kafka producer disabled")
+
+try:
+    from kafka_events import (
+        KAFKA_TOPICS, AttemptSubmitted, BattleCompleted, DiscussionVoted
+    )
+    _EVENTS_AVAILABLE = True
+except ImportError:
+    _EVENTS_AVAILABLE = False
+    KAFKA_TOPICS = {}
+    logger.warning("kafka_events not importable — Kafka events disabled")
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +51,10 @@ class GamificationProducer:
 
     def _init_producer(self):
         """Initialize Kafka producer with error handling."""
+        if not _KAFKA_AVAILABLE:
+            logger.warning("⚠️  kafka-python not installed, Kafka disabled")
+            self.available = False
+            return
         try:
             kafka_broker = os.getenv('KAFKA_BROKER', 'localhost:9092')
             self.producer = KafkaProducer(
@@ -89,6 +107,8 @@ class GamificationProducer:
         time_taken_seconds: int
     ) -> bool:
         """Publish attempt-submitted event."""
+        if not _EVENTS_AVAILABLE:
+            return False
         event = AttemptSubmitted(
             user_id=user_id,
             question_id=question_id,
