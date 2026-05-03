@@ -253,6 +253,12 @@ function QuestionDetail() {
                     </div>
                 )}
 
+                {submitError && (
+                    <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                        ⚠️ {submitError}
+                    </div>
+                )}
+
                 {/* Action Buttons */}
                 <div className="mt-6 flex justify-end space-x-3">
                     {!isAnswered && !question.solved ? (
@@ -292,13 +298,6 @@ function QuestionDetail() {
             />
         </div>
     );
-    {
-        submitError && (
-            <div className="mt-4 p-3 rounded bg-red-50 border border-red-200 text-sm text-red-700">
-                {submitError}
-            </div>
-        )
-    }
 
 }
 

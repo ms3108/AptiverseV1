@@ -460,9 +460,6 @@ def submit_answer(
     db: Session = Depends(get_db)
 ):
     """Submit an answer to a question, log the attempt, and update user stats"""
-    from datetime import datetime
-    import ml_service
-    from kafka_producer import get_producer
 
     # Get the question
     question = db.query(models.Question).filter(models.Question.id == answer_data.question_id).first()
@@ -494,8 +491,9 @@ def submit_answer(
     if is_correct and previous_attempts == 0:
         xp_earned = question.xp_reward
 
-    # Update BKT mastery for this topic (Gap 4)
+    # Update BKT mastery for this topic
     try:
+        import ml_service
         ml_service.update_mastery_after_attempt(
             db, current_user.id, question.topic, is_correct,
             int(answer_data.time_taken_seconds)
@@ -503,43 +501,19 @@ def submit_answer(
     except Exception as _bkt_err:
         print(f"⚠️ BKT update failed (non-fatal): {_bkt_err}")
 
-    # Dispatch async XP/badge processing via Kafka (Gap 5)
-    # Falls back to Celery, then to synchronous if both unavailable
-    _kafka_dispatched = False
-    _celery_dispatched = False
-
+    # Update XP, streak, and check for new badges synchronously
+    new_badges_data = []
     if is_correct:
         try:
-            producer = get_producer()
-            _kafka_dispatched = producer.publish_attempt_submitted(
-                current_user.id, answer_data.question_id, is_correct, xp_earned, question.topic,
-                int(answer_data.time_taken_seconds)
-            )
-            if _kafka_dispatched:
-                print(f"✓ Published attempt-submitted event to Kafka (user: {current_user.id})")
-        except Exception as _kafka_err:
-            print(f"⚠️ Kafka dispatch failed: {_kafka_err}")
-
-        # Fallback to Celery if Kafka unavailable
-        if not _kafka_dispatched:
-            try:
-                from celery_tasks import process_attempt_submitted
-                process_attempt_submitted.delay(current_user.id, answer_data.question_id, is_correct, xp_earned)
-                _celery_dispatched = True
-            except Exception as _cel_err:
-                print(f"⚠️ Celery dispatch failed, falling back to sync: {_cel_err}")
-
-    # Synchronous fallback (when both Kafka and Celery are not running)
-    if is_correct and not _kafka_dispatched and not _celery_dispatched:
-        ml_service.update_user_stats_after_practice(db, current_user.id, 1, xp_earned)  # type: ignore
-        newly_earned_badges = ml_service.check_and_award_badges(db, current_user.id)  # type: ignore
-        new_badges_data = [{"name": b.name, "description": b.description, "icon": b.icon} for b in newly_earned_badges]
-    elif is_correct and (_kafka_dispatched or _celery_dispatched):
-        # Synchronously update stats so the response shows correct XP (async updates badges)
-        ml_service.update_user_stats_after_practice(db, current_user.id, 1, xp_earned)  # type: ignore
-        new_badges_data = []  # badges will be computed async
-    else:
-        new_badges_data = []
+            import ml_service
+            ml_service.update_user_stats_after_practice(db, current_user.id, 1, xp_earned)
+            newly_earned_badges = ml_service.check_and_award_badges(db, current_user.id)
+            new_badges_data = [
+                {"name": b.name, "description": b.description, "icon": b.icon}
+                for b in newly_earned_badges
+            ]
+        except Exception as _stats_err:
+            print(f"⚠️ Stats update failed (non-fatal): {_stats_err}")
 
     db.commit()
 
