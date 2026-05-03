@@ -27,6 +27,8 @@ function BattleRoom() {
     const ws = useRef(null);
     const timerRef = useRef(null);
     const questionStartTime = useRef(null);
+    const isSubmittedRef = useRef(false);   // guard: prevent double-submit per question
+    const selectedAnswerRef = useRef(null); // mirror of selectedAnswer for timer closure
     const sounds = useSounds();
 
     useEffect(() => {
@@ -185,6 +187,8 @@ function BattleRoom() {
                     setAnswerResult(null);
                     setTimeLeft(timePerQuestion);
                     questionStartTime.current = Date.now();
+                    isSubmittedRef.current = false;   // reset for new question
+                    selectedAnswerRef.current = null; // reset for new question
                     sounds.playClickSound();
                     startTimer();
                     break;
@@ -242,8 +246,9 @@ function BattleRoom() {
             setTimeLeft(prev => {
                 if (prev <= 1) {
                     clearInterval(timerRef.current);
-                    // Auto-submit if time runs out
-                    if (!answerResult && selectedAnswer) {
+                    // Auto-submit only if player selected an answer and hasn't submitted yet.
+                    // Use refs to avoid stale closure reading old state values.
+                    if (!isSubmittedRef.current && selectedAnswerRef.current) {
                         handleSubmitAnswer();
                     }
                     return 0;
@@ -273,7 +278,15 @@ function BattleRoom() {
     };
 
     const handleSubmitAnswer = () => {
-        if (!selectedAnswer || answerResult) return;
+        // Guard against double-submit (rapid clicks, timer firing after manual submit)
+        if (isSubmittedRef.current) return;
+        const answer = selectedAnswerRef.current;
+        if (!answer) return;
+
+        isSubmittedRef.current = true; // lock immediately
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+        }
 
         const timeTaken = (Date.now() - questionStartTime.current) / 1000;
 
@@ -281,13 +294,9 @@ function BattleRoom() {
             ws.current.send(JSON.stringify({
                 type: 'submit_answer',
                 question_id: currentQuestion.id,
-                answer: selectedAnswer,
+                answer: answer,
                 time_taken: timeTaken
             }));
-        }
-
-        if (timerRef.current) {
-            clearInterval(timerRef.current);
         }
     };
 
@@ -490,8 +499,13 @@ function BattleRoom() {
                                     {['A', 'B', 'C', 'D'].map(option => (
                                         <button
                                             key={option}
-                                            onClick={() => !answerResult && setSelectedAnswer(option)}
-                                            disabled={answerResult !== null}
+                                            onClick={() => {
+                                                if (!answerResult && !isSubmittedRef.current) {
+                                                    setSelectedAnswer(option);
+                                                    selectedAnswerRef.current = option;
+                                                }
+                                            }}
+                                            disabled={answerResult !== null || isSubmittedRef.current}
                                             className={`w-full text-left p-4 rounded-lg transition ${selectedAnswer === option ? 'hover-lift' : ''
                                                 }`}
                                             style={{
