@@ -259,8 +259,19 @@ def main():
             index_all_questions()
         except ImportError as e:
             print(
-                "Skipping ChromaDB indexing (chromadb not installed or import failed): "
-                f"{e}\nInstall backend requirements, then run: python vector_service.py index"
+                "Skipping ChromaDB indexing (chromadb missing): "
+                f"{e}\nInstall deps (chromadb), then run: python vector_service.py index"
+            )
+        except Exception as e:
+            print(
+                "ChromaDB indexing failed:\n"
+                f"  {e}\n"
+                "Retry with local disk (examples):\n"
+                "  USE_CHROMA_CLOUD=false CHROMA_PERSIST_DIR=.\\chroma_db "
+                "PYTHONUTF8=1 python vector_service.py index\n"
+                "On Windows PowerShell: "
+                '$env:USE_CHROMA_CLOUD="false"; $env:CHROMA_PERSIST_DIR="...\\backend\\chroma_db"; '
+                '$env:PYTHONUTF8="1"; python vector_service.py index'
             )
         
         print("\n" + "="*80)

@@ -55,6 +55,9 @@ Thumbs.db
 # Database
 *.db
 *.sqlite
+
+# Local ChromaDB (Docker/dev persist under backend/)
+backend/chroma_db/
 *.sqlite3
 
 # React

@@ -504,41 +504,48 @@ async def generate_questions(
     current_admin: models.User = Depends(get_current_admin)
 ):
     """
-    Generate questions using Gemini AI with automatic duplicate detection.
-
-    Generates MCQ questions for a given topic and difficulty level,
-    checks for duplicates using vector similarity, and saves to database.
+    Generate MCQs via Groq (count 1–5). For each item, in order: exact title match (SQL),
+    then Chroma semantic duplicate check (one embed/query per item), then save + index into Chroma.
     """
     try:
         generator = get_question_generator()
         generated = generator.generate_single(topic=topic, difficulty=difficulty, count=count)
 
         if not generated:
-            raise HTTPException(status_code=500, detail="Failed to generate questions from Gemini")
+            raise HTTPException(status_code=500, detail="Groq: No questions generated (invalid JSON or empty response)")
 
         duplicates = []
         added_questions = []
 
         for gen_q in generated:
-            # Check for duplicate/similar questions
-            dup = check_duplicate(
-                title=gen_q.get("title", ""),
-                description=gen_q.get("description", ""),
-                threshold=0.92
-            )
+            title = gen_q.get("title", "") or ""
+            description = gen_q.get("description", "") or ""
 
+            existing = db.query(models.Question).filter(
+                models.Question.title.ilike(title)
+            ).first()
+
+            if existing:
+                duplicates.append({
+                    "title": title,
+                    "similar_to": existing.title,
+                    "similarity": 1.0,
+                })
+                continue
+
+            dup = check_duplicate(title=title, description=description, threshold=0.92)
             if dup:
                 duplicates.append({
-                    "title": gen_q.get("title"),
+                    "title": title,
                     "similar_to": dup.get("title"),
-                    "similarity": dup.get("similarity", 0)
+                    "similarity": dup.get("similarity", 0),
                 })
                 continue
 
             # Create question model
             new_question = models.Question(
-                title=gen_q.get("title", ""),
-                description=gen_q.get("description", ""),
+                title=title,
+                description=description,
                 difficulty=difficulty,
                 category=gen_q.get("category", "Quants"),
                 topic=topic,
@@ -555,11 +562,7 @@ async def generate_questions(
             db.add(new_question)
             db.flush()  # Get the ID
 
-            # Index to ChromaDB for semantic search
-            try:
-                index_question(new_question)
-            except Exception as idx_err:
-                print(f"Warning: Failed to index question {new_question.id}: {idx_err}")
+            index_question(new_question)
 
             added_questions.append({
                 "id": new_question.id,
@@ -596,7 +599,15 @@ async def generate_questions(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating questions: {str(e)}")
+        error_detail = str(e)
+        # Enhance error message for Groq API issues
+        if "API key" in error_detail or "APIKeyError" in error_detail or "401" in error_detail:
+            error_detail = f"Groq API Key Error: Invalid or missing GROQ_API_KEY environment variable"
+        elif "429" in error_detail or "rate limit" in error_detail.lower():
+            error_detail = f"Groq Rate Limited: Too many requests. Please wait a moment and try again."
+        elif "Groq" not in error_detail:
+            error_detail = f"Groq Error: {error_detail}"
+        raise HTTPException(status_code=500, detail=error_detail)
 
 
 

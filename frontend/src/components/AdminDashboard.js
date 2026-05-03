@@ -12,6 +12,14 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
 
+    // Question generation modal state
+    const [showGenerateModal, setShowGenerateModal] = useState(false);
+    const [genTopic, setGenTopic] = useState('');
+    const [genDifficulty, setGenDifficulty] = useState('Medium');
+    const [genCount, setGenCount] = useState(1);
+    const [generating, setGenerating] = useState(false);
+    const [generateResult, setGenerateResult] = useState(null);
+
     useEffect(() => {
         fetchStats();
     }, []);
@@ -62,6 +70,49 @@ const AdminDashboard = () => {
             alert(`❌ Failed to delete questions: ${error.response?.data?.detail || error.message}`);
         } finally {
             setDeleting(false);
+        }
+    };
+
+    const handleGenerateQuestions = async (e) => {
+        e.preventDefault();
+        if (!genTopic.trim()) {
+            alert('Please enter a topic');
+            return;
+        }
+
+        setGenerating(true);
+        setGenerateResult(null);
+
+        try {
+            const response = await axios.post(
+                `${API_URL}/admin/questions/generate`,
+                null,
+                {
+                    params: {
+                        topic: genTopic,
+                        difficulty: genDifficulty,
+                        count: genCount
+                    },
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            setGenerateResult(response.data);
+            setGenTopic('');
+            fetchStats();
+        } catch (error) {
+            console.error('Generation failed:', error);
+            if (error.response && error.response.data && error.response.data.detail) {
+                setGenerateResult({
+                    error: error.response.data.detail
+                });
+            } else {
+                setGenerateResult({
+                    error: 'Failed to generate questions'
+                });
+            }
+        } finally {
+            setGenerating(false);
         }
     };
 
@@ -248,6 +299,29 @@ const AdminDashboard = () => {
                         ))}
                     </div>
 
+                    {/* Generate Questions Button */}
+                    <div className="mt-6 p-4 border-2 border-blue-200 rounded-2xl bg-blue-50">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-100 text-blue-600">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-blue-800">Generate Questions</p>
+                                    <p className="text-sm text-blue-600">Create new questions using AI with specified topic & difficulty</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowGenerateModal(true)}
+                                className="px-6 py-3 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 hover:shadow-lg transition-all duration-200"
+                            >
+                                Open Generator →
+                            </button>
+                        </div>
+                    </div>
+
                     {/* Delete All Questions Button */}
                     <div className="mt-6 p-4 border-2 border-red-200 rounded-2xl bg-red-50">
                         <div className="flex items-center justify-between">
@@ -345,6 +419,190 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Generate Questions Modal */}
+            {showGenerateModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        {/* Modal Header */}
+                        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-5 flex items-center justify-between z-10">
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 text-blue-600">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <h2 className="text-xl font-bold text-gray-900">Generate Questions</h2>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setShowGenerateModal(false);
+                                    setGenerateResult(null);
+                                }}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 space-y-6">
+                            {!generateResult ? (
+                                <>
+                                    <p className="text-sm text-gray-600">
+                                        ✨ Generate new aptitude questions using Google Gemini AI. Specify a topic and difficulty level, and the system will automatically check for duplicates before saving.
+                                    </p>
+
+                                    <form onSubmit={handleGenerateQuestions} className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Topic *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={genTopic}
+                                                onChange={(e) => setGenTopic(e.target.value)}
+                                                placeholder="e.g., Profit and Loss, Time and Work, Probability"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                disabled={generating}
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Difficulty
+                                                </label>
+                                                <select
+                                                    value={genDifficulty}
+                                                    onChange={(e) => setGenDifficulty(e.target.value)}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                                    disabled={generating}
+                                                >
+                                                    <option value="Easy">Easy</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="Hard">Hard</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Number of Questions (1-5)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="5"
+                                                    value={genCount}
+                                                    onChange={(e) => setGenCount(Math.max(1, Math.min(5, parseInt(e.target.value) || 1)))}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    disabled={generating}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            disabled={generating || !genTopic.trim()}
+                                            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            {generating ? (
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Generating...
+                                                </span>
+                                            ) : (
+                                                'Generate Questions'
+                                            )}
+                                        </button>
+                                    </form>
+                                </>
+                            ) : (
+                                <>
+                                    {generateResult.error ? (
+                                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                            <p className="text-sm font-semibold text-red-800">Error</p>
+                                            <p className="text-sm text-red-600 mt-1">{generateResult.error}</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                                <p className="text-sm font-semibold text-green-800">✓ Generation Complete</p>
+                                                <div className="grid grid-cols-3 gap-4 mt-3">
+                                                    <div>
+                                                        <p className="text-xs text-green-600">Generated</p>
+                                                        <p className="text-2xl font-bold text-green-700">{generateResult.generated}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-green-600">Added</p>
+                                                        <p className="text-2xl font-bold text-green-700">{generateResult.added}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-green-600">Duplicates</p>
+                                                        <p className="text-2xl font-bold text-green-700">{generateResult.duplicates}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {generateResult.questions && generateResult.questions.length > 0 && (
+                                                <div>
+                                                    <h3 className="font-semibold text-gray-900 mb-3">New Questions Added:</h3>
+                                                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                                                        {generateResult.questions.map((q, idx) => (
+                                                            <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                                                <p className="text-sm font-medium text-gray-900">{q.title}</p>
+                                                                <div className="flex gap-2 mt-2">
+                                                                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{q.topic}</span>
+                                                                    <span className={`text-xs px-2 py-1 rounded ${q.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
+                                                                            q.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                                                                                'bg-red-100 text-red-700'
+                                                                        }`}>
+                                                                        {q.difficulty}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {generateResult.duplicate_summary && generateResult.duplicate_summary.length > 0 && (
+                                                <div>
+                                                    <h3 className="font-semibold text-gray-900 mb-3">Duplicates Detected:</h3>
+                                                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                                                        {generateResult.duplicate_summary.map((dup, idx) => (
+                                                            <div key={idx} className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                                                                <p className="text-sm font-medium text-gray-900">{dup.title}</p>
+                                                                <p className="text-xs text-yellow-600 mt-1">Similar to: {dup.similar_to} ({(dup.similarity * 100).toFixed(0)}%)</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={() => {
+                                            setShowGenerateModal(false);
+                                            setGenerateResult(null);
+                                            setGenTopic('');
+                                            setGenDifficulty('Medium');
+                                            setGenCount(1);
+                                        }}
+                                        className="w-full py-3 bg-gray-900 text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

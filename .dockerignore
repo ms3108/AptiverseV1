@@ -25,6 +25,8 @@ yarn-error.log
 .env
 .env.local
 .env.*.local
+backend/.env
+backend/.env.local
 
 # IDE
 .vscode
@@ -62,3 +64,6 @@ render.yaml
 # Frontend build (when building backend)
 frontend/node_modules
 frontend/build
+
+# Local Chroma (never ship in image)
+backend/chroma_db

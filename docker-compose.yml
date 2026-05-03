@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # -------------------------------------------------------------------------
   # Redis — broker for Celery + ephemeral state for battles & ML caches
@@ -16,25 +14,51 @@ services:
       retries: 5
 
   # -------------------------------------------------------------------------
+  # PostgreSQL — reachable as hostname `db` from backend / celery
+  # -------------------------------------------------------------------------
+  db:
+    # Must match existing `postgres_data` volume major version (15 vs 16)
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aptiverse
+      POSTGRES_PASSWORD: aptiverse123
+      POSTGRES_DB: aptiverse_db
+    # Host 5432 is often taken by local Postgres — map a different host port
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aptiverse -d aptiverse_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # -------------------------------------------------------------------------
   # Backend — FastAPI
   # -------------------------------------------------------------------------
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=sqlite:///./aptiverse.db
+      - DATABASE_URL=postgresql://aptiverse:aptiverse123@db:5432/aptiverse_db
       - SECRET_KEY=your-secret-key-for-local-dev
       - SKIP_EMAIL_VERIFICATION=true
       - REDIS_URL=redis://redis:6379/0
       - FRONTEND_URL=http://localhost:3000
+      - USE_CHROMA_CLOUD=false
+      - CHROMA_PERSIST_DIR=/app/chroma_db
     volumes:
       - ./backend:/app
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       redis:
+        condition: service_healthy
+      db:
         condition: service_healthy
 
   # -------------------------------------------------------------------------
@@ -42,10 +66,10 @@ services:
   # -------------------------------------------------------------------------
   celery_worker:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     environment:
-      - DATABASE_URL=sqlite:///./aptiverse.db
+      - DATABASE_URL=postgresql://aptiverse:aptiverse123@db:5432/aptiverse_db
       - SECRET_KEY=your-secret-key-for-local-dev
       - REDIS_URL=redis://redis:6379/0
       - GMAIL_USER=${GMAIL_USER:-}
@@ -57,16 +81,18 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      db:
+        condition: service_healthy
 
   # -------------------------------------------------------------------------
   # Celery Beat — schedules periodic tasks
   # -------------------------------------------------------------------------
   celery_beat:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     environment:
-      - DATABASE_URL=sqlite:///./aptiverse.db
+      - DATABASE_URL=postgresql://aptiverse:aptiverse123@db:5432/aptiverse_db
       - SECRET_KEY=your-secret-key-for-local-dev
       - REDIS_URL=redis://redis:6379/0
       - GMAIL_USER=${GMAIL_USER:-}
@@ -77,6 +103,8 @@ services:
     command: celery -A celery_app beat --loglevel=info
     depends_on:
       redis:
+        condition: service_healthy
+      db:
         condition: service_healthy
 
   # -------------------------------------------------------------------------
@@ -95,3 +123,6 @@ services:
       - ./frontend/public:/app/public
     depends_on:
       - backend
+
+volumes:
+  postgres_data:
