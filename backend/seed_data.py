@@ -251,6 +251,18 @@ def main():
         print("Γ¥ô Seeding questions...")
         seed_questions(db)
         
+        print("\n" + "="*80 + "\n")
+        print("Indexing seeded questions into ChromaDB...")
+        try:
+            from vector_service import index_all_questions
+
+            index_all_questions()
+        except ImportError as e:
+            print(
+                "Skipping ChromaDB indexing (chromadb not installed or import failed): "
+                f"{e}\nInstall backend requirements, then run: python vector_service.py index"
+            )
+        
         print("\n" + "="*80)
         print("≡ƒÄë Database seeding completed successfully!")
         print("="*80 + "\n")

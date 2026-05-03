@@ -6,12 +6,17 @@ from sqlalchemy import func, Integer
 from datetime import datetime, timedelta
 from typing import Optional
 from functools import lru_cache
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
 import models
 import schemas
 import auth
 from database import engine, get_db
 from cache import _cache, _cache_time, cached_query
-import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -20,6 +25,8 @@ import random
 import admin_routes
 import admin_questions
 import knowledge_hub
+
+# ML service imported lazily inside functions that need it
 
 # Create database tables - wrap in try-except to allow app to start even if DB connection fails temporarily
 try:
@@ -296,17 +303,14 @@ def get_daily_practice_set(
     current_user: models.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Generate a personalized daily practice set using ML-based weak area prediction and Weaviate vector similarity"""
-    import ml_service
-    
+    """Generate a daily practice set for the user from the question bank."""
     # Check if user has already completed practice today
     today = datetime.utcnow().date()
     today_activity = db.query(models.ActivityLog).filter(
         models.ActivityLog.user_id == current_user.id,
         func.date(models.ActivityLog.activity_date) == today
     ).first()
-    
-    # Only consider it completed if they solved at least 8 questions (a reasonable practice set)
+
     if today_activity and today_activity.questions_solved >= 8:  # type: ignore
         return {
             "already_completed": True,
@@ -314,15 +318,26 @@ def get_daily_practice_set(
             "questions_solved_today": today_activity.questions_solved,
             "xp_earned_today": today_activity.xp_earned
         }
-    
-    # Get weak areas and generate practice set
-    weak_areas = ml_service.predict_weak_areas(db, current_user.id)
-    questions = ml_service.generate_daily_practice_set(db, current_user.id, current_user.daily_practice_count)  # type: ignore
-    
-    # Format questions for frontend
-    questions_data = []
-    for q in questions:
-        questions_data.append({
+
+    # Pull questions the user hasn't solved yet, up to their daily preference
+    solved_ids_subq = (
+        db.query(models.QuestionAttempt.question_id)
+        .filter(
+            models.QuestionAttempt.user_id == current_user.id,
+            models.QuestionAttempt.is_correct == True  # noqa: E712
+        )
+        .subquery()
+    )
+    questions = (
+        db.query(models.Question)
+        .filter(models.Question.id.notin_(solved_ids_subq))
+        .order_by(func.random())
+        .limit(current_user.daily_practice_count or 10)
+        .all()
+    )
+
+    questions_data = [
+        {
             "id": q.id,
             "title": q.title,
             "description": q.description,
@@ -334,15 +349,15 @@ def get_daily_practice_set(
             "option_c": q.option_c,
             "option_d": q.option_d,
             "xp_reward": q.xp_reward
-        })
-    
+        }
+        for q in questions
+    ]
+
     return {
         "already_completed": False,
         "questions": questions_data,
         "total_questions": len(questions_data),
         "user_preference": current_user.daily_practice_count,
-        "weak_areas": weak_areas,
-        "selection_method": "ml_weak_area_prediction"
     }
 
 
