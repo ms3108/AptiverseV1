@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, DateTime, Float, ForeignKey, Text, JSON
+from sqlalchemy import Boolean, Column, Integer, String, DateTime, Float, ForeignKey, Text, JSON, UniqueConstraint, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from database import Base
@@ -48,7 +48,7 @@ class Question(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(Text, nullable=False)
-    difficulty = Column(String, nullable=False)  # Easy, Medium, Hard
+    difficulty = Column(String, nullable=False, index=True)  # Easy, Medium, Hard
     category = Column(String, nullable=True, index=True)  # Quants, Logical, Language
     topic = Column(String, nullable=False, index=True)  # e.g., Arrays, Graphs, DP
     sub_topic = Column(String, nullable=True)
@@ -81,8 +81,13 @@ class Question(Base):
     alpha_weight = Column(Float, default=0.7)  # Weight for heuristic (starts high, decreases)
     last_difficulty_update = Column(DateTime(timezone=True), nullable=True)
     
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+    # Composite index for the question bank filter + sort queries
+    __table_args__ = (
+        Index("ix_questions_cat_topic_diff", "category", "topic", "difficulty"),
+    )
+
     # Relationships
     attempts = relationship("QuestionAttempt", back_populates="question")
 
@@ -100,7 +105,12 @@ class QuestionAttempt(Base):
     attempt_count = Column(Integer, default=1)  # How many times attempted
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+
+    # Composite index — powers the batch solved-status lookup on question bank load
+    __table_args__ = (
+        Index("ix_qa_user_question_correct", "user_id", "question_id", "is_correct"),
+    )
+
     # Relationships
     user = relationship("User", back_populates="question_attempts")
     question = relationship("Question", back_populates="attempts")
@@ -174,6 +184,7 @@ class DiscussionVote(Base):
     
     # Unique constraint: one vote per user per discussion
     __table_args__ = (
+        UniqueConstraint("discussion_id", "user_id", name="uq_discussion_vote"),
         {'sqlite_autoincrement': True},
     )
     
@@ -325,3 +336,81 @@ class UserWarning(Base):
     user = relationship("User", foreign_keys=[user_id], backref="warnings")
     issued_by = relationship("User", foreign_keys=[issued_by_admin_id])
     report = relationship("ReportedPost", foreign_keys=[report_id])
+
+
+# =============================================================================
+# BKT Mastery State (Gap 4)
+# =============================================================================
+
+class UserTopicMastery(Base):
+    """Bayesian Knowledge Tracing state per user per topic."""
+    __tablename__ = "user_topic_mastery"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    topic = Column(String, nullable=False, index=True)
+
+    # BKT latent mastery probability [0, 1]
+    p_mastery = Column(Float, default=0.1, nullable=False)
+
+    # Per-topic BKT parameters (can be tuned over time)
+    p_learn = Column(Float, default=0.10)     # learning rate
+    p_guess = Column(Float, default=0.25)     # guess probability
+    p_slip = Column(Float, default=0.10)      # slip probability
+    forget_lambda = Column(Float, default=0.01)  # forgetting rate per day
+
+    updated_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Unique: one mastery record per (user, topic)
+    __table_args__ = (
+        UniqueConstraint("user_id", "topic", name="uq_user_topic_mastery"),
+    )
+
+    # Relationships
+    user = relationship("User", backref="topic_mastery")
+
+
+# =============================================================================
+# Knowledge Hub (Gap 6)
+# =============================================================================
+
+class KnowledgeContent(Base):
+    """User-generated knowledge articles for the Knowledge Hub."""
+    __tablename__ = "knowledge_content"
+
+    id = Column(Integer, primary_key=True, index=True)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String(300), nullable=False)
+    body = Column(Text, nullable=False)
+    status = Column(String(20), default="published")  # published, archived
+    upvotes = Column(Integer, default=0)
+    downvotes = Column(Integer, default=0)
+
+    # ChromaDB vector ID for semantic search
+    vector_id = Column(String, nullable=True)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relationships
+    author = relationship("User", backref="knowledge_articles")
+    votes = relationship("KnowledgeVote", back_populates="content", cascade="all, delete-orphan")
+
+
+class KnowledgeVote(Base):
+    """Upvote/downvote on a KnowledgeContent article."""
+    __tablename__ = "knowledge_votes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    content_id = Column(Integer, ForeignKey("knowledge_content.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    vote_type = Column(Integer, nullable=False)  # 1 = upvote, -1 = downvote
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        UniqueConstraint("content_id", "user_id", name="uq_knowledge_vote"),
+    )
+
+    # Relationships
+    content = relationship("KnowledgeContent", back_populates="votes")
+    user = relationship("User", backref="knowledge_votes")

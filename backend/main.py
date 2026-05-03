@@ -649,50 +649,48 @@ def get_categories(
     db: Session = Depends(get_db)
 ):
     """Get all question categories with topic counts (cached for 10 minutes)"""
-    from sqlalchemy import distinct
-    
-    # Use cache to avoid repeated database queries (10 minute TTL)
+
     def query_categories():
+        # Single GROUP BY query — replaces the previous N+1 loop
+        # that ran 1 + N_categories + N_categories×N_topics queries
+        rows = (
+            db.query(
+                models.Question.category,
+                models.Question.topic,
+                func.count(models.Question.id).label("count")
+            )
+            .filter(models.Question.category.isnot(None))
+            .group_by(models.Question.category, models.Question.topic)
+            .order_by(models.Question.category, models.Question.topic)
+            .all()
+        )
+
+        # Aggregate into {category: {topic: count, ...}, ...}
+        cat_map: dict = {}
+        for category, topic, count in rows:
+            if category not in cat_map:
+                cat_map[category] = {}
+            if topic:
+                cat_map[category][topic] = cat_map[category].get(topic, 0) + count
+
         categories_data = []
-        
-        categories = db.query(models.Question.category).distinct().filter(
-            models.Question.category.isnot(None)
-        ).all()
-        
-        for (category,) in categories:
-            # Get topics for this category
-            topics = db.query(models.Question.topic).filter(
-                models.Question.category == category
-            ).distinct().all()
-            
-            topic_list = []
-            for (topic,) in topics:
-                count = db.query(models.Question).filter(
-                    models.Question.category == category,
-                    models.Question.topic == topic
-                ).count()
-                topic_list.append({"name": topic, "count": count})
-            
-            # Sort topics alphabetically
-            topic_list.sort(key=lambda x: x["name"])
-            
-            total_count = db.query(models.Question).filter(
-                models.Question.category == category
-            ).count()
-            
+        for category, topics_dict in cat_map.items():
+            topic_list = sorted(
+                [{"name": t, "count": c} for t, c in topics_dict.items()],
+                key=lambda x: x["name"]
+            )
             categories_data.append({
                 "name": category,
-                "total_questions": total_count,
-                "topics": topic_list
+                "total_questions": sum(topics_dict.values()),
+                "topics": topic_list,
             })
-        
+
         # Sort categories: Quantitative, Logical, Linguistic
         category_order = {"Quantitative": 0, "Logical": 1, "Linguistic": 2}
         categories_data.sort(key=lambda x: category_order.get(x["name"], 99))
-        
         return {"categories": categories_data}
-    
-    # Cache the expensive query (10 minute TTL)
+
+    # Cache the result for 10 minutes (server-side in-memory)
     return cached_query("question_categories", query_categories, ttl_seconds=600)
 
 
