@@ -15,7 +15,7 @@ load_dotenv()
 import models
 import schemas
 import auth
-from database import engine, get_db
+from database import engine, get_db, SessionLocal
 from cache import _cache, _cache_time, cached_query
 import smtplib
 from email.mime.text import MIMEText
@@ -1299,6 +1299,115 @@ def get_available_topics(db: Session = Depends(get_db)):
     }
 
 
+# ---------------------------------------------------------------------------
+# Battle advance helpers  (run as asyncio tasks — own DB session, no blocking)
+# ---------------------------------------------------------------------------
+
+async def advance_to_next_question(room_code: str, battle_id: int, q_index: int):
+    """Advance battle to next question or declare completion.
+    Safe to run as an asyncio.create_task().  Uses its own DB session.
+    Only the first caller for a given (room, q_index) actually does anything
+    — subsequent callers (e.g. a timer firing after all players already
+    answered) are silently ignored via try_claim_advance.
+    """
+    if not manager.try_claim_advance(room_code, q_index):
+        return  # Another task already handling this question advance
+
+    try:
+        await asyncio.sleep(3)  # Show answer results for 3 s before moving on
+
+        battle_state = manager.get_battle_state(room_code)
+        # Guard: state might have been cleared if everyone disconnected
+        if not battle_state or battle_state.get("current_question_index") != q_index:
+            return
+
+        battle_state["current_question_index"] = q_index + 1
+        manager._save_state(room_code, battle_state)
+
+        db = SessionLocal()
+        try:
+            battle = db.query(models.BattleRoom).filter(
+                models.BattleRoom.id == battle_id
+            ).first()
+            if not battle:
+                return
+
+            new_index = q_index + 1
+            if new_index < len(battle_state["questions"]):
+                # ---- Send next question ----
+                next_q = battle_state["questions"][new_index]
+                await manager.broadcast_to_room(room_code, {
+                    "type": "question",
+                    "question": {
+                        "id": next_q["id"],
+                        "title": next_q["title"],
+                        "description": next_q["description"],
+                        "option_a": next_q["option_a"],
+                        "option_b": next_q["option_b"],
+                        "option_c": next_q["option_c"],
+                        "option_d": next_q["option_d"],
+                        "difficulty": next_q["difficulty"]
+                    },
+                    "question_number": new_index + 1,
+                    "total_questions": battle_state["num_questions"]
+                })
+                # Start auto-timer for the new question
+                asyncio.create_task(
+                    _question_timer(room_code, battle_id, new_index, int(battle.time_per_question))  # type: ignore
+                )
+            else:
+                # ---- Battle completed ----
+                battle.status = "completed"  # type: ignore
+                battle.completed_at = datetime.now()  # type: ignore
+
+                final_leaderboard = manager.get_sorted_leaderboard(room_code)
+                for entry in final_leaderboard:
+                    p = db.query(models.BattleParticipant).filter(
+                        models.BattleParticipant.battle_room_id == battle.id,
+                        models.BattleParticipant.user_id == entry["user_id"]
+                    ).first()
+                    if p:
+                        p.rank = entry["rank"]
+                db.commit()
+
+                # Publish to Kafka (graceful — no-op if unavailable)
+                try:
+                    from kafka_producer import get_producer
+                    producer = get_producer()
+                    battle_results = [
+                        {
+                            "user_id": entry["user_id"],
+                            "score": entry["score"],
+                            "correct_answers": entry.get("correct_answers", 0),
+                            "rank": entry["rank"]
+                        }
+                        for entry in final_leaderboard
+                    ]
+                    producer.publish_battle_completed(room_code, battle_results)
+                except Exception as _ke:
+                    print(f"⚠️ Kafka battle-completed dispatch failed: {_ke}")
+
+                await manager.broadcast_to_room(room_code, {
+                    "type": "battle_completed",
+                    "final_leaderboard": final_leaderboard
+                })
+        finally:
+            db.close()
+    finally:
+        manager.release_advance(room_code, q_index)
+
+
+async def _question_timer(room_code: str, battle_id: int, q_index: int, time_per_question: int):
+    """Auto-advance the question after time_per_question seconds.
+    Fires even if some players never submitted — prevents game from hanging
+    when a player disconnects mid-battle.
+    """
+    await asyncio.sleep(time_per_question)
+    # try_claim_advance inside advance_to_next_question handles the case
+    # where all players already answered and the advance already happened.
+    await advance_to_next_question(room_code, battle_id, q_index)
+
+
 @app.websocket("/ws/battle/{room_code}")
 async def battle_websocket(
     websocket: WebSocket,
@@ -1458,6 +1567,10 @@ async def battle_websocket(
                         "question_number": 1,
                         "total_questions": battle.num_questions
                     })
+                    # ⏱ Auto-advance after time_per_question seconds
+                    asyncio.create_task(
+                        _question_timer(room_code, battle.id, 0, int(battle.time_per_question))  # type: ignore
+                    )
             
             elif message_type == "submit_answer":
                 # Process answer submission
@@ -1510,86 +1623,28 @@ async def battle_websocket(
                     "leaderboard": leaderboard
                 })
                 
-                # Check if all participants answered
+                # Check if all *active* players have answered — use live WS
+                # connections, not DB rows, so a disconnected player can't hang
+                # the game.  The per-question timer is the final safety net.
                 battle_state = manager.get_battle_state(room_code)
                 current_q_index = battle_state["current_question_index"]
-                
-                # Count answers for current question
+
                 answers_count = db.query(models.BattleAnswer).join(
                     models.BattleParticipant
                 ).filter(
                     models.BattleParticipant.battle_room_id == battle.id,
                     models.BattleAnswer.question_id == question_id
                 ).count()
-                
-                participants_count = db.query(models.BattleParticipant).filter(
-                    models.BattleParticipant.battle_room_id == battle.id
-                ).count()
-                
-                # Move to next question after short delay
-                if answers_count >= participants_count:
-                    await asyncio.sleep(3)  # 3 second delay to show results
-                    
-                    battle_state["current_question_index"] += 1
-                    
-                    if battle_state["current_question_index"] < len(battle_state["questions"]):
-                        # Send next question
-                        next_q = battle_state["questions"][battle_state["current_question_index"]]
-                        await manager.broadcast_to_room(room_code, {
-                            "type": "question",
-                            "question": {
-                                "id": next_q["id"],
-                                "title": next_q["title"],
-                                "description": next_q["description"],
-                                "option_a": next_q["option_a"],
-                                "option_b": next_q["option_b"],
-                                "option_c": next_q["option_c"],
-                                "option_d": next_q["option_d"],
-                                "difficulty": next_q["difficulty"]
-                            },
-                            "question_number": battle_state["current_question_index"] + 1,
-                            "total_questions": battle_state["num_questions"]
-                        })
-                    else:
-                        # Battle completed
-                        battle.status = "completed"  # type: ignore
-                        battle.completed_at = datetime.now()  # type: ignore
 
-                        # Update ranks
-                        final_leaderboard = manager.get_sorted_leaderboard(room_code)
-                        for entry in final_leaderboard:
-                            p = db.query(models.BattleParticipant).filter(
-                                models.BattleParticipant.battle_room_id == battle.id,
-                                models.BattleParticipant.user_id == entry["user_id"]
-                            ).first()
-                            if p:
-                                p.rank = entry["rank"]
+                # Count only currently-connected players (not all who ever joined)
+                active_count = len(manager.active_connections.get(room_code, []))
 
-                        db.commit()
+                if answers_count >= max(1, active_count):
+                    # All active players answered — advance now (timer is a backup)
+                    asyncio.create_task(
+                        advance_to_next_question(room_code, battle.id, current_q_index)  # type: ignore
+                    )
 
-                        # Publish battle-completed event to Kafka (Gap 5)
-                        try:
-                            from kafka_producer import get_producer
-                            producer = get_producer()
-                            battle_results = [
-                                {
-                                    "user_id": entry["user_id"],
-                                    "score": entry["score"],
-                                    "correct_answers": entry.get("correct_answers", 0),
-                                    "rank": entry["rank"]
-                                }
-                                for entry in final_leaderboard
-                            ]
-                            producer.publish_battle_completed(room_code, battle_results)
-                            print(f"✓ Published battle-completed event to Kafka (room: {room_code})")
-                        except Exception as e:
-                            print(f"⚠️ Kafka dispatch failed for battle completion: {e}")
-
-                        # Broadcast final results
-                        await manager.broadcast_to_room(room_code, {
-                            "type": "battle_completed",
-                            "final_leaderboard": final_leaderboard
-                        })
     
     except WebSocketDisconnect:
         manager.disconnect(websocket)

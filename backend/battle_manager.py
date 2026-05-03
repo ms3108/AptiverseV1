@@ -84,6 +84,24 @@ class ConnectionManager:
         self.user_info: Dict[WebSocket, dict] = {}
         # in-memory fallback state
         self._mem_states: Dict[str, dict] = {}
+        # (room_code, question_index) -> True  — prevents two concurrent submits both advancing
+        self._advancing: Dict[tuple, bool] = {}
+
+    # ------------------------------------------------------------------
+    # Advance-lock helpers  (GIL-safe for single-process asyncio)
+    # ------------------------------------------------------------------
+
+    def try_claim_advance(self, room_code: str, q_index: int) -> bool:
+        """Returns True if this coroutine wins the right to advance q_index.
+        Subsequent calls for the same (room, q_index) return False."""
+        key = (room_code, q_index)
+        if self._advancing.get(key):
+            return False
+        self._advancing[key] = True
+        return True
+
+    def release_advance(self, room_code: str, q_index: int) -> None:
+        self._advancing.pop((room_code, q_index), None)
 
     # ------------------------------------------------------------------
     # State storage helpers
