@@ -567,8 +567,17 @@ async def generate_questions(
             added_questions.append({
                 "id": new_question.id,
                 "title": new_question.title,
+                "description": new_question.description,
                 "difficulty": new_question.difficulty,
-                "topic": new_question.topic
+                "category": new_question.category,
+                "topic": new_question.topic,
+                "option_a": new_question.option_a,
+                "option_b": new_question.option_b,
+                "option_c": new_question.option_c,
+                "option_d": new_question.option_d,
+                "correct_answer": new_question.correct_answer,
+                "explanation": new_question.explanation,
+                "xp_reward": new_question.xp_reward,
             })
 
         db.commit()

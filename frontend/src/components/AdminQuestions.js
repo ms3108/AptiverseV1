@@ -23,6 +23,8 @@ const AdminQuestions = () => {
     const [genCount, setGenCount] = useState(1);
     const [generating, setGenerating] = useState(false);
     const [generateResult, setGenerateResult] = useState(null);
+    const [showGenModal, setShowGenModal] = useState(false);
+    const [modalQuestions, setModalQuestions] = useState([]);
 
     // Search and filter state
     const [searchQuery, setSearchQuery] = useState('');
@@ -165,6 +167,11 @@ const AdminQuestions = () => {
             setGenerateResult(response.data);
             setGenTopic('');
             fetchQuestions();
+            // Open modal if questions were added
+            if (response.data.questions && response.data.questions.length > 0) {
+                setModalQuestions(response.data.questions);
+                setShowGenModal(true);
+            }
         } catch (error) {
             console.error('Generation failed:', error);
             if (error.response && error.response.data && error.response.data.detail) {
@@ -287,6 +294,14 @@ const AdminQuestions = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             <Navigation />
+
+            {/* Generated Questions Modal */}
+            {showGenModal && modalQuestions.length > 0 && (
+                <GeneratedQuestionsModal
+                    questions={modalQuestions}
+                    onClose={() => setShowGenModal(false)}
+                />
+            )}
 
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Header */}
@@ -428,7 +443,7 @@ const AdminQuestions = () => {
                         <form onSubmit={handleGenerateQuestions} className="space-y-4">
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                                 <p className="text-sm text-blue-800">
-                                    ✨ Generate questions using Google Gemini AI. Specify a topic and difficulty level, and the system will automatically check for duplicates before saving.
+                                    ✨ Generate questions using <strong>Groq AI</strong>. Specify a topic and difficulty level, and the questions will be saved directly to the database.
                                 </p>
                             </div>
 
@@ -484,7 +499,7 @@ const AdminQuestions = () => {
                                 disabled={generating || !genTopic.trim()}
                                 className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all"
                             >
-                                {generating ? 'Generating... 🤖' : 'Generate with Gemini AI 🚀'}
+                                {generating ? 'Generating... 🤖' : 'Generate with Groq AI ⚡'}
                             </button>
                         </form>
                     )}
@@ -822,6 +837,216 @@ const AdminQuestions = () => {
                         </div>
                     </div>
                 )}
+            </div>
+        </div>
+    );
+};
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Generated Questions Modal
+───────────────────────────────────────────────────────────────────────────── */
+const OPTION_LABELS = ['A', 'B', 'C', 'D'];
+const OPTION_KEYS   = ['option_a', 'option_b', 'option_c', 'option_d'];
+
+const DIFFICULTY_STYLES = {
+    easy:   { bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+    medium: { bg: 'bg-amber-100',   text: 'text-amber-700',   dot: 'bg-amber-500'   },
+    hard:   { bg: 'bg-rose-100',    text: 'text-rose-700',    dot: 'bg-rose-500'    },
+};
+
+const GeneratedQuestionsModal = ({ questions, onClose }) => {
+    const [activeIdx, setActiveIdx] = useState(0);
+    const [revealed, setRevealed] = useState(false);
+    const total = questions.length;
+    const q = questions[activeIdx];
+
+    // Keyboard navigation
+    React.useEffect(() => {
+        const handler = (e) => {
+            if (e.key === 'Escape') onClose();
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                setActiveIdx(i => Math.min(i + 1, total - 1));
+                setRevealed(false);
+            }
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                setActiveIdx(i => Math.max(i - 1, 0));
+                setRevealed(false);
+            }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [onClose, total]);
+
+    const goTo = (idx) => { setActiveIdx(idx); setRevealed(false); };
+
+    const diffKey  = (q.difficulty || 'easy').toLowerCase();
+    const diffStyle = DIFFICULTY_STYLES[diffKey] || DIFFICULTY_STYLES.easy;
+    const correctLetter = (q.correct_answer || 'A').toUpperCase();
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)' }}
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div
+                className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+                style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
+            >
+                {/* ── Header ── */}
+                <div className="px-6 pt-5 pb-4 border-b border-gray-100" style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)' }}>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-white text-xl">✨</span>
+                                <h2 className="text-white font-bold text-lg">Generated Questions</h2>
+                            </div>
+                            <p className="text-purple-200 text-sm mt-0.5">
+                                {total} question{total !== 1 ? 's' : ''} saved to the database
+                            </p>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="text-white/70 hover:text-white transition-colors text-2xl leading-none"
+                            aria-label="Close"
+                        >
+                            ×
+                        </button>
+                    </div>
+
+                    {/* Progress dots */}
+                    {total > 1 && (
+                        <div className="flex gap-1.5 mt-3">
+                            {questions.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => goTo(i)}
+                                    className={`h-2 rounded-full transition-all ${
+                                        i === activeIdx
+                                            ? 'bg-white w-6'
+                                            : 'bg-white/40 w-2 hover:bg-white/70'
+                                    }`}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* ── Body (scrollable) ── */}
+                <div className="overflow-y-auto flex-1 px-6 py-5" style={{ scrollbarWidth: 'thin' }}>
+                    {/* Meta row */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${diffStyle.bg} ${diffStyle.text}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${diffStyle.dot}`} />
+                            {q.difficulty}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
+                            📚 {q.topic}
+                        </span>
+                        {q.category && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700">
+                                {q.category}
+                            </span>
+                        )}
+                        {q.xp_reward && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                                ⚡ {q.xp_reward} XP
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Question text */}
+                    <div className="mb-5">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">
+                            Question {activeIdx + 1} of {total}
+                        </p>
+                        <p className="text-gray-900 font-medium leading-relaxed text-base">
+                            {q.description || q.title}
+                        </p>
+                    </div>
+
+                    {/* Options */}
+                    <div className="space-y-2.5 mb-5">
+                        {OPTION_LABELS.map((letter, idx) => {
+                            const optionText = q[OPTION_KEYS[idx]];
+                            const isCorrect  = letter === correctLetter;
+                            let optionClass = 'border border-gray-200 bg-gray-50 text-gray-700';
+                            if (revealed) {
+                                optionClass = isCorrect
+                                    ? 'border-2 border-emerald-500 bg-emerald-50 text-emerald-800'
+                                    : 'border border-gray-200 bg-gray-50 text-gray-400';
+                            }
+                            return (
+                                <div
+                                    key={letter}
+                                    className={`flex items-start gap-3 p-3 rounded-xl transition-all ${optionClass}`}
+                                >
+                                    <span
+                                        className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                                            revealed && isCorrect
+                                                ? 'bg-emerald-500 text-white'
+                                                : 'bg-white border border-gray-300 text-gray-600'
+                                        }`}
+                                    >
+                                        {revealed && isCorrect ? '✓' : letter}
+                                    </span>
+                                    <span className="text-sm leading-relaxed pt-0.5">{optionText}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Reveal / Explanation */}
+                    {!revealed ? (
+                        <button
+                            onClick={() => setRevealed(true)}
+                            className="w-full py-2.5 rounded-xl border-2 border-dashed border-purple-300 text-purple-600 text-sm font-semibold hover:bg-purple-50 transition-colors"
+                        >
+                            👁 Reveal Answer & Explanation
+                        </button>
+                    ) : (
+                        <div className="rounded-xl p-4" style={{ background: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: '1px solid #86efac' }}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">✓</span>
+                                <span className="font-bold text-emerald-800 text-sm">Correct Answer: Option {correctLetter}</span>
+                            </div>
+                            {q.explanation && (
+                                <p className="text-emerald-900 text-sm leading-relaxed">{q.explanation}</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* ── Footer Nav ── */}
+                <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between gap-3 bg-gray-50">
+                    <button
+                        onClick={() => goTo(Math.max(activeIdx - 1, 0))}
+                        disabled={activeIdx === 0}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                        ← Prev
+                    </button>
+
+                    <span className="text-xs text-gray-400">
+                        {activeIdx + 1} / {total}
+                    </span>
+
+                    {activeIdx < total - 1 ? (
+                        <button
+                            onClick={() => goTo(activeIdx + 1)}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+                        >
+                            Next →
+                        </button>
+                    ) : (
+                        <button
+                            onClick={onClose}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors"
+                        >
+                            Done ✓
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

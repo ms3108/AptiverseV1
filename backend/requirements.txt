@@ -14,5 +14,8 @@ websockets==12.0
 scikit-learn==1.4.0
 numpy==1.26.3
 
+# Groq LLM API
+groq>=0.9.0
+
 # Caching (Redis - optional, falls back gracefully)
 redis==5.0.1
