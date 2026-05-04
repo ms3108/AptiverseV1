@@ -450,7 +450,7 @@ const AdminDashboard = () => {
                             {!generateResult ? (
                                 <>
                                     <p className="text-sm text-gray-600">
-                                        ✨ Generate new aptitude questions using Google Gemini AI. Specify a topic and difficulty level, and the system will automatically check for duplicates before saving.
+                                        ✨ Generate new aptitude questions using <strong>Groq AI</strong>. Specify a topic and difficulty level, and the system will automatically check for duplicates before saving.
                                     </p>
 
                                     <form onSubmit={handleGenerateQuestions} className="space-y-4">
