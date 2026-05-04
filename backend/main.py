@@ -659,8 +659,8 @@ def get_categories(
                 "topics": topic_list,
             })
 
-        # Sort categories: Quantitative, Logical, Linguistic
-        category_order = {"Quantitative": 0, "Logical": 1, "Linguistic": 2}
+        # Sort categories: Quants, Logical, Linguistics
+        category_order = {"Quants": 0, "Logical": 1, "Linguistics": 2}
         categories_data.sort(key=lambda x: category_order.get(x["name"], 99))
         return {"categories": categories_data}
 

@@ -89,7 +89,10 @@ class Question(Base):
     )
 
     # Relationships
-    attempts = relationship("QuestionAttempt", back_populates="question")
+    attempts = relationship("QuestionAttempt", back_populates="question", cascade="all, delete-orphan")
+    discussions = relationship("Discussion", back_populates="question", cascade="all, delete-orphan")
+    battle_questions = relationship("BattleQuestion", back_populates="question", cascade="all, delete-orphan")
+    battle_answers = relationship("BattleAnswer", back_populates="question", cascade="all, delete-orphan")
 
 
 class QuestionAttempt(Base):
@@ -97,7 +100,7 @@ class QuestionAttempt(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
+    question_id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False)
     
     user_answer = Column(String, nullable=False)  # A, B, C, or D
     is_correct = Column(Boolean, nullable=False)
@@ -159,7 +162,7 @@ class Discussion(Base):
     __tablename__ = "discussions"
     
     id = Column(Integer, primary_key=True, index=True)
-    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
+    question_id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     content = Column(Text, nullable=False)
     upvotes = Column(Integer, default=0)
@@ -168,7 +171,7 @@ class Discussion(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    question = relationship("Question", backref="discussions")
+    question = relationship("Question", back_populates="discussions")
     user = relationship("User", backref="discussions")
     votes = relationship("DiscussionVote", back_populates="discussion", cascade="all, delete-orphan")
 
@@ -241,12 +244,12 @@ class BattleQuestion(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     battle_room_id = Column(Integer, ForeignKey("battle_rooms.id"), nullable=False)
-    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
+    question_id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False)
     question_order = Column(Integer, nullable=False)  # Order in battle (1, 2, 3...)
     
     # Relationships
     battle_room = relationship("BattleRoom", back_populates="questions")
-    question = relationship("Question", backref="battle_questions")
+    question = relationship("Question", back_populates="battle_questions")
 
 
 class BattleAnswer(Base):
@@ -254,7 +257,7 @@ class BattleAnswer(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     participant_id = Column(Integer, ForeignKey("battle_participants.id"), nullable=False)
-    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
+    question_id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False)
     
     user_answer = Column(String, nullable=False)  # A, B, C, or D
     is_correct = Column(Boolean, nullable=False)
@@ -265,7 +268,7 @@ class BattleAnswer(Base):
     
     # Relationships
     participant = relationship("BattleParticipant", back_populates="answers")
-    question = relationship("Question", backref="battle_answers")
+    question = relationship("Question", back_populates="battle_answers")
 
 
 class AdminActionLog(Base):
