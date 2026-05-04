@@ -30,7 +30,7 @@ const AdminQuestionForm = ({ onClose, onSuccess, defaultCategory = '', defaultTo
     const [uploadProgress, setUploadProgress] = useState(null);
     const [mergeStrategy, setMergeStrategy] = useState('merge');
 
-    const categories = ['Quants', 'Logical', 'Language'];
+    const categories = ['Quants', 'Logical', 'Linguistics'];
     const difficulties = ['Easy', 'Medium', 'Hard'];
     const answerOptions = ['A', 'B', 'C', 'D'];
 

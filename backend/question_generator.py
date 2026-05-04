@@ -31,7 +31,7 @@ Return a JSON array. Each element must have EXACTLY these keys:
 - "option_d": fourth option text
 - "correct_answer": exactly one of "A", "B", "C", or "D"
 - "explanation": concise step-by-step solution
-- "category": one of "Quants", "Logical", "Language"
+- "category": one of "Quants", "Logical", "Linguistics"
 - "xp_reward": integer — 10 for Easy, 20 for Medium, 30 for Hard
 
 Rules:

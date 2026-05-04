@@ -651,9 +651,9 @@ const AdminQuestions = () => {
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                             >
                                 <option value="">All Categories</option>
-                                <option value="Quantitative">Quantitative</option>
+                                <option value="Quants">Quants</option>
                                 <option value="Logical">Logical</option>
-                                <option value="Linguistic">Linguistic</option>
+                                <option value="Linguistics">Linguistics</option>
                             </select>
 
                             {/* Difficulty Filter */}
@@ -717,9 +717,9 @@ const AdminQuestions = () => {
                                                     <div className="max-w-md truncate">{question.title}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${question.category === 'Quantitative' ? 'bg-blue-100 text-blue-800' :
+                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${question.category === 'Quants' ? 'bg-blue-100 text-blue-800' :
                                                         question.category === 'Logical' ? 'bg-blue-200 text-blue-900' :
-                                                            question.category === 'Linguistic' ? 'bg-sky-100 text-sky-800' :
+                                                            question.category === 'Linguistics' ? 'bg-sky-100 text-sky-800' :
                                                                 'bg-slate-100 text-slate-800'
                                                         }`}>
                                                         {question.category || 'N/A'}

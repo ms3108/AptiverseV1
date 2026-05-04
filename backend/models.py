@@ -49,7 +49,7 @@ class Question(Base):
     title = Column(String, nullable=False)
     description = Column(Text, nullable=False)
     difficulty = Column(String, nullable=False, index=True)  # Easy, Medium, Hard
-    category = Column(String, nullable=True, index=True)  # Quants, Logical, Language
+    category = Column(String, nullable=True, index=True)  # Quants, Logical, Linguistics
     topic = Column(String, nullable=False, index=True)  # e.g., Arrays, Graphs, DP
     sub_topic = Column(String, nullable=True)
     

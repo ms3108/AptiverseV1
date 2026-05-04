@@ -294,13 +294,6 @@ function QuestionBank() {
             icon: '🔢',
             iconBg: 'rgba(0, 0, 0, 0.12)'
         },
-        'Quantitative': {
-            gradient: 'linear-gradient(135deg, #000000 0%, #333333 100%)',
-            bgLight: '#F8F9FA',
-            border: '#6C757D',
-            icon: '🔢',
-            iconBg: 'rgba(0, 0, 0, 0.12)'
-        },
         'Logical': {
             gradient: 'linear-gradient(135deg, #333333 0%, #555555 100%)',
             bgLight: '#F8F9FA',
@@ -308,14 +301,7 @@ function QuestionBank() {
             icon: '🧩',
             iconBg: 'rgba(51, 51, 51, 0.12)'
         },
-        'Language': {
-            gradient: 'linear-gradient(135deg, #555555 0%, #777777 100%)',
-            bgLight: '#F8F9FA',
-            border: '#6C757D',
-            icon: '📝',
-            iconBg: 'rgba(85, 85, 85, 0.12)'
-        },
-        'Linguistic': {
+        'Linguistics': {
             gradient: 'linear-gradient(135deg, #555555 0%, #777777 100%)',
             bgLight: '#F8F9FA',
             border: '#6C757D',
