@@ -31,7 +31,7 @@ Return a JSON array. Each element must have EXACTLY these keys:
 - "option_d": fourth option text
 - "correct_answer": exactly one of "A", "B", "C", or "D"
 - "explanation": concise step-by-step solution
-- "category": one of "Quantitative", "Logical", "Linguistic"
+- "category": one of "Quants", "Logical", "Language"
 - "xp_reward": integer — 10 for Easy, 20 for Medium, 30 for Hard
 
 Rules:
@@ -52,7 +52,7 @@ Example of a single item:
     "option_d": "32%",
     "correct_answer": "A",
     "explanation": "Let CP = 100. Marked price = 140. After 10% discount, SP = 140 × 0.9 = 126. Profit = 26%. Hence profit % = 26%.",
-    "category": "Quantitative",
+    "category": "Quants",
     "xp_reward": 20
   }}
 ]"""
@@ -236,7 +236,7 @@ class GroqQuestionGenerator:
             "option_d": str(item["option_d"]).strip(),
             "correct_answer": correct,
             "explanation": str(item.get("explanation", "")).strip(),
-            "category": str(item.get("category", "Quantitative")).strip(),
+            "category": str(item.get("category", "Quants")).strip(),
             "topic": topic,
             "difficulty": difficulty,
             "xp_reward": xp,

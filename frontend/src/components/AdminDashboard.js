@@ -19,9 +19,11 @@ const AdminDashboard = () => {
     const [genCount, setGenCount] = useState(1);
     const [generating, setGenerating] = useState(false);
     const [generateResult, setGenerateResult] = useState(null);
+    const [topics, setTopics] = useState([]);
 
     useEffect(() => {
         fetchStats();
+        fetchTopics();
     }, []);
 
     const fetchStats = async () => {
@@ -38,6 +40,17 @@ const AdminDashboard = () => {
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchTopics = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/admin/topics`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setTopics(response.data);
+        } catch (error) {
+            console.error('Failed to fetch topics:', error);
         }
     };
 
@@ -461,12 +474,18 @@ const AdminDashboard = () => {
                                             </label>
                                             <input
                                                 type="text"
+                                                list="topic-list"
                                                 value={genTopic}
                                                 onChange={(e) => setGenTopic(e.target.value)}
                                                 placeholder="e.g., Profit and Loss, Time and Work, Probability"
                                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 disabled={generating}
                                             />
+                                            <datalist id="topic-list">
+                                                {topics.map(t => (
+                                                    <option key={t} value={t} />
+                                                ))}
+                                            </datalist>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4">

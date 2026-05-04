@@ -58,12 +58,6 @@ const AdminQuestions = () => {
             });
             setQuestions(response.data.questions);
             setTotal(response.data.total);
-
-            // Extract unique topics from questions for filter dropdown
-            if (!selectedCategory && !selectedDifficulty && !searchQuery && !selectedTopic) {
-                const uniqueTopics = [...new Set(response.data.questions.map(q => q.topic).filter(Boolean))];
-                setTopics(uniqueTopics.sort());
-            }
         } catch (error) {
             console.error('Failed to fetch questions:', error);
             alert('Failed to load questions');
@@ -72,9 +66,21 @@ const AdminQuestions = () => {
         }
     }, [token, searchQuery, selectedCategory, selectedDifficulty, selectedTopic]);
 
+    const fetchTopics = useCallback(async () => {
+        try {
+            const response = await axios.get(`${API_URL}/admin/topics`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setTopics(response.data);
+        } catch (error) {
+            console.error('Failed to fetch topics:', error);
+        }
+    }, [token]);
+
     useEffect(() => {
         fetchQuestions();
-    }, [fetchQuestions]);
+        fetchTopics();
+    }, [fetchQuestions, fetchTopics]);
 
     // Debounced search
     useEffect(() => {
@@ -454,12 +460,18 @@ const AdminQuestions = () => {
                                     </label>
                                     <input
                                         type="text"
+                                        list="gen-topic-list"
                                         value={genTopic}
                                         onChange={(e) => setGenTopic(e.target.value)}
                                         placeholder="e.g., Profit and Loss, Time and Work"
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
                                         disabled={generating}
                                     />
+                                    <datalist id="gen-topic-list">
+                                        {topics.map(t => (
+                                            <option key={t} value={t} />
+                                        ))}
+                                    </datalist>
                                 </div>
 
                                 <div>

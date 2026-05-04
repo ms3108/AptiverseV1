@@ -620,6 +620,17 @@ async def generate_questions(
 
 
 
+@router.get("/topics")
+async def get_all_topics(
+    db: Session = Depends(get_db),
+    current_admin: models.User = Depends(get_current_admin)
+):
+    """Get all unique question topics from the database"""
+    topics = db.query(models.Question.topic).distinct().all()
+    # topics is a list of tuples like [('Profit and Loss',), ('Time and Work',)]
+    return sorted([t[0] for t in topics if t[0]])
+
+
 @router.get("/questions")
 async def get_all_questions(
     skip: int = 0,
