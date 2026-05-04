@@ -480,7 +480,7 @@ const AdminQuestions = () => {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Count (1-5)
+                                        Number of Questions
                                     </label>
                                     <input
                                         type="number"
