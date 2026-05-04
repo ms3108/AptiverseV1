@@ -444,13 +444,14 @@ const AdminDashboard = () => {
                                 ✕
                             </button>
                         </div>
-
                         {/* Modal Body */}
                         <div className="p-6 space-y-6">
                             {!generateResult ? (
                                 <>
                                     <p className="text-sm text-gray-600">
-                                        ✨ Generate new aptitude questions using <strong>Groq AI</strong>. Specify a topic and difficulty level, and the system will automatically check for duplicates before saving.
+                                        ✨ Generate new aptitude questions using PEFT fine-tuned LLMs.
+                                        Specify a topic and difficulty level,
+                                        and the system will automatically check for duplicates before saving to the DB.
                                     </p>
 
                                     <form onSubmit={handleGenerateQuestions} className="space-y-4">
@@ -557,8 +558,8 @@ const AdminDashboard = () => {
                                                                 <div className="flex gap-2 mt-2">
                                                                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{q.topic}</span>
                                                                     <span className={`text-xs px-2 py-1 rounded ${q.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
-                                                                            q.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                                                                                'bg-red-100 text-red-700'
+                                                                        q.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                                                                            'bg-red-100 text-red-700'
                                                                         }`}>
                                                                         {q.difficulty}
                                                                     </span>
